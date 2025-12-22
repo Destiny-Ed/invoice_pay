@@ -25,10 +25,10 @@ class CompanyModel {
     this.fontFamily = 'Manrope',
   });
 
-  factory CompanyModel.fromMap(String id, Map<String, dynamic> map) {
+  factory CompanyModel.fromMap(Map<String, dynamic> map) {
     return CompanyModel(
-      id: id,
-      name: map['company_name'] ?? '',
+      id: map['id'] ?? "",
+      name: map['name'] ?? '',
       email: map['email'] ?? '',
       phone: map['phone'] ?? '',
       street: map['street'] ?? '',
@@ -40,17 +40,16 @@ class CompanyModel {
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'company_name': name,
-      'email': email,
-      'phone': phone,
-      'street': street,
-      'city': city,
-      'zip': zip,
-      'logo_url': logoUrl,
-      'primary_color': primaryColor.value,
-      'font_family': fontFamily,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+    "id": id,
+    'name': name,
+    'email': email,
+    'phone': phone,
+    'street': street,
+    'city': city,
+    'zip': zip,
+    'logo_url': logoUrl,
+    'primary_color': primaryColor.value,
+    'font_family': fontFamily,
+  };
 }

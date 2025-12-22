@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "733179330588",
+    "project_id": "invoice-pay-ef942",
+    "storage_bucket": "invoice-pay-ef942.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:733179330588:android:de9a092433bcf529a5dfd9",
+        "android_client_info": {
+          "package_name": "com.example.invoice_pay"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "733179330588-7di3eq55jo90o18m9mlga0aqhdt97gaf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYCWxF3AU5F_E2kSs0aSWHg96Hzg-k48k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "733179330588-7di3eq55jo90o18m9mlga0aqhdt97gaf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
