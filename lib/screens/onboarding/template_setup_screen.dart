@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/dashboard/dashboard.dart';
+import 'package:invoice_pay/screens/main_activity/main_activity.dart';
 import 'package:invoice_pay/screens/onboarding/onboarding_progress.dart';
 import 'package:invoice_pay/styles/colors.dart';
 import 'package:invoice_pay/styles/theme.dart';
@@ -398,7 +399,7 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => DashboardScreen(),
+                              builder: (context) => MainActivity(),
                             ),
                             (_) => false,
                           );

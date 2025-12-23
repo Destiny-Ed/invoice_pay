@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_utilities/flutter_utilities.dart';
+import 'package:intl/intl.dart';
+import 'package:invoice_pay/config/extension.dart';
+import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
@@ -22,8 +26,9 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
     final provider = context.watch<InvoiceProvider>();
     final filteredInvoices = provider.invoices.where((inv) {
       // Status filter
-      if (_selectedStatus != null && inv.status != _selectedStatus)
+      if (_selectedStatus != null && inv.status != _selectedStatus) {
         return false;
+      }
 
       // Date range filter
       if (_startDate != null && inv.due.isBefore(_startDate!)) return false;
@@ -33,7 +38,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
       if (_searchQuery.isNotEmpty) {
         final lowerQuery = _searchQuery.toLowerCase();
         if (!inv.number.toLowerCase().contains(lowerQuery) &&
-            !inv.clientName.toLowerCase().contains(lowerQuery)) {
+            !inv.getClientName(context).toLowerCase().contains(lowerQuery)) {
           return false;
         }
       }
@@ -47,7 +52,12 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => context.push('/invoices/create'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NewInvoiceScreen()),
+              );
+            },
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/authentication/onboarding.dart';
 import 'package:invoice_pay/screens/dashboard/dashboard.dart';
+import 'package:invoice_pay/screens/main_activity/main_activity.dart';
 import 'package:invoice_pay/screens/onboarding/company_setup.dart';
 import 'package:provider/provider.dart';
 
@@ -22,6 +23,12 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+
+    final companyProvider = context.read<CompanyProvider>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      companyProvider.loadCompany();
+    });
 
     _controller = AnimationController(
       duration: const Duration(milliseconds: 2000),
@@ -45,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
 
     // Navigate after animation
-    Future.delayed(const Duration(milliseconds: 2800), () {
+    Future.delayed(const Duration(milliseconds: 2800), () async {
       if (!mounted) return;
 
       if (FirebaseAuth.instance.currentUser == null) {
@@ -56,11 +63,10 @@ class _SplashScreenState extends State<SplashScreen>
         return;
       }
 
-      final companyProvider = context.read<CompanyProvider>();
       if (companyProvider.isOnboardingComplete) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DashboardScreen()),
+          MaterialPageRoute(builder: (context) => MainActivity()),
         );
       } else {
         Navigator.pushReplacement(

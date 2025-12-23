@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:invoice_pay/providers/base_provider.dart';
 import '../models/invoice_model.dart';
 
-class InvoiceProvider extends ChangeNotifier {
+class InvoiceProvider extends BaseViewModel {
   List<InvoiceModel> _invoices = [];
   List<InvoiceModel> get invoices => _invoices;
 
@@ -11,8 +11,7 @@ class InvoiceProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<void> loadInvoices() async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -28,10 +27,11 @@ class InvoiceProvider extends ChangeNotifier {
         .orderBy('due', descending: true)
         .get();
 
-    _invoices = snapshot.docs.map((doc) => InvoiceModel.fromMap(doc.id, doc.data())).toList();
+    _invoices = snapshot.docs
+        .map((doc) => InvoiceModel.fromMap(doc.id, doc.data()))
+        .toList();
 
-    _isLoading = false;
-    notifyListeners();
+    setLoading(false);
   }
 
   Future<void> addInvoice(InvoiceModel invoice) async {

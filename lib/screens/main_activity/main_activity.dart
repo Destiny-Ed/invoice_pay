@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:invoice_pay/screens/clients/client_screen.dart';
 import 'package:invoice_pay/screens/dashboard/dashboard.dart';
+import 'package:invoice_pay/screens/invoice/invoice_screen.dart';
+import 'package:invoice_pay/screens/reports/report_screen.dart';
 import 'package:invoice_pay/styles/colors.dart';
 
 class MainActivity extends StatefulWidget {
@@ -16,16 +18,18 @@ class _MainActivityState extends State<MainActivity> {
   List<Widget> pages = [
     DashboardScreen(),
     ClientsScreen(),
-    Invoice
-  ]
+    InvoicesScreen(),
+    ReportsScreen(),
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      body: pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: primaryColor,
         unselectedItemColor: Colors.grey,
-        currentIndex: 0,
+        currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Clients'),
@@ -40,6 +44,9 @@ class _MainActivityState extends State<MainActivity> {
         ],
         onTap: (index) {
           // Navigation logic
+          setState(() {
+            _currentIndex = index;
+          });
         },
       ),
     );

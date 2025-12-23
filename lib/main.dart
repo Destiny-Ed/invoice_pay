@@ -4,6 +4,7 @@ import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/client_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
+import 'package:invoice_pay/providers/report_provider.dart';
 import 'package:invoice_pay/providers/settings_provider.dart';
 import 'package:invoice_pay/screens/onboarding/splash.dart';
 import 'package:invoice_pay/styles/colors.dart';
@@ -20,6 +21,26 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProvider(create: (_) => AuthenticationProviderImpl()),
         ChangeNotifierProvider(create: (_) => CompanyProvider()),
+
+        // ViewModels depend on raw providers — create after them
+        ChangeNotifierProxyProvider2<
+          InvoiceProvider,
+          ClientProvider,
+          ReportsViewModel
+        >(
+          create: (_) => ReportsViewModel(
+            InvoiceProvider(), // Will be updated below
+            ClientProvider(),
+          ),
+          update: (_, invoiceProvider, clientProvider, previous) =>
+              ReportsViewModel(invoiceProvider, clientProvider),
+        ),
+
+        // Add other ViewModels similarly
+        // ChangeNotifierProxyProvider<InvoiceProvider, InvoicesViewModel>(
+        //   create: (_) => InvoicesViewModel(InvoiceProvider()),
+        //   update: (_, invoiceProvider, previous) => InvoicesViewModel(invoiceProvider),
+        // ),
       ],
       child: MaterialApp(
         title: 'Invoice Pay',
