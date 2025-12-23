@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
@@ -69,8 +70,8 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                               color: Colors.grey,
                             )
                           : ClipOval(
-                              child: Image.network(
-                                provider.logoUrl!,
+                              child: CachedNetworkImage(
+                                imageUrl: provider.logoUrl!,
                                 fit: BoxFit.cover,
                                 width: 120,
                                 height: 120,

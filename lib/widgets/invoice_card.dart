@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:invoice_pay/config/extension.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/screens/invoice/invoice_details_screen.dart';
 
@@ -13,8 +14,9 @@ class InvoiceCard extends StatelessWidget {
     final statusColor = _getStatusColor(invoice.status);
     final statusText = _getStatusText(invoice.status);
 
+    final client = invoice.getClient(context);
+
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
@@ -52,40 +54,34 @@ class InvoiceCard extends StatelessWidget {
               // Main Content
               Expanded(
                 child: Column(
+                  spacing: 2,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Invoice #${invoice.number}',
+                        SelectableText(
+                          "${client?.contactName} - ${client?.companyName}",
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 12,
+                            overflow: TextOverflow.ellipsis,
                             fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: statusColor.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            statusText,
-                            style: TextStyle(
-                              color: statusColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
                           ),
                         ),
                       ],
                     ),
-
-                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SelectableText(
+                          '#${invoice.number}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
 
                     Text(
                       'Due ${DateFormat('MMM dd, yyyy').format(invoice.due)}',
@@ -107,15 +103,24 @@ class InvoiceCard extends StatelessWidget {
                                 : Colors.black87,
                           ),
                         ),
-                        if (invoice.isOverdue)
-                          const Text(
-                            'OVERDUE',
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: statusColor.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            statusText,
                             style: TextStyle(
-                              color: Colors.red,
+                              color: statusColor,
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                             ),
                           ),
+                        ),
                       ],
                     ),
                   ],

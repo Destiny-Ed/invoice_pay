@@ -55,7 +55,20 @@ void main() async {
             primarySwatch: Colors.blue,
           ).copyWith(secondary: primaryColor),
         ),
-        home: const SplashScreen(),
+        home: Builder(
+          builder: (context) {
+            final MediaQueryData data = MediaQuery.of(context);
+
+            return MediaQuery(
+              data: data.copyWith(
+                textScaler: TextScaler.linear(
+                  data.textScaleFactor.clamp(0.85, 0.90),
+                ),
+              ),
+              child: SplashScreen(),
+            );
+          },
+        ),
       ),
     ),
   );

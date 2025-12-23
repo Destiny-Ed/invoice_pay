@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_utilities/flutter_utilities.dart';
 import 'package:intl/intl.dart';
-import 'package:invoice_pay/config/extension.dart';
+import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/widgets/invoice_card.dart';
+import 'package:invoice_pay/styles/colors.dart';
 
 class InvoicesScreen extends StatefulWidget {
   const InvoicesScreen({super.key});
@@ -16,42 +17,26 @@ class InvoicesScreen extends StatefulWidget {
 }
 
 class _InvoicesScreenState extends State<InvoicesScreen> {
-  InvoiceStatus? _selectedStatus;
-  DateTime? _startDate;
-  DateTime? _endDate;
-  String _searchQuery = '';
+  @override
+  initState() {
+    super.initState();
+    context.read<InvoiceProvider>().loadInvoices();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<InvoiceProvider>();
-    final filteredInvoices = provider.invoices.where((inv) {
-      // Status filter
-      if (_selectedStatus != null && inv.status != _selectedStatus) {
-        return false;
-      }
-
-      // Date range filter
-      if (_startDate != null && inv.due.isBefore(_startDate!)) return false;
-      if (_endDate != null && inv.due.isAfter(_endDate!)) return false;
-
-      // Search by client or number
-      if (_searchQuery.isNotEmpty) {
-        final lowerQuery = _searchQuery.toLowerCase();
-        if (!inv.number.toLowerCase().contains(lowerQuery) &&
-            !inv.getClientName(context).toLowerCase().contains(lowerQuery)) {
-          return false;
-        }
-      }
-
-      return true;
-    }).toList();
+    final invoiceProvider = context.read<InvoiceProvider>();
 
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('Invoices'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add_circle_outline),
             onPressed: () {
               Navigator.push(
                 context,
@@ -63,131 +48,194 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
       ),
       body: Column(
         children: [
-          // Filters Section
-          Padding(
-            padding: const EdgeInsets.all(16),
+          // Filters Card
+          Container(
+            margin: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 20,
+                ),
+              ],
+            ),
             child: Column(
               children: [
                 // Search
                 TextField(
                   decoration: InputDecoration(
-                    hintText: 'Search by number or client...',
+                    hintText: 'Search invoices...',
                     prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    fillColor: Colors.grey[50],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
                     ),
                   ),
-                  onChanged: (value) {
-                    setState(() => _searchQuery = value);
-                  },
+                  onChanged: invoiceProvider.setListSearchQuery,
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
-                // Status Dropdown
-                DropdownButtonFormField<InvoiceStatus>(
-                  value: _selectedStatus,
-                  hint: const Text('Filter by Status'),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
+                // Status Chips
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    _filterChip(
+                      'All',
+                      invoiceProvider.listSelectedStatus == null,
+                      () => invoiceProvider.setListStatusFilter(null),
                     ),
-                  ),
-                  items: InvoiceStatus.values.map((status) {
-                    return DropdownMenuItem(
-                      value: status,
-                      child: Text(status.name.capitalize()),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() => _selectedStatus = value);
-                  },
+                    ...InvoiceStatus.values.map(
+                      (status) => _filterChip(
+                        status.name.capitalize(),
+                        invoiceProvider.listSelectedStatus == status,
+                        () => invoiceProvider.setListStatusFilter(status),
+                      ),
+                    ),
+                  ],
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 // Date Range
                 Row(
                   children: [
                     Expanded(
-                      child: GestureDetector(
-                        onTap: () async {
-                          final date = await showDatePicker(
+                      child: _dateButton(
+                        'From',
+                        invoiceProvider.listStartDate,
+                        () async {
+                          final picked = await showDatePicker(
                             context: context,
-                            initialDate: _startDate ?? DateTime.now(),
+                            initialDate:
+                                invoiceProvider.listStartDate ?? DateTime.now(),
                             firstDate: DateTime(2020),
                             lastDate: DateTime(2030),
                           );
-                          if (date != null) setState(() => _startDate = date);
+                          invoiceProvider.setListStartDate(picked);
                         },
-                        child: AbsorbPointer(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Start Date',
-                              suffixIcon: const Icon(Icons.calendar_today),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            controller: TextEditingController(
-                              text: _startDate != null
-                                  ? DateFormat(
-                                      'MMM dd, yyyy',
-                                    ).format(_startDate!)
-                                  : '',
-                            ),
-                          ),
-                        ),
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: GestureDetector(
-                        onTap: () async {
-                          final date = await showDatePicker(
+                      child: _dateButton(
+                        'To',
+                        invoiceProvider.listEndDate,
+                        () async {
+                          final picked = await showDatePicker(
                             context: context,
-                            initialDate: _endDate ?? DateTime.now(),
+                            initialDate:
+                                invoiceProvider.listEndDate ?? DateTime.now(),
                             firstDate: DateTime(2020),
                             lastDate: DateTime(2030),
                           );
-                          if (date != null) setState(() => _endDate = date);
+                          invoiceProvider.setListEndDate(picked);
                         },
-                        child: AbsorbPointer(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'End Date',
-                              suffixIcon: const Icon(Icons.calendar_today),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            controller: TextEditingController(
-                              text: _endDate != null
-                                  ? DateFormat('MMM dd, yyyy').format(_endDate!)
-                                  : '',
-                            ),
-                          ),
-                        ),
                       ),
                     ),
+                    if (invoiceProvider.listStartDate != null ||
+                        invoiceProvider.listEndDate != null)
+                      IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: invoiceProvider.clearListFilters,
+                      ),
                   ],
                 ),
               ],
             ),
           ),
 
-          // Invoices List
+          // List
           Expanded(
-            child: filteredInvoices.isEmpty
-                ? const Center(child: Text('No invoices match your filters'))
+            child: invoiceProvider.viewState == ViewState.Busy
+                ? const Center(child: CircularProgressIndicator())
+                : invoiceProvider.filteredInvoices(context).isEmpty
+                ? _emptyState()
                 : ListView.builder(
-                    itemCount: filteredInvoices.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: invoiceProvider.filteredInvoices(context).length,
                     itemBuilder: (context, index) {
-                      return InvoiceCard(invoice: filteredInvoices[index]);
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: InvoiceCard(
+                          invoice: invoiceProvider.filteredInvoices(
+                            context,
+                          )[index],
+                        ),
+                      );
                     },
                   ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _emptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.receipt_long_outlined, size: 80, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          const Text(
+            'No invoices',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Create your first invoice to get started',
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _filterChip(String label, bool selected, VoidCallback onTap) {
+    return FilterChip(
+      label: Text(label),
+      selected: selected,
+      onSelected: (_) => onTap(),
+      selectedColor: primaryColor.withOpacity(0.2),
+      checkmarkColor: primaryColor,
+      backgroundColor: Colors.grey[100],
+      labelStyle: TextStyle(
+        color: selected ? primaryColor : Colors.grey[700],
+        fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+    );
+  }
+
+  Widget _dateButton(String label, DateTime? date, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.grey[300]!),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.calendar_today, color: Colors.grey[600]),
+            const SizedBox(width: 12),
+            Text(
+              date == null ? label : DateFormat('dd MMM yyyy').format(date),
+              style: TextStyle(
+                fontWeight: date == null ? FontWeight.normal : FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:invoice_pay/providers/client_provider.dart';
+import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/screens/clients/client_screen.dart';
 import 'package:invoice_pay/screens/dashboard/dashboard.dart';
 import 'package:invoice_pay/screens/invoice/invoice_screen.dart';
 import 'package:invoice_pay/screens/reports/report_screen.dart';
 import 'package:invoice_pay/styles/colors.dart';
+import 'package:provider/provider.dart';
 
 class MainActivity extends StatefulWidget {
   const MainActivity({super.key});
@@ -21,6 +24,17 @@ class _MainActivityState extends State<MainActivity> {
     InvoicesScreen(),
     ReportsScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch invoices and clients on screen load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<InvoiceProvider>().loadInvoices();
+      context.read<ClientProvider>().loadClients();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

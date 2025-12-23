@@ -1,14 +1,17 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:invoice_pay/providers/auth_provider.dart';
 
 class BaseViewModel extends ChangeNotifier {
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  ViewState _viewState = ViewState.Idle;
+  ViewState get viewState => _viewState;
 
   String _errorMessage = '';
   String get errorMessage => _errorMessage;
 
-  void setLoading(bool loading) {
-    _isLoading = loading;
+  void setLoading(ViewState state) {
+    _viewState = state;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       notifyListeners();
     });
@@ -16,6 +19,7 @@ class BaseViewModel extends ChangeNotifier {
 
   void setError(String message) {
     _errorMessage = message;
+    log(message);
     notifyListeners();
   }
 

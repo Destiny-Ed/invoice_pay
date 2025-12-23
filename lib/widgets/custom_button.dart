@@ -4,7 +4,7 @@ import 'package:invoice_pay/styles/theme.dart';
  
 
 class CustomButton extends StatelessWidget {
-  final Function() onPressed;
+  final Function()? onPressed;
   final String text;
   final double? width;
   final Color? bgColor;

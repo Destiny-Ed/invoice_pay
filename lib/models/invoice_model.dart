@@ -39,7 +39,8 @@ class InvoiceModel {
 
   double get balanceDue => total - paidAmount;
 
-  bool get isOverdue => status != InvoiceStatus.paid && DateTime.now().isAfter(due);
+  bool get isOverdue =>
+      status != InvoiceStatus.paid && DateTime.now().isAfter(due);
 
   bool get isPartiallyPaid => paidAmount > 0 && paidAmount < total;
 
