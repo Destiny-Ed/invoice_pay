@@ -51,7 +51,7 @@ class CompanyProvider extends ChangeNotifier {
 
       if (doc.docs.isNotEmpty) {
         final data = doc.docs.first.data();
-        _company = CompanyModel.fromMap(data);
+        _company = CompanyModel.fromMap(doc.docs.first.id, data);
 
         // Populate temporary fields for editing
         companyName = _company!.name;
@@ -77,7 +77,7 @@ class CompanyProvider extends ChangeNotifier {
   }
 
   // Save all company details (called after onboarding or edit)
-  Future<void> saveCompanyDetails() async {
+  Future<void> saveCompanyDetails({CompanyModel? model}) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
@@ -101,7 +101,7 @@ class CompanyProvider extends ChangeNotifier {
           .collection('user')
           .doc(user.uid)
           .collection('company')
-          .add(company.toMap());
+          .add(model?.toMap() ?? company.toMap());
 
       _company = company;
       _viewState = ViewState.Success;
@@ -113,6 +113,13 @@ class CompanyProvider extends ChangeNotifier {
       _message = 'Error saving company: $e';
       _viewState = ViewState.Error;
     }
+  }
+
+  Future<void> updateMonthlyGoal(double goal) async {
+    if (company == null) return;
+
+    final updated = company!.copyWith(monthlyGoal: goal);
+    await saveCompanyDetails(model: updated); // Your existing save method
   }
 
   // Upload logo to Firebase Storage and return URL

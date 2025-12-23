@@ -4,8 +4,10 @@ import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/client_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
+import 'package:invoice_pay/providers/main_activity_provider.dart';
 import 'package:invoice_pay/providers/report_provider.dart';
 import 'package:invoice_pay/providers/settings_provider.dart';
+import 'package:invoice_pay/screens/main_activity/main_activity.dart';
 import 'package:invoice_pay/screens/onboarding/splash.dart';
 import 'package:invoice_pay/styles/colors.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +23,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProvider(create: (_) => AuthenticationProviderImpl()),
         ChangeNotifierProvider(create: (_) => CompanyProvider()),
+        ChangeNotifierProvider(create: (_) => MainActivityProvider()),
 
         // ViewModels depend on raw providers — create after them
         ChangeNotifierProxyProvider2<

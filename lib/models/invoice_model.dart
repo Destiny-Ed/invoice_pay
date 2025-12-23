@@ -14,6 +14,7 @@ class InvoiceModel {
   final double discountPercent;
   final double paidAmount;
   final InvoiceStatus status;
+  DateTime? sentDate;
 
   InvoiceModel({
     required this.id,
@@ -26,6 +27,7 @@ class InvoiceModel {
     this.discountPercent = 0.0,
     this.paidAmount = 0.0,
     this.status = InvoiceStatus.draft,
+    this.sentDate,
   });
 
   // Calculated getters
@@ -64,6 +66,9 @@ class InvoiceModel {
       number: map['number'] ?? '',
       clientId: map['client_id'] ?? '',
       issued: DateTime.parse(map['issued'] ?? DateTime.now().toIso8601String()),
+      sentDate: DateTime.parse(
+        map['sent_date'] ?? DateTime.now().toIso8601String(),
+      ),
       due: DateTime.parse(map['due'] ?? DateTime.now().toIso8601String()),
       items: items,
       taxPercent: (map['tax_percent'] ?? 0.0).toDouble(),
@@ -81,6 +86,7 @@ class InvoiceModel {
       'number': number,
       'client_id': clientId,
       'issued': issued.toIso8601String(),
+      'sent_date': sentDate?.toIso8601String(),
       'due': due.toIso8601String(),
       'items': items.map((e) => e.toMap()).toList(),
       'tax_percent': taxPercent,
@@ -96,6 +102,7 @@ class InvoiceModel {
     String? number,
     String? clientId,
     DateTime? issued,
+    DateTime? sentDate,
     DateTime? due,
     List<InvoiceItemModel>? items,
     double? taxPercent,
@@ -108,6 +115,7 @@ class InvoiceModel {
       number: number ?? this.number,
       clientId: clientId ?? this.clientId,
       issued: issued ?? this.issued,
+      sentDate: sentDate ?? this.sentDate,
       due: due ?? this.due,
       items: items ?? this.items,
       taxPercent: taxPercent ?? this.taxPercent,

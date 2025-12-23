@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/models/invoice_item_model.dart';
+import 'package:invoice_pay/providers/invoice_provider.dart';
+import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
 import 'package:invoice_pay/screens/invoice/invoice_preview.dart';
+import 'package:invoice_pay/screens/invoice/wigets/record_payment_modal.dart';
+import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/utils/resent_invoice.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
@@ -43,11 +47,75 @@ class InvoiceDetailScreen extends StatelessWidget {
         foregroundColor: Colors.black,
         elevation: 0,
         actions: [
-          TextButton(
-            onPressed: () {
-              // Navigate to edit screen (future)
+          PopupMenuButton<String>(
+            onSelected: (value) async {
+              if (value == 'edit') {
+                // Navigate to edit screen (use same NewInvoiceScreen with pre-filled data)
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => NewInvoiceScreen(invoiceToEdit: invoice),
+                  ),
+                );
+              } else if (value == 'delete') {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text('Delete Invoice?'),
+                    content: Text(
+                      'Are you sure you want to delete invoice #${invoice.number}? This cannot be undone.',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text(
+                          'Delete',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  final success = await context
+                      .read<InvoiceProvider>()
+                      .deleteInvoice(invoice.id);
+                  if (success && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Invoice deleted')),
+                    );
+                    Navigator.pop(context); // Go back to list
+                  }
+                }
+              }
             },
-            child: const Text('Edit', style: TextStyle(color: primaryColor)),
+            itemBuilder: (_) => [
+              const PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(Icons.edit),
+                    SizedBox(width: 12),
+                    Text('Edit Invoice'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete, color: Colors.red),
+                    SizedBox(width: 12),
+                    Text('Delete Invoice', style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -113,13 +181,16 @@ class InvoiceDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Quick Actions
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _actionChip(
                   icon: Icons.notifications_active,
                   label: 'Remind',
-                  onTap: () => resendInvoice(context, client, invoice),
+                  onTap: () =>
+                      resendInvoiceAndMarkSent(context, client, invoice),
                 ),
                 _actionChip(
                   icon: Icons.preview,
@@ -131,6 +202,12 @@ class InvoiceDetailScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (invoice.balanceDue > 0)
+                  _actionChip(
+                    icon: Icons.preview,
+                    label: 'Record Payment',
+                    onTap: () => showRecordPayment(context, invoice),
+                  ),
               ],
             ),
 
@@ -164,8 +241,8 @@ class InvoiceDetailScreen extends StatelessWidget {
                     radius: 30,
                     backgroundColor: primaryColor.withOpacity(0.2),
                     child: Text(
-                      (client?.companyName ?? "").isNotEmpty
-                          ? client!.companyName[0].toUpperCase()
+                      (client.companyName).isNotEmpty
+                          ? client.companyName[0].toUpperCase()
                           : '?',
                       style: TextStyle(
                         color: primaryColor,
@@ -180,16 +257,16 @@ class InvoiceDetailScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          client?.companyName ?? "-",
+                          client.companyName,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        if ((client?.contactName ?? "").isNotEmpty)
-                          Text(client?.contactName ?? "-"),
-                        Text(client?.email ?? "-"),
-                        Text(client?.phone ?? "-"),
+                        if ((client.contactName).isNotEmpty)
+                          Text(client.contactName),
+                        Text(client.email),
+                        Text(client.phone),
                       ],
                     ),
                   ),
@@ -283,7 +360,7 @@ class InvoiceDetailScreen extends StatelessWidget {
                 Expanded(
                   child: CustomButton(
                     onPressed: () {
-                      resendInvoice(context, client, invoice);
+                      resendInvoiceAndMarkSent(context, client, invoice);
                     },
                     text: "Resend Invoice",
                   ),
@@ -299,23 +376,24 @@ class InvoiceDetailScreen extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            _activityItem(
-              'Invoice Sent',
-              'Dec 20, 2025 • 3:30 PM',
-              Icons.send,
-              Colors.blue,
-            ),
+            if (invoice.status != InvoiceStatus.draft)
+              _activityItem(
+                'Invoice Sent',
+                DateFormat('MMM dd, yyyy • h:mm a').format(invoice.sentDate!),
+                Icons.send,
+                Colors.blue,
+              ),
             if (invoice.paidAmount > 0)
               _activityItem(
-                'Partial Payment Received',
-                'Dec 22, 2025 • +\$500.00',
+                'Payment Received',
+                '+\$${invoice.paidAmount.toStringAsFixed(2)}',
                 Icons.payment,
                 Colors.green,
               ),
             _activityItem(
-              'Invoice Viewed',
-              'Dec 21, 2025 • 10:15 AM',
-              Icons.visibility,
+              'Invoice Created',
+              DateFormat('MMM dd, yyyy').format(invoice.issued),
+              Icons.note_add,
               Colors.grey,
             ),
 

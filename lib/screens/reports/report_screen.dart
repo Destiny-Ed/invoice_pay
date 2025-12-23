@@ -4,10 +4,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/report_provider.dart';
+import 'package:invoice_pay/screens/reports/widgets/custom_widgets.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-
 import 'package:invoice_pay/styles/colors.dart';
 
 class ReportsScreen extends StatelessWidget {
@@ -17,37 +17,57 @@ class ReportsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ReportsViewModel>(
       builder: (context, vm, _) {
+        final isSmallScreen = MediaQuery.of(context).size.width < 600;
         return Scaffold(
+          backgroundColor: Colors.grey[50],
           appBar: AppBar(
-            title: const Text('Reports'),
+            title: const Text(
+              'Financial Overview',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            elevation: 0,
             actions: [
               IconButton(
-                icon: const Icon(Icons.date_range),
+                icon: const Icon(Icons.date_range_outlined),
                 onPressed: () async {
                   final picked = await showDateRangePicker(
                     context: context,
                     firstDate: DateTime(2020),
                     lastDate: DateTime.now(),
                     initialDateRange: vm.dateRange,
+                    builder: (context, child) => Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: Theme.of(
+                          context,
+                        ).colorScheme.copyWith(primary: primaryColor),
+                      ),
+                      child: child!,
+                    ),
                   );
                   if (picked != null) vm.setDateRange(picked);
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.share),
+                icon: const Icon(Icons.share_outlined),
                 onPressed: () {
+                  final period = vm.dateRange != null
+                      ? '${DateFormat('MMM dd').format(vm.dateRange!.start)} - ${DateFormat('MMM dd, yyyy').format(vm.dateRange!.end)}'
+                      : 'All Time';
+
                   final text =
                       '''
-InvoicePay Report
-Period: ${vm.dateRange != null ? '${DateFormat('MMM dd').format(vm.dateRange!.start)} - ${DateFormat('MMM dd, yyyy').format(vm.dateRange!.end)}' : 'All Time'}
+📊 InvoicePay Financial Report
 
-Total Revenue: \$${NumberFormat('#,##0').format(vm.totalRevenue)}
-Outstanding: \$${NumberFormat('#,##0').format(vm.outstanding)}
-Overdue: \$${NumberFormat('#,##0').format(vm.overdue)}
+📅 Period: $period
+💰 Total Revenue: \$${NumberFormat('#,##0').format(vm.totalRevenue)}
+⚠️ Outstanding: \$${NumberFormat('#,##0').format(vm.outstanding)}
+🔴 Overdue: \$${NumberFormat('#,##0').format(vm.overdue)}
 
-Generated from InvoicePay
-                    ''';
-                  Share.share(text, subject: 'InvoicePay Report');
+Generated with ❤️ by InvoicePay
+                  ''';
+                  Share.share(text, subject: 'InvoicePay Report - $period');
                 },
               ),
             ],
@@ -55,249 +75,320 @@ Generated from InvoicePay
           body: BusyOverlay(
             show: vm.viewState == ViewState.Busy,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title & Period
-                  const Text(
-                    'Financial Reports',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
+                  // Header
                   Text(
                     vm.dateRange != null
-                        ? '${DateFormat('MMM dd').format(vm.dateRange!.start)} - ${DateFormat('MMM dd, yyyy').format(vm.dateRange!.end)}'
+                        ? '${DateFormat('MMMM dd').format(vm.dateRange!.start)} – ${DateFormat('MMMM dd, yyyy').format(vm.dateRange!.end)}'
                         : 'All Time',
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
 
                   // Summary Cards
-                  Row(
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: isSmallScreen ? 1 : 2,
+                    childAspectRatio: isSmallScreen ? 3.5 : 3,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
                     children: [
-                      Expanded(
-                        child: _summaryCard(
-                          'Total Revenue',
-                          vm.totalRevenue,
-                          Icons.trending_up,
-                          Colors.green,
-                        ),
+                      summaryCard(
+                        'Total Revenue',
+                        vm.totalRevenue,
+                        Icons.trending_up,
+                        Colors.green,
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _summaryCard(
-                          'Outstanding',
-                          vm.outstanding,
-                          Icons.account_balance_wallet,
-                          Colors.orange,
-                        ),
+                      summaryCard(
+                        'Outstanding',
+                        vm.outstanding,
+                        Icons.account_balance_wallet,
+                        Colors.orange,
+                      ),
+                      summaryCard(
+                        'Overdue',
+                        vm.overdue,
+                        Icons.warning_amber,
+                        Colors.red,
+                        isFullWidth: true,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  _summaryCard(
-                    'Overdue',
-                    vm.overdue,
-                    Icons.warning_amber,
-                    Colors.red,
-                    isFullWidth: true,
-                  ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
 
-                  // Status Filter Chips
-                  const Text(
-                    'Filter by Status',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 10,
-                    children: [
-                      FilterChip(
-                        label: const Text('All'),
-                        selected: vm.statusFilter == null,
-                        onSelected: (_) => vm.setStatusFilter(null),
-                        selectedColor: primaryColor.withOpacity(0.2),
-                      ),
-                      ...InvoiceStatus.values.map((status) {
-                        return FilterChip(
-                          label: Text(_statusLabel(status)),
-                          selected: vm.statusFilter == status,
-                          onSelected: (_) => vm.setStatusFilter(status),
-                          selectedColor: primaryColor.withOpacity(0.2),
-                        );
-                      }),
-                    ],
-                  ),
+                  // Status Filter
+                  // const Text(
+                  //   'Filter by Status',
+                  //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  // ),
+                  // const SizedBox(height: 16),
+                  // Wrap(
+                  //   spacing: 12,
+                  //   runSpacing: 12,
+                  //   children: [
+                  //     filterChip(
+                  //       'All',
+                  //       vm.statusFilter == null,
+                  //       () => vm.setStatusFilter(null),
+                  //     ),
+                  //     ...InvoiceStatus.values.map(
+                  //       (status) => filterChip(
+                  //         _statusLabel(status),
+                  //         vm.statusFilter == status,
+                  //         () => vm.setStatusFilter(status),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  const SizedBox(height: 20),
 
-                  const SizedBox(height: 40),
-
-                  // Revenue Chart
+                  // Revenue Trend Chart
                   const Text(
                     'Revenue Trend',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   Container(
-                    height: 320,
-                    padding: const EdgeInsets.all(16),
+                    height: 360,
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withOpacity(0.06),
                           blurRadius: 20,
+                          offset: const Offset(0, 8),
                         ),
                       ],
                     ),
                     child: vm.monthlyRevenueSpots.isEmpty
-                        ? const Center(
-                            child: Text('No revenue data for selected period'),
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.bar_chart,
+                                  size: 60,
+                                  color: Colors.grey[400],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No revenue data',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                Text(
+                                  'Complete some invoices to see trends',
+                                  style: TextStyle(color: Colors.grey[500]),
+                                ),
+                              ],
+                            ),
                           )
                         : LineChart(
                             LineChartData(
-                              gridData: FlGridData(show: true),
+                              gridData: FlGridData(
+                                show: true,
+                                drawVerticalLine: true,
+                                horizontalInterval: null,
+                                verticalInterval: null,
+                                getDrawingHorizontalLine: (value) => FlLine(
+                                  color: Colors.grey[200]!,
+                                  strokeWidth: 1,
+                                ),
+                                getDrawingVerticalLine: (value) => FlLine(
+                                  color: Colors.grey[200]!,
+                                  strokeWidth: 1,
+                                ),
+                              ),
                               titlesData: FlTitlesData(
                                 leftTitles: AxisTitles(
                                   sideTitles: SideTitles(
                                     showTitles: true,
-                                    reservedSize: 50,
+                                    reservedSize: 60,
+                                    getTitlesWidget: (value, meta) => Text(
+                                      '\$${value.toInt()}',
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
                                   ),
                                 ),
                                 bottomTitles: AxisTitles(
                                   sideTitles: SideTitles(
                                     showTitles: true,
+                                    interval: 1,
                                     getTitlesWidget: (value, meta) {
                                       final index = value.toInt();
                                       if (index < 0 ||
-                                          index >= vm.monthLabels.length)
+                                          index >= vm.monthLabels.length) {
                                         return const Text('');
+                                      }
                                       return Padding(
-                                        padding: const EdgeInsets.only(top: 8),
+                                        padding: const EdgeInsets.only(top: 12),
                                         child: Text(
                                           vm.monthLabels[index],
-                                          style: const TextStyle(fontSize: 11),
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
                                       );
                                     },
                                   ),
                                 ),
-                                topTitles: AxisTitles(
+                                topTitles: const AxisTitles(
                                   sideTitles: SideTitles(showTitles: false),
                                 ),
-                                rightTitles: AxisTitles(
+                                rightTitles: const AxisTitles(
                                   sideTitles: SideTitles(showTitles: false),
                                 ),
                               ),
                               borderData: FlBorderData(show: false),
+                              minX: 0,
+                              maxX: (vm.monthLabels.length - 1).toDouble(),
+                              minY: 0,
                               lineBarsData: [
                                 LineChartBarData(
                                   spots: vm.monthlyRevenueSpots,
                                   isCurved: true,
                                   color: primaryColor,
-                                  barWidth: 4,
-                                  dotData: FlDotData(show: true),
+                                  barWidth: 5,
+                                  isStrokeCapRound: true,
+                                  dotData: FlDotData(
+                                    show: true,
+                                    getDotPainter:
+                                        (spot, percent, bar, index) =>
+                                            FlDotCirclePainter(
+                                              radius: 6,
+                                              color: Colors.white,
+                                              strokeWidth: 3,
+                                              strokeColor: primaryColor,
+                                            ),
+                                  ),
                                   belowBarData: BarAreaData(
                                     show: true,
-                                    color: primaryColor.withOpacity(0.2),
+                                    color: primaryColor.withOpacity(0.15),
                                   ),
                                 ),
                               ],
+                              lineTouchData: LineTouchData(
+                                touchTooltipData: LineTouchTooltipData(
+                                  getTooltipColor: (touchedSpot) =>
+                                      Colors.black87,
+                                  getTooltipItems: (touchedSpots) {
+                                    return touchedSpots.map((spot) {
+                                      return LineTooltipItem(
+                                        '\$${spot.y.toStringAsFixed(0)}',
+                                        const TextStyle(
+                                          color: greyColor,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      );
+                                    }).toList();
+                                  },
+                                ),
+                              ),
                             ),
                           ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
 
                   // Top Clients
                   const Text(
                     'Top Clients',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   if (vm.topClients.isEmpty)
-                    const Text('No paid invoices yet')
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 40),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.people_outline,
+                              size: 60,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No client data yet',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
                   else
                     ...vm.topClients.entries.map((entry) {
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.grey[300],
-                            child: Text(entry.key[0].toUpperCase()),
-                          ),
-                          title: Text(
-                            entry.key,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          trailing: Text(
-                            '\$${NumberFormat('#,##0').format(entry.value)}',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor,
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 12,
                             ),
-                          ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 28,
+                              backgroundColor: primaryColor.withOpacity(0.1),
+                              child: Text(
+                                entry.key[0].toUpperCase(),
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Text(
+                                entry.key,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              '\$${NumberFormat('#,##0').format(entry.value)}',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: primaryColor,
+                              ),
+                            ),
+                          ],
                         ),
                       );
                     }),
 
-                  const SizedBox(height: 100),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _summaryCard(
-    String title,
-    double amount,
-    IconData icon,
-    Color color, {
-    bool isFullWidth = false,
-  }) {
-    return Card(
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        width: isFullWidth ? double.infinity : null,
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            colors: [color.withOpacity(0.8), color],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: Colors.white, size: 32),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: const TextStyle(color: Colors.white70, fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '\$${NumberFormat('#,##0').format(amount)}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

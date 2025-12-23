@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:invoice_pay/config/extension.dart';
 import 'package:invoice_pay/modal/single_select_modal.dart';
 import 'package:invoice_pay/models/invoice_item_model.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
@@ -15,23 +16,53 @@ import 'package:invoice_pay/styles/colors.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:uuid/uuid.dart';
 
-class NewInvoiceScreen extends StatelessWidget {
+class NewInvoiceScreen extends StatefulWidget {
   final ClientModel? client;
+  final InvoiceModel? invoiceToEdit;
 
-  const NewInvoiceScreen({super.key, this.client});
+  const NewInvoiceScreen({super.key, this.client, this.invoiceToEdit});
+
+  @override
+  State<NewInvoiceScreen> createState() => _NewInvoiceScreenState();
+}
+
+class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _init(context);
+  }
+
+  void _init(BuildContext context) async {
+    final invoiceProvider = context.read<InvoiceProvider>();
+
+    // Initialize draft if coming from client detail
+    if (widget.client != null && invoiceProvider.draftSelectedClient == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        invoiceProvider.selectDraftClient(widget.client!);
+      });
+    }
+    if (widget.invoiceToEdit != null) {
+      // Pre-fill all draft fields from invoiceToEdit
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        invoiceProvider.updateDraftInvoiceNumber(widget.invoiceToEdit!.number);
+        invoiceProvider.updateDraftIssuedDate(widget.invoiceToEdit!.issued);
+        invoiceProvider.updateDraftDueDate(widget.invoiceToEdit!.due);
+        invoiceProvider.selectDraftClient(
+          widget.invoiceToEdit!.getClient(context)!,
+        );
+        invoiceProvider.draftItems.clear();
+        invoiceProvider.draftItems.addAll(widget.invoiceToEdit!.items);
+        invoiceProvider.updateDraftTaxPercent(widget.invoiceToEdit!.taxPercent);
+        invoiceProvider.updateDraftDiscountPercent(
+          widget.invoiceToEdit!.discountPercent,
+        );
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final invoiceProvider = context.watch<InvoiceProvider>();
-    final clientProvider = context.watch<ClientProvider>();
-
-    // Initialize draft if coming from client detail
-    if (client != null && invoiceProvider.draftSelectedClient == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        invoiceProvider.selectDraftClient(client!);
-      });
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Invoice'),
@@ -47,380 +78,401 @@ class NewInvoiceScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: BusyOverlay(
-        show: invoiceProvider.viewState == ViewState.Busy,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'New Invoice',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Professional invoices in seconds',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-
-              const SizedBox(height: 40),
-
-              // Invoice Number
-              TextField(
-                controller:
-                    TextEditingController(
-                        text: invoiceProvider.draftInvoiceNumber,
-                      )
-                      ..selection = TextSelection.fromPosition(
-                        TextPosition(
-                          offset: invoiceProvider.draftInvoiceNumber.length,
-                        ),
-                      ),
-                decoration: InputDecoration(
-                  labelText: 'Invoice Number',
-                  prefixIcon: const Icon(Icons.tag),
-                  filled: true,
-                  fillColor: Colors.grey[50],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                onChanged: invoiceProvider.updateDraftInvoiceNumber,
-              ),
-
-              const SizedBox(height: 32),
-
-              // Template Selection
-              const Text(
-                'Choose Template',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 180,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: invoiceProvider.templates.length,
-                  itemBuilder: (context, index) {
-                    final template = invoiceProvider.templates[index];
-                    final isSelected =
-                        template == invoiceProvider.draftSelectedTemplate;
-                    return GestureDetector(
-                      onTap: () =>
-                          invoiceProvider.selectDraftTemplate(template),
-                      child: Container(
-                        width: 140,
-                        margin: const EdgeInsets.only(right: 16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: isSelected
-                                ? primaryColor
-                                : Colors.grey[300]!,
-                            width: isSelected ? 3 : 1,
-                          ),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 10,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.receipt_long,
-                              size: 60,
-                              color: isSelected ? primaryColor : Colors.grey,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              template,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: isSelected
-                                    ? primaryColor
-                                    : Colors.grey[700],
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Client Selection
-              const Text(
-                'Client',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () async {
-                  final clients = clientProvider.clients;
-                  final selectedName = await showSingleSelectModal(
-                    context: context,
-                    title: 'Select Client',
-                    items: clients
-                        .map(
-                          (c) => c.contactName.isEmpty
-                              ? c.companyName
-                              : '${c.contactName} • ${c.companyName}',
-                        )
-                        .toList(),
-                    selectedItem: invoiceProvider.draftSelectedClient == null
-                        ? null
-                        : (invoiceProvider
-                                  .draftSelectedClient!
-                                  .contactName
-                                  .isEmpty
-                              ? invoiceProvider.draftSelectedClient!.companyName
-                              : '${invoiceProvider.draftSelectedClient!.contactName} • ${invoiceProvider.draftSelectedClient!.companyName}'),
-                  );
-                  if (selectedName != null) {
-                    final selectedClient = clients.firstWhere(
-                      (c) =>
-                          (c.contactName.isEmpty
-                              ? c.companyName
-                              : '${c.contactName} • ${c.companyName}') ==
-                          selectedName,
-                    );
-                    invoiceProvider.selectDraftClient(selectedClient);
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 20,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: invoiceProvider.draftSelectedClient == null
-                          ? Colors.grey[400]!
-                          : primaryColor,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.person_outline, color: Colors.grey),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          invoiceProvider.draftSelectedClient == null
-                              ? 'Select a client'
-                              : (invoiceProvider
-                                        .draftSelectedClient!
-                                        .contactName
-                                        .isEmpty
-                                    ? invoiceProvider
-                                          .draftSelectedClient!
-                                          .companyName
-                                    : invoiceProvider
-                                          .draftSelectedClient!
-                                          .contactName),
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: invoiceProvider.draftSelectedClient == null
-                                ? Colors.grey[600]
-                                : Colors.black87,
-                          ),
-                        ),
-                      ),
-                      const Icon(Icons.arrow_drop_down),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Dates
-              const Text(
-                'Dates',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: _dateField(
-                      context,
-                      'Issued',
-                      invoiceProvider.draftIssuedDate,
-                      invoiceProvider.updateDraftIssuedDate,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _dateField(
-                      context,
-                      'Due',
-                      invoiceProvider.draftDueDate,
-                      invoiceProvider.updateDraftDueDate,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 32),
-
-              // Line Items
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Consumer2<InvoiceProvider, ClientProvider>(
+        builder: (context, invoiceProvider, clientProvider, _) {
+          return BusyOverlay(
+            show: invoiceProvider.viewState == ViewState.Busy,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Line Items',
+                    'New Invoice',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Professional invoices in seconds',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // Invoice Number
+                  TextField(
+                    controller:
+                        TextEditingController(
+                            text: invoiceProvider.draftInvoiceNumber,
+                          )
+                          ..selection = TextSelection.fromPosition(
+                            TextPosition(
+                              offset: invoiceProvider.draftInvoiceNumber.length,
+                            ),
+                          ),
+                    decoration: InputDecoration(
+                      labelText: 'Invoice Number',
+                      prefixIcon: const Icon(Icons.tag),
+                      filled: true,
+                      fillColor: Colors.grey[50],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    onChanged: invoiceProvider.updateDraftInvoiceNumber,
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Template Selection
+                  const Text(
+                    'Choose Template',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  TextButton.icon(
-                    onPressed: invoiceProvider.addDraftItem,
-                    icon: const Icon(Icons.add_circle, color: primaryColor),
-                    label: const Text(
-                      'Add Item',
-                      style: TextStyle(color: primaryColor),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              ...invoiceProvider.draftItems.asMap().entries.map(
-                (e) => _itemCard(e.value, e.key, invoiceProvider),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Tax & Discount
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: 'Tax %',
-                        suffixText: '%',
-                        filled: true,
-                        fillColor: Colors.grey[50],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      onChanged: (v) => invoiceProvider.updateDraftTaxPercent(
-                        double.tryParse(v) ?? 0.0,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: TextField(
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: 'Discount %',
-                        suffixText: '%',
-                        filled: true,
-                        fillColor: Colors.grey[50],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      onChanged: (v) =>
-                          invoiceProvider.updateDraftDiscountPercent(
-                            double.tryParse(v) ?? 0.0,
-                          ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 40),
-
-              // Summary
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: primaryColor.withOpacity(0.3)),
-                ),
-                child: Column(
-                  children: [
-                    _summaryRow('Subtotal', invoiceProvider.draftSubtotal),
-                    _summaryRow(
-                      'Tax (${invoiceProvider.draftTaxPercent.toStringAsFixed(0)}%)',
-                      invoiceProvider.draftTaxAmount,
-                    ),
-                    _summaryRow(
-                      'Discount (${invoiceProvider.draftDiscountPercent.toStringAsFixed(0)}%)',
-                      -invoiceProvider.draftDiscountAmount,
-                    ),
-                    const Divider(),
-                    _summaryRow(
-                      'Total Due',
-                      invoiceProvider.draftTotal,
-                      isBold: true,
-                      isLarge: true,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Generate Button
-              SizedBox(
-                width: double.infinity,
-                child: CustomButton(
-                  bgColor: invoiceProvider.canCreateDraftInvoice
-                      ? primaryColor
-                      : greyColor,
-                  onPressed: invoiceProvider.canCreateDraftInvoice
-                      ? () async {
-                          final success = await invoiceProvider.addInvoice(
-                            InvoiceModel(
-                              id: Uuid().v4(),
-                              number: invoiceProvider.draftInvoiceNumber.trim(),
-                              clientId: invoiceProvider.draftSelectedClient!.id,
-                              issued: invoiceProvider.draftIssuedDate,
-                              due: invoiceProvider.draftDueDate,
-                              items: invoiceProvider.draftItems,
-                              taxPercent: invoiceProvider.draftTaxPercent,
-                              discountPercent:
-                                  invoiceProvider.draftDiscountPercent,
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 180,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: invoiceProvider.templates.length,
+                      itemBuilder: (context, index) {
+                        final template = invoiceProvider.templates[index];
+                        final isSelected =
+                            template == invoiceProvider.draftSelectedTemplate;
+                        return GestureDetector(
+                          onTap: () =>
+                              invoiceProvider.selectDraftTemplate(template),
+                          child: Container(
+                            width: 140,
+                            margin: const EdgeInsets.only(right: 16),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: isSelected
+                                    ? primaryColor
+                                    : Colors.grey[300]!,
+                                width: isSelected ? 3 : 1,
+                              ),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                ),
+                              ],
                             ),
-                          );
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.receipt_long,
+                                  size: 60,
+                                  color: isSelected
+                                      ? primaryColor
+                                      : Colors.grey,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  template,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: isSelected
+                                        ? primaryColor
+                                        : Colors.grey[700],
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
 
-                          if (!success && context.mounted) {
-                            showMessage(context, invoiceProvider.errorMessage);
-                            return;
-                          }
+                  const SizedBox(height: 32),
 
-                          if (success && context.mounted) {
-                            showMessage(
-                              context,
-                              'Invoice created successfully!',
-                            );
-                            invoiceProvider.resetDraft();
-                          }
-                        }
-                      : null,
+                  // Client Selection
+                  const Text(
+                    'Client',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: () async {
+                      final clients = clientProvider.clients;
+                      final selectedName = await showSingleSelectModal(
+                        context: context,
+                        title: 'Select Client',
+                        items: clients
+                            .map(
+                              (c) => c.contactName.isEmpty
+                                  ? c.companyName
+                                  : '${c.contactName} • ${c.companyName}',
+                            )
+                            .toList(),
+                        selectedItem:
+                            invoiceProvider.draftSelectedClient == null
+                            ? null
+                            : (invoiceProvider
+                                      .draftSelectedClient!
+                                      .contactName
+                                      .isEmpty
+                                  ? invoiceProvider
+                                        .draftSelectedClient!
+                                        .companyName
+                                  : '${invoiceProvider.draftSelectedClient!.contactName} • ${invoiceProvider.draftSelectedClient!.companyName}'),
+                      );
+                      if (selectedName != null) {
+                        final selectedClient = clients.firstWhere(
+                          (c) =>
+                              (c.contactName.isEmpty
+                                  ? c.companyName
+                                  : '${c.contactName} • ${c.companyName}') ==
+                              selectedName,
+                        );
+                        invoiceProvider.selectDraftClient(selectedClient);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: invoiceProvider.draftSelectedClient == null
+                              ? Colors.grey[400]!
+                              : primaryColor,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.person_outline, color: Colors.grey),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              invoiceProvider.draftSelectedClient == null
+                                  ? 'Select a client'
+                                  : (invoiceProvider
+                                            .draftSelectedClient!
+                                            .contactName
+                                            .isEmpty
+                                        ? invoiceProvider
+                                              .draftSelectedClient!
+                                              .companyName
+                                        : invoiceProvider
+                                              .draftSelectedClient!
+                                              .contactName),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color:
+                                    invoiceProvider.draftSelectedClient == null
+                                    ? Colors.grey[600]
+                                    : Colors.black87,
+                              ),
+                            ),
+                          ),
+                          const Icon(Icons.arrow_drop_down),
+                        ],
+                      ),
+                    ),
+                  ),
 
-                  text: "Generate & Send",
-                ),
+                  const SizedBox(height: 32),
+
+                  // Dates
+                  const Text(
+                    'Dates',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _dateField(
+                          context,
+                          'Issued',
+                          invoiceProvider.draftIssuedDate,
+                          invoiceProvider.updateDraftIssuedDate,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _dateField(
+                          context,
+                          'Due',
+                          invoiceProvider.draftDueDate,
+                          invoiceProvider.updateDraftDueDate,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Line Items
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Line Items',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      TextButton.icon(
+                        onPressed: invoiceProvider.addDraftItem,
+                        icon: const Icon(Icons.add_circle, color: primaryColor),
+                        label: const Text(
+                          'Add Item',
+                          style: TextStyle(color: primaryColor),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  ...invoiceProvider.draftItems.asMap().entries.map(
+                    (e) => _itemCard(e.value, e.key, invoiceProvider),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Tax & Discount
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Tax %',
+                            suffixText: '%',
+                            filled: true,
+                            fillColor: Colors.grey[50],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          onChanged: (v) => invoiceProvider
+                              .updateDraftTaxPercent(double.tryParse(v) ?? 0.0),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextField(
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Discount %',
+                            suffixText: '%',
+                            filled: true,
+                            fillColor: Colors.grey[50],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          onChanged: (v) =>
+                              invoiceProvider.updateDraftDiscountPercent(
+                                double.tryParse(v) ?? 0.0,
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // Summary
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: primaryColor.withOpacity(0.3)),
+                    ),
+                    child: Column(
+                      children: [
+                        _summaryRow('Subtotal', invoiceProvider.draftSubtotal),
+                        _summaryRow(
+                          'Tax (${invoiceProvider.draftTaxPercent.toStringAsFixed(0)}%)',
+                          invoiceProvider.draftTaxAmount,
+                        ),
+                        _summaryRow(
+                          'Discount (${invoiceProvider.draftDiscountPercent.toStringAsFixed(0)}%)',
+                          -invoiceProvider.draftDiscountAmount,
+                        ),
+                        const Divider(),
+                        _summaryRow(
+                          'Total Due',
+                          invoiceProvider.draftTotal,
+                          isBold: true,
+                          isLarge: true,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Generate Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: CustomButton(
+                      bgColor: invoiceProvider.canCreateDraftInvoice
+                          ? primaryColor
+                          : greyColor,
+                      onPressed: invoiceProvider.canCreateDraftInvoice
+                          ? () async {
+                              final newInvoice = InvoiceModel(
+                                id: widget.invoiceToEdit?.id ?? Uuid().v4(),
+                                number: invoiceProvider.draftInvoiceNumber
+                                    .trim(),
+                                clientId:
+                                    invoiceProvider.draftSelectedClient!.id,
+                                issued: invoiceProvider.draftIssuedDate,
+                                due: invoiceProvider.draftDueDate,
+                                items: invoiceProvider.draftItems,
+                                taxPercent: invoiceProvider.draftTaxPercent,
+                                discountPercent:
+                                    invoiceProvider.draftDiscountPercent,
+                              );
+
+                              final success = widget.invoiceToEdit == null
+                                  ? await invoiceProvider.addInvoice(newInvoice)
+                                  : await invoiceProvider.updateInvoice(
+                                      newInvoice,
+                                    );
+
+                              if (!success && context.mounted) {
+                                showMessage(
+                                  context,
+                                  invoiceProvider.errorMessage,
+                                );
+                                return;
+                              }
+
+                              if (success && context.mounted) {
+                                showMessage(
+                                  context,
+                                  'Invoice created successfully!',
+                                );
+                                invoiceProvider.resetDraft();
+                              }
+                            }
+                          : null,
+
+                      text: "Generate & Send",
+                    ),
+                  ),
+
+                  const SizedBox(height: 40),
+                ],
               ),
-
-              const SizedBox(height: 40),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

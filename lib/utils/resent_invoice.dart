@@ -2,27 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/models/client_model.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
-import 'package:invoice_pay/providers/company_provider.dart';
+import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-Future<void> resendInvoice(
+Future<void> resendInvoiceAndMarkSent(
   BuildContext context,
   ClientModel client,
-  InvoiceModel invoice,
+  InvoiceModel currentInvoice,
 ) async {
-  final subject =
-      'Invoice #${invoice.number} from ${context.read<CompanyProvider>().company?.name ?? 'Your Business'}';
+  // First: Resend via email/WhatsApp
+  final subject = 'Invoice #${currentInvoice.number}';
   final body =
       '''
 Hi ${client.contactName.isEmpty ? client.companyName : client.contactName},
 
-Please find your invoice attached.
+Please find your invoice below.
 
-Invoice #: ${invoice.number}
-Amount Due: \$${invoice.total.toStringAsFixed(2)}
-Due Date: ${DateFormat('MMM dd, yyyy').format(invoice.due)}
+Amount: \$${currentInvoice.total.toStringAsFixed(2)}
+Due: ${DateFormat('MMM dd, yyyy').format(currentInvoice.due)}
 
 Thank you!
     ''';
@@ -33,7 +32,7 @@ Thank you!
   final whatsappUrl =
       'https://wa.me/${client.phone.replaceAll(RegExp(r'[^0-9]'), '')}?text=$body';
 
-  showModalBottomSheet(
+  final choice = await showModalBottomSheet<String>(
     context: context,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -43,37 +42,39 @@ Thank you!
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
-            leading: const Icon(Icons.email_outlined),
-            title: const Text('Send via Email'),
-            onTap: () async {
-              if (await canLaunchUrl(Uri.parse(emailUrl))) {
-                await launchUrl(Uri.parse(emailUrl));
-              }
-              Navigator.pop(context);
-            },
+            leading: const Icon(Icons.email),
+            title: const Text('Email'),
+            onTap: () => Navigator.pop(context, 'email'),
           ),
           ListTile(
             leading: const Icon(Icons.chat),
-            title: const Text('Send via WhatsApp'),
-            onTap: () async {
-              if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
-                await launchUrl(Uri.parse(whatsappUrl));
-              }
-              Navigator.pop(context);
-            },
+            title: const Text('WhatsApp'),
+            onTap: () => Navigator.pop(context, 'whatsapp'),
           ),
           ListTile(
             leading: const Icon(Icons.share),
-            title: const Text('Share Link'),
-            onTap: () {
-              Share.share(
-                'Check your invoice: Invoice #${invoice.number} - Due: \$${invoice.total}',
-              );
-              Navigator.pop(context);
-            },
+            title: const Text('Other Apps'),
+            onTap: () => Navigator.pop(context, 'share'),
           ),
         ],
       ),
     ),
   );
+
+  if (choice == 'email' && await canLaunchUrl(Uri.parse(emailUrl))) {
+    await launchUrl(Uri.parse(emailUrl));
+  } else if (choice == 'whatsapp' &&
+      await canLaunchUrl(Uri.parse(whatsappUrl))) {
+    await launchUrl(Uri.parse(whatsappUrl));
+  } else if (choice == 'share') {
+    Share.share(body);
+  }
+
+  // After sending: Update status to Sent → Pending
+  final updatedInvoice = currentInvoice.copyWith(
+    status: InvoiceStatus.sent, // Will auto become Pending in getter
+    sentDate: DateTime.now(),
+  );
+
+  await context.read<InvoiceProvider>().updateInvoice(updatedInvoice);
 }

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
+import 'package:invoice_pay/screens/settings/widgets/custom_widgets.dart';
 import 'package:invoice_pay/styles/colors.dart';
 import 'package:provider/provider.dart';
 import '../../providers/settings_provider.dart';
@@ -9,8 +12,8 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<SettingsProvider>(
-      builder: (context, settings, _) {
+    return Consumer2<SettingsProvider, CompanyProvider>(
+      builder: (context, settings, companyProvider, _) {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Settings'),
@@ -44,6 +47,13 @@ class SettingsScreen extends StatelessWidget {
 
               // Preferences
               const _SectionTitle('Preferences'),
+              _SettingsTile(
+                icon: Icons.track_changes,
+                title: 'Monthly Revenue Goal',
+                subtitle:
+                    'Current: \$${NumberFormat('#,##0').format(companyProvider.company?.monthlyGoal ?? 5000)}',
+                onTap: () => showGoalModal(context),
+              ),
               _SwitchTile(
                 icon: Icons.notifications_outlined,
                 title: 'Push Notifications',

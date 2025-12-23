@@ -68,14 +68,14 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Client Details'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Edit client
-            },
-            child: const Text('Edit', style: TextStyle(color: primaryColor)),
-          ),
-        ],
+        // actions: [
+        //   TextButton(
+        //     onPressed: () {
+        //       // Edit client
+        //     },
+        //     child: const Text('Edit', style: TextStyle(color: primaryColor)),
+        //   ),
+        // ],
       ),
       body: Column(
         children: [

@@ -15,8 +15,6 @@ class InvoiceProvider extends BaseViewModel {
   List<InvoiceModel> get invoices => List.unmodifiable(_invoices);
 
   Future<void> loadInvoices() async {
-    setLoading(ViewState.Busy);
-
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       setError('User not authenticated');
@@ -25,6 +23,8 @@ class InvoiceProvider extends BaseViewModel {
     }
 
     try {
+      setLoading(ViewState.Busy);
+
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
@@ -37,6 +37,7 @@ class InvoiceProvider extends BaseViewModel {
           .toList();
 
       setLoading(ViewState.Success);
+      notifyListeners();
     } catch (e) {
       setError('Failed to load invoices');
       setLoading(ViewState.Error);
@@ -59,12 +60,80 @@ class InvoiceProvider extends BaseViewModel {
 
       final newInvoice = invoice.copyWith(id: ref.id);
       _invoices.insert(0, newInvoice);
+      notifyListeners();
 
       setLoading(ViewState.Success);
       unawaited(loadInvoices());
       return true;
     } catch (e) {
       setError('Failed to create invoice');
+      setLoading(ViewState.Error);
+      return false;
+    }
+  }
+
+  Future<bool> updateInvoice(InvoiceModel updatedInvoice) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      setError('User not authenticated');
+      return false;
+    }
+
+    setLoading(ViewState.Busy);
+    clearError();
+
+    try {
+      // Update in Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('invoices')
+          .doc(updatedInvoice.id)
+          .update(updatedInvoice.toMap());
+
+      // Update local list
+      final index = _invoices.indexWhere((inv) => inv.id == updatedInvoice.id);
+      if (index != -1) {
+        _invoices[index] = updatedInvoice;
+        notifyListeners();
+      }
+
+      setLoading(ViewState.Success);
+      return true;
+    } catch (e) {
+      setError('Failed to update invoice: ${e.toString()}');
+      setLoading(ViewState.Error);
+      return false;
+    }
+  }
+
+  Future<bool> deleteInvoice(String invoiceId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      setError('User not authenticated');
+      return false;
+    }
+
+    setLoading(ViewState.Busy);
+    clearError();
+
+    try {
+      // Delete from Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('invoices')
+          .doc(invoiceId)
+          .delete();
+
+      // Remove from local list
+      _invoices.removeWhere((inv) => inv.id == invoiceId);
+      notifyListeners();
+
+      setLoading(ViewState.Success);
+      return true;
+    } catch (e) {
+      setError('Failed to delete invoice: ${e.toString()}');
       setLoading(ViewState.Error);
       return false;
     }
@@ -214,10 +283,12 @@ class InvoiceProvider extends BaseViewModel {
   // Filtered Invoices
   List<InvoiceModel> filteredInvoices(BuildContext context) {
     return _invoices.where((inv) {
-      if (_listSelectedStatus != null && inv.status != _listSelectedStatus)
+      if (_listSelectedStatus != null && inv.status != _listSelectedStatus) {
         return false;
-      if (_listStartDate != null && inv.due.isBefore(_listStartDate!))
+      }
+      if (_listStartDate != null && inv.due.isBefore(_listStartDate!)) {
         return false;
+      }
       if (_listEndDate != null && inv.due.isAfter(_listEndDate!)) return false;
       if (_listSearchQuery.isNotEmpty) {
         final query = _listSearchQuery.toLowerCase();
