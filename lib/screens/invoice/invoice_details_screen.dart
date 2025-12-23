@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/models/invoice_item_model.dart';
-import 'package:invoice_pay/styles/colors.dart';
+import 'package:invoice_pay/screens/invoice/invoice_preview.dart';
+import 'package:invoice_pay/utils/resent_invoice.dart';
+import 'package:invoice_pay/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/models/client_model.dart';
 import 'package:invoice_pay/providers/client_provider.dart';
+import 'package:invoice_pay/styles/colors.dart';
 
 class InvoiceDetailScreen extends StatelessWidget {
   final InvoiceModel invoice;
@@ -14,8 +17,8 @@ class InvoiceDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final clientProvider = Provider.of<ClientProvider>(context);
-    final ClientModel? client = clientProvider.clients.firstWhere(
+    final clientProvider = context.watch<ClientProvider>();
+    final ClientModel client = clientProvider.clients.firstWhere(
       (c) => c.id == invoice.clientId,
       orElse: () => ClientModel(
         id: '',
@@ -23,31 +26,38 @@ class InvoiceDetailScreen extends StatelessWidget {
         contactName: '',
         email: '',
         phone: '',
-        statusTag: "",
-        statusColor: Colors.blue,
-        actionIcon: Icons.cleaning_services,
+        website: '',
+        notes: '',
+        outstandingBalance: 0,
+        statusTag: '',
+        statusColor: Colors.grey,
+        actionIcon: Icons.person,
       ),
     );
 
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text('Invoice #${invoice.number}'),
+        title: Text('#${invoice.number}'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
         actions: [
           TextButton(
             onPressed: () {
-              // Edit invoice logic
+              // Navigate to edit screen (future)
             },
             child: const Text('Edit', style: TextStyle(color: primaryColor)),
           ),
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Overdue Badge
-            if (invoice.isOverdue)
+            // Status Badge
+            if (invoice.status == InvoiceStatus.overdue)
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -58,181 +68,258 @@ class InvoiceDetailScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: const Text(
-                  'Overdue',
+                  'OVERDUE',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            else if (invoice.status == InvoiceStatus.paid)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: const Text(
+                  'PAID',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-            const SizedBox(height: 12),
 
-            // Balance Due
+            const SizedBox(height: 10),
+
+            // Amount Due
             Text(
-              '\$${NumberFormat('#,###.00').format(invoice.balanceDue)}',
-              style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+              '\$${NumberFormat('#,##0.00').format(invoice.balanceDue)}',
+              style: TextStyle(
+                fontSize: 38,
+                fontWeight: FontWeight.bold,
+                color: invoice.isOverdue ? Colors.red : Colors.black87,
+              ),
             ),
             Text(
               'Due ${DateFormat('MMM dd, yyyy').format(invoice.due)}',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 20),
 
-            // Action Chips
+            // Quick Actions
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _actionChip(
-                  icon: Icons.notifications,
+                  icon: Icons.notifications_active,
                   label: 'Remind',
-                  onTap: () {
-                    // Send reminder
-                  },
-                ),
-                _actionChip(
-                  icon: Icons.percent,
-                  label: 'Late Fee',
-                  onTap: () {
-                    // Add late fee
-                  },
+                  onTap: () => resendInvoice(context, client, invoice),
                 ),
                 _actionChip(
                   icon: Icons.preview,
                   label: 'Preview',
-                  onTap: () {
-                    // Show PDF preview
-                  },
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const InvoicePreviewScreen(),
+                    ),
+                  ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 20),
 
             // Billed To
             const Text(
               'BILLED TO',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              leading: CircleAvatar(
-                backgroundColor: primaryColor.withOpacity(0.2),
-                child: Text(
-                  client!.companyName.isNotEmpty
-                      ? client.companyName[0].toUpperCase()
-                      : '?',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+                fontWeight: FontWeight.w600,
               ),
-              title: Text(client.companyName),
-              subtitle: Text(client.email),
-              trailing: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios, size: 16),
-                onPressed: () {
-                  // Navigate to client detail
-                },
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: primaryColor.withOpacity(0.2),
+                    child: Text(
+                      (client?.companyName ?? "").isNotEmpty
+                          ? client!.companyName[0].toUpperCase()
+                          : '?',
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          client?.companyName ?? "-",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if ((client?.contactName ?? "").isNotEmpty)
+                          Text(client?.contactName ?? "-"),
+                        Text(client?.email ?? "-"),
+                        Text(client?.phone ?? "-"),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 20),
 
             // Dates
             Row(
+              spacing: 10,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _dateColumn('Issued Date', invoice.issued),
-                _dateColumn('Due Date', invoice.due, isDue: true),
+                _infoCard(
+                  'Issued',
+                  DateFormat('MMM dd, yyyy').format(invoice.issued),
+                ),
+                _infoCard(
+                  'Due',
+                  DateFormat('MMM dd, yyyy').format(invoice.due),
+                  highlight: invoice.isOverdue,
+                ),
               ],
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 20),
 
-            // Services
+            // Line Items
             const Text(
-              'Services',
+              'Items',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
-            ...invoice.items.map((item) => _serviceItem(item)).toList(),
+            const SizedBox(height: 10),
+            ...invoice.items.map((item) => _itemRow(item)),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 20),
 
             // Summary
-            const Text(
-              'Summary',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: primaryColor.withOpacity(0.3)),
+              ),
+              child: Column(
+                children: [
+                  _summaryRow('Subtotal', invoice.subtotal),
+                  _summaryRow(
+                    'Tax (${invoice.taxPercent.toStringAsFixed(0)}%)',
+                    invoice.taxAmount,
+                  ),
+                  _summaryRow(
+                    'Discount (${invoice.discountPercent.toStringAsFixed(0)}%)',
+                    -invoice.discountAmount,
+                  ),
+                  const Divider(),
+                  _summaryRow('Total Due', invoice.total, isLarge: true),
+                  if (invoice.paidAmount > 0)
+                    _summaryRow(
+                      'Amount Paid',
+                      invoice.paidAmount,
+                      color: Colors.green,
+                    ),
+                  _summaryRow(
+                    'Balance Due',
+                    invoice.balanceDue,
+                    isLarge: true,
+                    color: invoice.balanceDue > 0 ? Colors.red : Colors.green,
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 12),
-            _summaryRow('Subtotal', invoice.subtotal),
-            _summaryRow(
-              'Tax (${invoice.taxPercent.toStringAsFixed(0)}%)',
-              invoice.taxAmount,
-            ),
-            _summaryRow(
-              'Discount (${invoice.discountPercent.toStringAsFixed(0)}%)',
-              -invoice.discountAmount,
-            ),
-            const Divider(height: 40, thickness: 1),
-            _summaryRow('Total', invoice.total, isBold: true),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
 
-            // Action Buttons
+            // Main Actions
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      // Export PDF
-                    },
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      side: const BorderSide(color: Colors.grey),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: const Text('Export PDF'),
+                  child: CustomButton(
+                    bgColor: greyColor,
+                    icon: Icons.picture_as_pdf,
+                    onPressed: () {},
+                    text: "Export PDF",
                   ),
                 ),
+
                 const SizedBox(width: 16),
                 Expanded(
-                  child: ElevatedButton(
+                  child: CustomButton(
                     onPressed: () {
-                      // Resend invoice
+                      resendInvoice(context, client, invoice);
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: const Text(
-                      'Resend Invoice',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    text: "Resend Invoice",
                   ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
 
-            // Activity Log (Example)
-            _activityItem(
-              'Partial Payment',
-              'Oct 26, 10:00 AM • +\$500.00',
-              primaryColor,
+            // Activity Timeline
+            const Text(
+              'Activity',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            _activityItem('Invoice Viewed', 'Oct 25, 9:12 AM', Colors.blue),
-            _activityItem('Invoice Sent', 'Oct 24, 2:30 PM', Colors.grey),
+            const SizedBox(height: 16),
+            _activityItem(
+              'Invoice Sent',
+              'Dec 20, 2025 • 3:30 PM',
+              Icons.send,
+              Colors.blue,
+            ),
+            if (invoice.paidAmount > 0)
+              _activityItem(
+                'Partial Payment Received',
+                'Dec 22, 2025 • +\$500.00',
+                Icons.payment,
+                Colors.green,
+              ),
+            _activityItem(
+              'Invoice Viewed',
+              'Dec 21, 2025 • 10:15 AM',
+              Icons.visibility,
+              Colors.grey,
+            ),
 
-            const SizedBox(height: 100),
+            const SizedBox(height: 50),
           ],
         ),
       ),
@@ -247,96 +334,125 @@ class InvoiceDetailScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.grey[100],
+          color: Colors.white,
           borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 20, color: Colors.grey[700]),
-            const SizedBox(width: 8),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+            Icon(icon, color: primaryColor, size: 22),
+            const SizedBox(width: 10),
+            Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _dateColumn(String label, DateTime date, {bool isDue = false}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-        const SizedBox(height: 4),
-        Text(
-          DateFormat('MMM dd, yyyy').format(date),
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: isDue
-                ? (invoice.isOverdue ? Colors.red : Colors.black)
-                : Colors.black,
-          ),
+  Widget _infoCard(String label, String value, {bool highlight = false}) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: highlight ? Border.all(color: Colors.red, width: 2) : null,
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
+          ],
         ),
-      ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            ),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _serviceItem(InvoiceItemModel item) {
+  Widget _itemRow(InvoiceItemModel item) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
+        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(
-            item.description,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          Expanded(
+            flex: 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.description,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${item.qty} × \$${item.rate.toStringAsFixed(2)}',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${item.qty} hrs × \$${item.rate.toStringAsFixed(2)}',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-              Text(
-                '\$${item.amount.toStringAsFixed(2)}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
+          Text(
+            '\$${item.amount.toStringAsFixed(2)}',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
       ),
     );
   }
 
-  Widget _summaryRow(String label, double value, {bool isBold = false}) {
-    final bool isNegative = value < 0;
+  Widget _summaryRow(
+    String label,
+    double value, {
+    Color? color,
+    bool isLarge = false,
+  }) {
+    final isNegative = value < 0;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
             style: TextStyle(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              fontSize: 16,
+              fontSize: isLarge ? 16 : 14,
+              fontWeight: FontWeight.w600,
             ),
           ),
           Text(
-            '${isNegative ? '-' : ''}\$${NumberFormat('#,###.00').format(value.abs())}',
+            '${isNegative ? '-' : ''}\$${NumberFormat('#,##0.00').format(value.abs())}',
             style: TextStyle(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              fontSize: 16,
+              fontSize: isLarge ? 20 : 14,
+              fontWeight: FontWeight.bold,
+              color: color ?? (isLarge ? primaryColor : Colors.black87),
             ),
           ),
         ],
@@ -344,11 +460,20 @@ class InvoiceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _activityItem(String title, String subtitle, Color color) {
+  Widget _activityItem(
+    String title,
+    String subtitle,
+    IconData icon,
+    Color color,
+  ) {
     return ListTile(
-      leading: CircleAvatar(radius: 8, backgroundColor: color),
+      leading: CircleAvatar(
+        radius: 20,
+        backgroundColor: color.withOpacity(0.1),
+        child: Icon(icon, color: color, size: 16),
+      ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-      subtitle: Text(subtitle, style: TextStyle(color: Colors.grey[600])),
+      subtitle: Text(subtitle),
     );
   }
 }
