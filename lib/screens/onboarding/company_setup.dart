@@ -28,6 +28,28 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
   final _zipCtrl = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadSavedDetails();
+    });
+  }
+
+  void _loadSavedDetails() {
+    final provider = context.read<CompanyProvider>();
+    final company = provider.company;
+
+    if (company != null) {
+      _nameCtrl.text = company.name;
+      _emailCtrl.text = company.email;
+      _phoneCtrl.text = company.phone;
+      _streetCtrl.text = company.street;
+      _cityCtrl.text = company.city;
+      _zipCtrl.text = company.zip;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final provider = context.watch<CompanyProvider>();
 

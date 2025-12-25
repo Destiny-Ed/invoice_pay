@@ -104,25 +104,25 @@ class SettingsScreen extends StatelessWidget {
                     'Current: \$${NumberFormat('#,##0').format(company?.monthlyGoal ?? 15000)}',
                 onTap: () => showGoalModal(context),
               ),
-              _SwitchTile(
-                icon: Icons.notifications_outlined,
-                title: 'Push Notifications',
-                value: settings.notificationsEnabled,
-                onChanged: settings.toggleNotifications,
-              ),
+
+              // _SwitchTile(
+              //   icon: Icons.notifications_outlined,
+              //   title: 'Push Notifications',
+              //   value: settings.notificationsEnabled,
+              //   onChanged: settings.toggleNotifications,
+              // ),
               // _SwitchTile(
               //   icon: Icons.dark_mode_outlined,
               //   title: 'Dark Mode',
               //   value: settings.darkMode,
               //   onChanged: settings.toggleDarkMode,
               // ),
-              _SwitchTile(
-                icon: Icons.alarm,
-                title: 'Auto Payment Reminders',
-                value: settings.autoReminders,
-                onChanged: settings.toggleAutoReminders,
-              ),
-
+              // _SwitchTile(
+              //   icon: Icons.alarm,
+              //   title: 'Auto Payment Reminders',
+              //   value: settings.autoReminders,
+              //   onChanged: settings.toggleAutoReminders,
+              // ),
               const SizedBox(height: 10),
 
               // Account

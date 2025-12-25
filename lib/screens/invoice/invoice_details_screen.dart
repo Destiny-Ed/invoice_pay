@@ -3,6 +3,7 @@ import 'package:flutter_utilities/flutter_utilities.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/models/invoice_item_model.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
 import 'package:invoice_pay/screens/invoice/invoice_preview.dart';
@@ -39,7 +40,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     return Consumer<InvoiceProvider>(
       builder: (context, invoiceProvider, child) {
         final invoice = invoiceProvider.singleInvoice;
-        final clientProvider = context.watch<ClientProvider>();
+        final clientProvider = context.read<ClientProvider>();
+        final companyProvider = context.read<CompanyProvider>();
         final ClientModel client = clientProvider.clients.firstWhere(
           (c) => c.id == invoice?.clientId,
           orElse: () => ClientModel(
@@ -221,9 +223,10 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               icon: Icons.notifications_active,
                               label: 'Remind',
                               onTap: () => resendInvoiceAndMarkSent(
-                                context,
-                                client,
-                                invoice,
+                                context: context,
+                                client: client,
+                                invoice: invoice,
+                                company: companyProvider.company!,
                               ),
                             ),
                             _actionChip(
@@ -236,13 +239,6 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                 ),
                               ),
                             ),
-                            if (invoice.balanceDue > 0)
-                              _actionChip(
-                                icon: Icons.preview,
-                                label: 'Record Payment',
-                                onTap: () =>
-                                    showRecordPayment(context, invoice),
-                              ),
                           ],
                         ),
 
@@ -443,23 +439,27 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         // Main Actions
                         Row(
                           children: [
-                            Expanded(
-                              child: CustomButton(
-                                bgColor: greyColor,
-                                icon: Icons.picture_as_pdf,
-                                onPressed: () {},
-                                text: "Export PDF",
+                            if (invoice.balanceDue > 0)
+                              Expanded(
+                                child: CustomButton(
+                                  bgColor: greyColor,
+                                  icon: Icons.picture_as_pdf,
+                                  onPressed: () {
+                                    showRecordPayment(context, invoice);
+                                  },
+                                  text: "Record Payment",
+                                ),
                               ),
-                            ),
 
                             const SizedBox(width: 16),
                             Expanded(
                               child: CustomButton(
                                 onPressed: () {
                                   resendInvoiceAndMarkSent(
-                                    context,
-                                    client,
-                                    invoice,
+                                    context: context,
+                                    client: client,
+                                    invoice: invoice,
+                                    company: companyProvider.company!,
                                   );
                                 },
                                 text: "Resend Invoice",

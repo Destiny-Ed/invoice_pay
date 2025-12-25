@@ -5,8 +5,9 @@ import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/invoice/invoice_preview.dart';
-import 'package:invoice_pay/screens/invoice/invoice_template.dart';
+import 'package:invoice_pay/screens/invoice/wigets/invoice_template.dart';
 import 'package:invoice_pay/screens/invoice/wigets/custom_widgets.dart';
+import 'package:invoice_pay/screens/invoice/wigets/template_preview_layout.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
 import 'package:invoice_pay/widgets/custom_text_field.dart';
@@ -82,7 +83,9 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const InvoicePreviewScreen()),
+                MaterialPageRoute(
+                  builder: (_) => const InvoicePreviewScreen(fromAdd: true),
+                ),
               );
             },
             child: const Text('Preview', style: TextStyle(color: primaryColor)),
@@ -128,87 +131,86 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
 
                   // Template Selection
                   // ================= TEMPLATE SELECTION =================
-                  const Text(
-                    'Choose Template',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
+                  // const Text(
+                  //   'Choose Template',
+                  //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  // ),
+                  // const SizedBox(height: 16),
 
-                  SizedBox(
-                    height: 220,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: invoiceProvider.templates.length,
-                      itemBuilder: (context, index) {
-                        final templateName = invoiceProvider.templates[index];
-                        final isSelected =
-                            templateName ==
-                            invoiceProvider.draftSelectedTemplate;
+                  // SizedBox(
+                  //   height: 220,
+                  //   child: ListView.builder(
+                  //     scrollDirection: Axis.horizontal,
+                  //     itemCount: invoiceProvider.templates.length,
+                  //     itemBuilder: (context, index) {
+                  //       final templateName = invoiceProvider.templates[index];
+                  //       final isSelected =
+                  //           templateName ==
+                  //           invoiceProvider.draftSelectedTemplate;
 
-                        final templateType = TemplateType.values.firstWhere(
-                          (e) => e.name == templateName,
-                        );
+                  //       final templateType = TemplateType.values.firstWhere(
+                  //         (e) => e.name == templateName,
+                  //       );
 
-                        return GestureDetector(
-                          onTap: () =>
-                              invoiceProvider.selectDraftTemplate(templateName),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            width: 180,
-                            margin: const EdgeInsets.only(right: 16),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: isSelected
-                                    ? primaryColor
-                                    : Colors.grey[300]!,
-                                width: isSelected ? 3 : 1,
-                              ),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.06),
-                                  blurRadius: 12,
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: IgnorePointer(
-                                    child: InvoiceTemplate(
-                                      templateType: templateType,
-                                      invoice: invoiceProvider.previewInvoice(
-                                        context,
-                                      ),
-                                      company: context
-                                          .read<CompanyProvider>()
-                                          .company!,
-                                      client:
-                                          invoiceProvider.draftSelectedClient ??
-                                          ClientModel.empty(),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  templateName.toUpperCase(),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: isSelected
-                                        ? primaryColor
-                                        : Colors.grey[700],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
+                  //       return GestureDetector(
+                  //         onTap: () =>
+                  //             invoiceProvider.selectDraftTemplate(templateName),
+                  //         child: AnimatedContainer(
+                  //           duration: const Duration(milliseconds: 200),
+                  //           width: 180,
+                  //           margin: const EdgeInsets.only(right: 16),
+                  //           padding: const EdgeInsets.all(12),
+                  //           decoration: BoxDecoration(
+                  //             borderRadius: BorderRadius.circular(20),
+                  //             border: Border.all(
+                  //               color: isSelected
+                  //                   ? primaryColor
+                  //                   : Colors.grey[300]!,
+                  //               width: isSelected ? 3 : 1,
+                  //             ),
+                  //             color: Colors.white,
+                  //             boxShadow: [
+                  //               BoxShadow(
+                  //                 color: Colors.black.withOpacity(0.06),
+                  //                 blurRadius: 12,
+                  //               ),
+                  //             ],
+                  //           ),
+                  //           child: Column(
+                  //             children: [
+                  //               Expanded(
+                  //                 child: IgnorePointer(
+                  //                   child: InvoiceTemplatePreview(
+                  //                     templateType: templateType,
+                  //                     invoice: invoiceProvider.previewInvoice(
+                  //                       context,
+                  //                     ),
+                  //                     company: context
+                  //                         .read<CompanyProvider>()
+                  //                         .company!,
+                  //                     client:
+                  //                         invoiceProvider.draftSelectedClient ??
+                  //                         ClientModel.empty(),
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //               const SizedBox(height: 8),
+                  //               Text(
+                  //                 templateName.toUpperCase(),
+                  //                 style: TextStyle(
+                  //                   fontWeight: FontWeight.bold,
+                  //                   color: isSelected
+                  //                       ? primaryColor
+                  //                       : Colors.grey[700],
+                  //                 ),
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
                   const SizedBox(height: 20),
 
                   // Client Selection

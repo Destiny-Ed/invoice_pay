@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
-import 'package:invoice_pay/screens/invoice/invoice_template.dart';
+import 'package:invoice_pay/screens/invoice/wigets/invoice_template.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -421,18 +421,11 @@ class InvoiceProvider extends BaseViewModel {
     required CompanyModel company,
     required ClientModel client,
   }) async {
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        margin: const pw.EdgeInsets.all(32),
-        build: (_) => PdfInvoiceTemplate.build(
-          invoice: invoice,
-          company: company,
-          client: client,
-          template: invoice.templateType,
-        ),
-      ),
+    final pdf = await PdfInvoiceTemplate.generate(
+      invoice: invoice,
+      company: company,
+      client: client,
+      template: invoice.templateType,
     );
 
     final dir = await getTemporaryDirectory();
