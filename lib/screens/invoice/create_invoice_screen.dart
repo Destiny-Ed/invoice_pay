@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:invoice_pay/config/extension.dart';
 import 'package:invoice_pay/modal/single_select_modal.dart';
-import 'package:invoice_pay/models/invoice_item_model.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/invoice/invoice_preview.dart';
+import 'package:invoice_pay/screens/invoice/invoice_template.dart';
+import 'package:invoice_pay/screens/invoice/wigets/custom_widgets.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
+import 'package:invoice_pay/widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
 import 'package:invoice_pay/models/client_model.dart';
 import 'package:invoice_pay/providers/client_provider.dart';
@@ -57,6 +59,15 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
         invoiceProvider.updateDraftDiscountPercent(
           widget.invoiceToEdit!.discountPercent,
         );
+        invoiceProvider.toggleDraftReceivePayment(
+          widget.invoiceToEdit!.receivePayment,
+        );
+        invoiceProvider.setDraftPaymentMethod(
+          widget.invoiceToEdit!.paymentMethod,
+        );
+        invoiceProvider.updateDraftPaymentDetails(
+          widget.invoiceToEdit!.paymentDetails,
+        );
       });
     }
   }
@@ -91,60 +102,61 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     'New Invoice',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 8),
                   Text(
                     'Professional invoices in seconds',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
 
                   // Invoice Number
-                  TextField(
-                    controller:
-                        TextEditingController(
-                            text: invoiceProvider.draftInvoiceNumber,
-                          )
-                          ..selection = TextSelection.fromPosition(
-                            TextPosition(
-                              offset: invoiceProvider.draftInvoiceNumber.length,
-                            ),
-                          ),
-                    decoration: InputDecoration(
-                      labelText: 'Invoice Number',
-                      prefixIcon: const Icon(Icons.tag),
-                      filled: true,
-                      fillColor: Colors.grey[50],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
+                  CustomTextField(
+                    TextEditingController(
+                        text: invoiceProvider.draftInvoiceNumber,
+                      )
+                      ..selection = TextSelection.fromPosition(
+                        TextPosition(
+                          offset: invoiceProvider.draftInvoiceNumber.length,
+                        ),
                       ),
-                    ),
-                    onChanged: invoiceProvider.updateDraftInvoiceNumber,
+                    password: false,
+                    prefixIcon: const Icon(Icons.tag),
+                    onPress: invoiceProvider.updateDraftInvoiceNumber,
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
 
                   // Template Selection
+                  // ================= TEMPLATE SELECTION =================
                   const Text(
                     'Choose Template',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
+
                   SizedBox(
-                    height: 180,
+                    height: 220,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: invoiceProvider.templates.length,
                       itemBuilder: (context, index) {
-                        final template = invoiceProvider.templates[index];
+                        final templateName = invoiceProvider.templates[index];
                         final isSelected =
-                            template == invoiceProvider.draftSelectedTemplate;
+                            templateName ==
+                            invoiceProvider.draftSelectedTemplate;
+
+                        final templateType = TemplateType.values.firstWhere(
+                          (e) => e.name == templateName,
+                        );
+
                         return GestureDetector(
                           onTap: () =>
-                              invoiceProvider.selectDraftTemplate(template),
-                          child: Container(
-                            width: 140,
+                              invoiceProvider.selectDraftTemplate(templateName),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 180,
                             margin: const EdgeInsets.only(right: 16),
+                            padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
@@ -156,30 +168,37 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                               color: Colors.white,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 10,
+                                  color: Colors.black.withOpacity(0.06),
+                                  blurRadius: 12,
                                 ),
                               ],
                             ),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.receipt_long,
-                                  size: 60,
-                                  color: isSelected
-                                      ? primaryColor
-                                      : Colors.grey,
+                                Expanded(
+                                  child: IgnorePointer(
+                                    child: InvoiceTemplate(
+                                      templateType: templateType,
+                                      invoice: invoiceProvider.previewInvoice(
+                                        context,
+                                      ),
+                                      company: context
+                                          .read<CompanyProvider>()
+                                          .company!,
+                                      client:
+                                          invoiceProvider.draftSelectedClient ??
+                                          ClientModel.empty(),
+                                    ),
+                                  ),
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 8),
                                 Text(
-                                  template,
+                                  templateName.toUpperCase(),
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: isSelected
                                         ? primaryColor
                                         : Colors.grey[700],
-                                    fontSize: 16,
                                   ),
                                 ),
                               ],
@@ -190,7 +209,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
 
                   // Client Selection
                   const Text(
@@ -201,7 +220,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                   GestureDetector(
                     onTap: () async {
                       final clients = clientProvider.clients;
-                      final selectedName = await showSingleSelectModal(
+                      final selectedName = await showSingleClientSelectModal(
                         context: context,
                         title: 'Select Client',
                         items: clients
@@ -256,16 +275,16 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                             child: Text(
                               invoiceProvider.draftSelectedClient == null
                                   ? 'Select a client'
-                                  : (invoiceProvider
-                                            .draftSelectedClient!
-                                            .contactName
-                                            .isEmpty
-                                        ? invoiceProvider
-                                              .draftSelectedClient!
-                                              .companyName
-                                        : invoiceProvider
-                                              .draftSelectedClient!
-                                              .contactName),
+                                  : invoiceProvider
+                                        .draftSelectedClient!
+                                        .contactName
+                                        .isEmpty
+                                  ? invoiceProvider
+                                        .draftSelectedClient!
+                                        .companyName
+                                  : invoiceProvider
+                                        .draftSelectedClient!
+                                        .contactName,
                               style: TextStyle(
                                 fontSize: 16,
                                 color:
@@ -281,7 +300,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
 
                   // Dates
                   const Text(
@@ -292,7 +311,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: _dateField(
+                        child: dateField(
                           context,
                           'Issued',
                           invoiceProvider.draftIssuedDate,
@@ -301,7 +320,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: _dateField(
+                        child: dateField(
                           context,
                           'Due',
                           invoiceProvider.draftDueDate,
@@ -311,7 +330,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
 
                   // Line Items
                   Row(
@@ -336,10 +355,10 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                   ),
                   const SizedBox(height: 12),
                   ...invoiceProvider.draftItems.asMap().entries.map(
-                    (e) => _itemCard(e.value, e.key, invoiceProvider),
+                    (e) => itemCard(e.value, e.key, invoiceProvider),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
 
                   // Tax & Discount
                   Row(
@@ -382,6 +401,68 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     ],
                   ),
 
+                  const SizedBox(height: 20),
+
+                  // Receive Payment Toggle
+                  Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: SwitchListTile(
+                      title: const Text(
+                        'Accept Payment with Invoice',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: const Text('Include payment instructions'),
+                      value: invoiceProvider.draftReceivePayment,
+                      onChanged: invoiceProvider.toggleDraftReceivePayment,
+                      activeColor: primaryColor,
+                    ),
+                  ),
+
+                  if (invoiceProvider.draftReceivePayment) ...[
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Payment Method',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        _paymentMethodChip(
+                          'Bank Transfer',
+                          'bank_transfer',
+                          invoiceProvider,
+                        ),
+                        _paymentMethodChip('PayPal', 'paypal', invoiceProvider),
+                        _paymentMethodChip('Stripe', 'stripe', invoiceProvider),
+                        _paymentMethodChip('UPI', 'upi', invoiceProvider),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      decoration: InputDecoration(
+                        labelText: _getPaymentLabel(
+                          invoiceProvider.draftPaymentMethod,
+                        ),
+                        hintText: _getPaymentHint(
+                          invoiceProvider.draftPaymentMethod,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[50],
+                      ),
+                      onChanged: invoiceProvider.updateDraftPaymentDetails,
+                    ),
+                  ],
+
                   const SizedBox(height: 40),
 
                   // Summary
@@ -394,17 +475,17 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     ),
                     child: Column(
                       children: [
-                        _summaryRow('Subtotal', invoiceProvider.draftSubtotal),
-                        _summaryRow(
+                        summaryRow('Subtotal', invoiceProvider.draftSubtotal),
+                        summaryRow(
                           'Tax (${invoiceProvider.draftTaxPercent.toStringAsFixed(0)}%)',
                           invoiceProvider.draftTaxAmount,
                         ),
-                        _summaryRow(
+                        summaryRow(
                           'Discount (${invoiceProvider.draftDiscountPercent.toStringAsFixed(0)}%)',
                           -invoiceProvider.draftDiscountAmount,
                         ),
                         const Divider(),
-                        _summaryRow(
+                        summaryRow(
                           'Total Due',
                           invoiceProvider.draftTotal,
                           isBold: true,
@@ -414,7 +495,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 40),
 
                   // Generate Button
                   SizedBox(
@@ -426,7 +507,9 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                       onPressed: invoiceProvider.canCreateDraftInvoice
                           ? () async {
                               final newInvoice = InvoiceModel(
-                                id: widget.invoiceToEdit?.id ?? Uuid().v4(),
+                                id:
+                                    widget.invoiceToEdit?.id ??
+                                    const Uuid().v4(),
                                 number: invoiceProvider.draftInvoiceNumber
                                     .trim(),
                                 clientId:
@@ -437,6 +520,18 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                                 taxPercent: invoiceProvider.draftTaxPercent,
                                 discountPercent:
                                     invoiceProvider.draftDiscountPercent,
+                                receivePayment:
+                                    invoiceProvider.draftReceivePayment,
+                                paymentMethod:
+                                    invoiceProvider.draftPaymentMethod,
+                                paymentDetails:
+                                    invoiceProvider.draftPaymentDetails,
+                                templateType: TemplateType.values.firstWhere(
+                                  (e) =>
+                                      e.name ==
+                                      invoiceProvider.draftSelectedTemplate,
+                                  orElse: () => TemplateType.minimal,
+                                ),
                               );
 
                               final success = widget.invoiceToEdit == null
@@ -445,25 +540,21 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                                       newInvoice,
                                     );
 
-                              if (!success && context.mounted) {
-                                showMessage(
-                                  context,
-                                  invoiceProvider.errorMessage,
-                                );
-                                return;
-                              }
-
                               if (success && context.mounted) {
                                 showMessage(
                                   context,
-                                  'Invoice created successfully!',
+                                  widget.invoiceToEdit == null
+                                      ? 'Invoice created!'
+                                      : 'Invoice updated!',
                                 );
                                 invoiceProvider.resetDraft();
+                                Navigator.pop(context);
                               }
                             }
                           : null,
-
-                      text: "Generate & Send",
+                      text: widget.invoiceToEdit == null
+                          ? "Generate & Send"
+                          : "Update Invoice",
                     ),
                   ),
 
@@ -477,228 +568,54 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
     );
   }
 
-  Widget _dateField(
-    BuildContext context,
+  Widget _paymentMethodChip(
     String label,
-    DateTime date,
-    Function(DateTime) onPicked,
+    String value,
+    InvoiceProvider provider,
   ) {
-    return GestureDetector(
-      onTap: () async {
-        final picked = await showDatePicker(
-          context: context,
-          initialDate: date,
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2100),
-        );
-        if (picked != null) onPicked(picked);
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        decoration: BoxDecoration(
-          color: Colors.grey[50],
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey[300]!),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.calendar_today, color: Colors.grey[600]),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                ),
-                Text(
-                  DateFormat('dd MMM yyyy').format(date),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ],
-        ),
+    final isSelected = provider.draftPaymentMethod == value;
+    return FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => provider.setDraftPaymentMethod(value),
+      selectedColor: primaryColor.withOpacity(0.2),
+      checkmarkColor: primaryColor,
+      backgroundColor: Colors.grey[100],
+      labelStyle: TextStyle(
+        color: isSelected ? primaryColor : Colors.grey[700],
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
     );
   }
 
-  Widget _itemCard(InvoiceItemModel item, int index, InvoiceProvider provider) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Item Description',
-                    hintText: 'e.g. Website Design - Phase 1',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  onChanged: (v) =>
-                      provider.updateDraftItemDescription(index, v),
-                ),
-              ),
-              if (provider.draftItems.length > 1)
-                IconButton(
-                  onPressed: () => provider.removeDraftItem(index),
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  spacing: 10,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Qty"),
-                    SizedBox(
-                      height: 50,
-                      child: Row(
-                        spacing: 10,
-                        children: [
-                          GestureDetector(
-                            onTap: () => provider.decrementDraftQuantity(index),
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: greyColor.withOpacity(0.3),
-                              ),
-                              child: const Icon(Icons.remove),
-                            ),
-                          ),
-                          Container(
-                            width: 10,
-                            alignment: Alignment.center,
-                            child: Text(
-                              item.qty.toStringAsFixed(0),
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => provider.incrementDraftQuantity(index),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: greyColor.withOpacity(0.3),
-                              ),
-                              padding: const EdgeInsets.all(2),
-                              child: const Icon(Icons.add),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  spacing: 10,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Rate"),
-                    SizedBox(
-                      height: 50,
-                      child: TextFormField(
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          hintText: '0',
-                          prefixText: '\$ ',
-                          isDense: true,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        onChanged: (v) => provider.updateDraftItemRate(
-                          index,
-                          double.tryParse(v) ?? 0.0,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-
-              Column(
-                spacing: 10,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text("Amount"),
-                  Container(
-                    height: 50,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      '\$${NumberFormat('#,##0.00').format(item.amount.abs())}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: primaryColor,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+  String _getPaymentLabel(String method) {
+    switch (method) {
+      case 'bank_transfer':
+        return 'Bank Account Details';
+      case 'paypal':
+        return 'PayPal Email';
+      case 'stripe':
+        return 'Stripe Account / Payment Link';
+      case 'upi':
+        return 'UPI ID';
+      default:
+        return 'Payment Details';
+    }
   }
 
-  Widget _summaryRow(
-    String label,
-    double value, {
-    bool isBold = false,
-    bool isLarge = false,
-  }) {
-    final isNegative = value < 0;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: isLarge ? 16 : 14,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-          Text(
-            '${isNegative ? '-' : ''}\$${NumberFormat('#,##0.00').format(value.abs())}',
-            style: TextStyle(
-              fontSize: isLarge ? 20 : 16,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-              color: isLarge ? primaryColor : null,
-            ),
-          ),
-        ],
-      ),
-    );
+  String _getPaymentHint(String method) {
+    switch (method) {
+      case 'bank_transfer':
+        return 'Account Name, Number, Bank, IFSC';
+      case 'paypal':
+        return 'yourname@paypal.com';
+      case 'stripe':
+        return 'https://buy.stripe.com/...';
+      case 'upi':
+        return 'yourname@upi';
+      default:
+        return '';
+    }
   }
 }

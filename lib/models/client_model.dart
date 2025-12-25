@@ -31,6 +31,19 @@ class ClientModel {
     required this.actionIcon,
   });
 
+  factory ClientModel.empty() {
+    return ClientModel(
+      id: '',
+      email: '',
+      companyName: 'Client Company',
+      contactName: '',
+      phone: '',
+      statusTag: '',
+      statusColor: primaryColor,
+      actionIcon: Icons.drafts,
+    );
+  }
+
   // Factory from Firestore
   factory ClientModel.fromMap(String id, Map<String, dynamic> map) {
     final outstanding = (map['outstanding_balance'] ?? 0.0).toDouble();
@@ -111,7 +124,9 @@ class ClientModel {
     }
 
     final newPhone = phone ?? this.phone;
-    final newActionIcon = (newPhone.isNotEmpty && newPhone != 'null') ? Icons.call : Icons.email;
+    final newActionIcon = (newPhone.isNotEmpty && newPhone != 'null')
+        ? Icons.call
+        : Icons.email;
 
     return ClientModel(
       id: id ?? this.id,
@@ -144,13 +159,13 @@ class ClientModel {
 
   @override
   int get hashCode => Object.hash(
-        id,
-        companyName,
-        contactName,
-        email,
-        phone,
-        website,
-        notes,
-        outstandingBalance,
-      );
+    id,
+    companyName,
+    contactName,
+    email,
+    phone,
+    website,
+    notes,
+    outstandingBalance,
+  );
 }

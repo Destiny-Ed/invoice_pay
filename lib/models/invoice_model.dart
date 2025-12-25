@@ -1,7 +1,8 @@
-// models/invoice_model.dart
 import 'package:invoice_pay/models/invoice_item_model.dart';
 
 enum InvoiceStatus { draft, sent, pending, paid, overdue, partial }
+
+enum TemplateType { minimal, bold, classic, modern, creative }
 
 class InvoiceModel {
   final String id;
@@ -14,7 +15,11 @@ class InvoiceModel {
   final double discountPercent;
   final double paidAmount;
   final InvoiceStatus status;
+  final TemplateType templateType;
   DateTime? sentDate;
+  bool receivePayment;
+  String paymentMethod; // bank_transfer, paypal, stripe, upi
+  String paymentDetails; // e.g. Account number, PayPal email, etc.
 
   InvoiceModel({
     required this.id,
@@ -28,6 +33,10 @@ class InvoiceModel {
     this.paidAmount = 0.0,
     this.status = InvoiceStatus.draft,
     this.sentDate,
+    required this.templateType,
+    this.receivePayment = false,
+    this.paymentDetails = "bank_transfer",
+    this.paymentMethod = "",
   });
 
   // Calculated getters
@@ -64,6 +73,10 @@ class InvoiceModel {
     return InvoiceModel(
       id: id,
       number: map['number'] ?? '',
+      templateType: TemplateType.values.firstWhere(
+        (e) => e.name == map['template_type'],
+        orElse: () => TemplateType.minimal,
+      ),
       clientId: map['client_id'] ?? '',
       issued: DateTime.parse(map['issued'] ?? DateTime.now().toIso8601String()),
       sentDate: DateTime.parse(
@@ -78,6 +91,9 @@ class InvoiceModel {
         (e) => e.index == (map['status'] ?? 0),
         orElse: () => InvoiceStatus.draft,
       ),
+      receivePayment: map['receive_payment'] ?? false,
+      paymentMethod: map['payment_method'] ?? 'bank_transfer',
+      paymentDetails: map['payment_details'] ?? '',
     );
   }
 
@@ -93,6 +109,10 @@ class InvoiceModel {
       'discount_percent': discountPercent,
       'paid_amount': paidAmount,
       'status': status.index,
+      'template_type': templateType.name,
+      'receive_payment': receivePayment,
+      'payment_method': paymentMethod,
+      'payment_details': paymentDetails,
     };
   }
 
@@ -109,11 +129,16 @@ class InvoiceModel {
     double? discountPercent,
     double? paidAmount,
     InvoiceStatus? status,
+    TemplateType? templateType,
+    bool? receivePayment,
+    String? paymentMethod,
+    String? paymentDetails,
   }) {
     return InvoiceModel(
       id: id ?? this.id,
       number: number ?? this.number,
       clientId: clientId ?? this.clientId,
+      templateType: templateType ?? this.templateType,
       issued: issued ?? this.issued,
       sentDate: sentDate ?? this.sentDate,
       due: due ?? this.due,
@@ -122,6 +147,9 @@ class InvoiceModel {
       discountPercent: discountPercent ?? this.discountPercent,
       paidAmount: paidAmount ?? this.paidAmount,
       status: status ?? this.status,
+      receivePayment: receivePayment ?? this.receivePayment,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      paymentDetails: paymentDetails ?? this.paymentDetails,
     );
   }
 }

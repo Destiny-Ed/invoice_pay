@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/modal/auth_modal.dart';
 import 'package:invoice_pay/screens/onboarding/company_setup.dart';
+import 'package:invoice_pay/screens/settings/support_screen.dart';
 import 'package:invoice_pay/screens/settings/widgets/custom_widgets.dart';
 import 'package:invoice_pay/utils/app_version.dart';
+import 'package:invoice_pay/utils/contants.dart';
 import 'package:provider/provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/settings_provider.dart';
@@ -137,13 +139,18 @@ class SettingsScreen extends StatelessWidget {
                 icon: Icons.security,
                 title: 'Privacy & Security',
                 onTap: () {
-                  settings.openUrl('https://invoicepay.app/privacy');
+                  settings.openUrl(privacyPolicy);
                 },
               ),
               _SettingsTile(
                 icon: Icons.help_outline,
                 title: 'Help & Support',
-                onTap: () => settings.openUrl('https://invoicepay.app/support'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SupportPage()),
+                  );
+                },
               ),
               _SettingsTile(
                 icon: Icons.update,

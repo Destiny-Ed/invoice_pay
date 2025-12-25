@@ -148,7 +148,7 @@ class AuthenticationProviderImpl extends ChangeNotifier
     final batch = FirebaseFirestore.instance.batch();
 
     // Delete or soft-delete main user document
-    final userRef = FirebaseFirestore.instance.collection('user').doc(uid);
+    final userRef = FirebaseFirestore.instance.collection('users').doc(uid);
     final checkUser = await userRef.get();
     if (!checkUser.exists) return;
     batch.update(userRef, {
@@ -205,7 +205,7 @@ class AuthenticationProviderImpl extends ChangeNotifier
           });
     } else {
       return await FirebaseFirestore.instance
-          .collection('user')
+          .collection('users')
           .doc(firebaseUser?.uid)
           .update({
             "date_deleted": DateTime.now().toIso8601String(),
@@ -216,7 +216,7 @@ class AuthenticationProviderImpl extends ChangeNotifier
 
   Future<bool> isUserAvailable(User? firebaseUser) async {
     final userDetail = await FirebaseFirestore.instance
-        .collection('user')
+        .collection('users')
         .doc(firebaseUser?.uid)
         .get();
 

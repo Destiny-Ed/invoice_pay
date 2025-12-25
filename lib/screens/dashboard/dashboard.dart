@@ -212,7 +212,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 // Recent Invoices List
                 if (invoiceProvider.invoices.isEmpty)
-                  emptyState()
+                  emptyState(
+                    "No invoices",
+                    'Create your first invoice to get started',
+                  )
                 else
                   ...invoiceProvider.invoices
                       .take(5)

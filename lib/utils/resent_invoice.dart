@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/models/client_model.dart';
@@ -67,7 +69,16 @@ Thank you!
       await canLaunchUrl(Uri.parse(whatsappUrl))) {
     await launchUrl(Uri.parse(whatsappUrl));
   } else if (choice == 'share') {
-    Share.share(body);
+    if (context.mounted) {
+      final overlay =
+          Overlay.of(context).context.findRenderObject() as RenderBox;
+      SharePlus.instance.share(
+        ShareParams(
+          text: body,
+          sharePositionOrigin: Offset.zero & overlay.size,
+        ),
+      );
+    }
   }
 
   // After sending: Update status to Sent → Pending

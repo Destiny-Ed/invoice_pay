@@ -1,18 +1,62 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:invoice_pay/config/extension.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
-import 'package:invoice_pay/providers/base_provider.dart';
+import 'package:invoice_pay/screens/invoice/invoice_template.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/widgets.dart' as pw;
+
+import '../providers/base_provider.dart';
 import '../models/invoice_model.dart';
 import '../models/invoice_item_model.dart';
 import '../models/client_model.dart';
+import '../models/company_model.dart';
 
 class InvoiceProvider extends BaseViewModel {
+  // ==========================================================
+  // INVOICES LIST
+  // ==========================================================
+
   List<InvoiceModel> _invoices = [];
   List<InvoiceModel> get invoices => List.unmodifiable(_invoices);
+
+  InvoiceModel? _singleInvoice;
+  InvoiceModel? get singleInvoice => _singleInvoice;
+
+  // ==========================================================
+  // PAYMENT SETTINGS
+  // ==========================================================
+
+  bool _draftReceivePayment = false;
+  bool get draftReceivePayment => _draftReceivePayment;
+
+  String _draftPaymentMethod = 'bank_transfer';
+  String get draftPaymentMethod => _draftPaymentMethod;
+
+  String _draftPaymentDetails = '';
+  String get draftPaymentDetails => _draftPaymentDetails;
+
+  void toggleDraftReceivePayment(bool value) {
+    _draftReceivePayment = value;
+    notifyListeners();
+  }
+
+  void setDraftPaymentMethod(String method) {
+    _draftPaymentMethod = method;
+    notifyListeners();
+  }
+
+  void updateDraftPaymentDetails(String details) {
+    _draftPaymentDetails = details;
+    notifyListeners();
+  }
+
+  // ==========================================================
+  // FIRESTORE CRUD
+  // ==========================================================
 
   Future<void> loadInvoices() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -33,13 +77,41 @@ class InvoiceProvider extends BaseViewModel {
           .get();
 
       _invoices = snapshot.docs
-          .map((doc) => InvoiceModel.fromMap(doc.id, doc.data()))
+          .map((d) => InvoiceModel.fromMap(d.id, d.data()))
           .toList();
 
       setLoading(ViewState.Success);
       notifyListeners();
-    } catch (e) {
-      setError('Failed to load invoices');
+    } catch (e, s) {
+      setError('Failed to load invoices $e', s: s);
+      setLoading(ViewState.Error);
+    }
+  }
+
+  Future<void> loadSingleInvoice(String invoiceId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      setError('User not authenticated');
+      setLoading(ViewState.Error);
+      return;
+    }
+
+    try {
+      setLoading(ViewState.Busy);
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('invoices')
+          .doc(invoiceId)
+          .get();
+
+      _singleInvoice = InvoiceModel.fromMap(snapshot.id, snapshot.data()!);
+
+      setLoading(ViewState.Success);
+      notifyListeners();
+    } catch (e, s) {
+      setError('Failed to load single invoice $e', s: s);
       setLoading(ViewState.Error);
     }
   }
@@ -48,98 +120,84 @@ class InvoiceProvider extends BaseViewModel {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return false;
 
-    setLoading(ViewState.Busy);
-    clearError();
-
     try {
+      setLoading(ViewState.Busy);
+
       final ref = await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('invoices')
           .add(invoice.toMap());
 
-      final newInvoice = invoice.copyWith(id: ref.id);
-      _invoices.insert(0, newInvoice);
+      _invoices.insert(0, invoice.copyWith(id: ref.id));
       notifyListeners();
 
       setLoading(ViewState.Success);
       unawaited(loadInvoices());
       return true;
-    } catch (e) {
+    } catch (_) {
       setError('Failed to create invoice');
       setLoading(ViewState.Error);
       return false;
     }
   }
 
-  Future<bool> updateInvoice(InvoiceModel updatedInvoice) async {
+  Future<bool> updateInvoice(InvoiceModel invoice) async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      setError('User not authenticated');
-      return false;
-    }
-
-    setLoading(ViewState.Busy);
-    clearError();
+    if (user == null) return false;
 
     try {
-      // Update in Firestore
+      setLoading(ViewState.Busy);
+
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('invoices')
-          .doc(updatedInvoice.id)
-          .update(updatedInvoice.toMap());
+          .doc(invoice.id)
+          .update(invoice.toMap());
 
-      // Update local list
-      final index = _invoices.indexWhere((inv) => inv.id == updatedInvoice.id);
-      if (index != -1) {
-        _invoices[index] = updatedInvoice;
-        notifyListeners();
-      }
+      final index = _invoices.indexWhere((i) => i.id == invoice.id);
+      if (index != -1) _invoices[index] = invoice;
 
-      setLoading(ViewState.Success);
+      await loadSingleInvoice(invoice.id);
       return true;
-    } catch (e) {
-      setError('Failed to update invoice: ${e.toString()}');
+    } catch (e, s) {
+      setError('Failed to update invoice $e', s: s);
       setLoading(ViewState.Error);
       return false;
     }
   }
 
-  Future<bool> deleteInvoice(String invoiceId) async {
+  Future<bool> deleteInvoice(String id) async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      setError('User not authenticated');
-      return false;
-    }
-
-    setLoading(ViewState.Busy);
-    clearError();
+    if (user == null) return false;
 
     try {
-      // Delete from Firestore
+      setLoading(ViewState.Busy);
+
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('invoices')
-          .doc(invoiceId)
+          .doc(id)
           .delete();
 
-      // Remove from local list
-      _invoices.removeWhere((inv) => inv.id == invoiceId);
+      _invoices.removeWhere((i) => i.id == id);
       notifyListeners();
 
       setLoading(ViewState.Success);
       return true;
-    } catch (e) {
-      setError('Failed to delete invoice: ${e.toString()}');
+    } catch (_) {
+      setError('Failed to delete invoice');
       setLoading(ViewState.Error);
       return false;
     }
   }
 
-  // === Create Invoice State & Logic ===
+  // ==========================================================
+  // DRAFT STATE
+  // ==========================================================
+
   String _draftInvoiceNumber = 'INV-';
   String get draftInvoiceNumber => _draftInvoiceNumber;
 
@@ -152,59 +210,69 @@ class InvoiceProvider extends BaseViewModel {
   ClientModel? _draftSelectedClient;
   ClientModel? get draftSelectedClient => _draftSelectedClient;
 
-  String _draftSelectedTemplate = 'Minimal';
-  String get draftSelectedTemplate => _draftSelectedTemplate;
+  // ---------- TEMPLATE ----------
+  TemplateType _draftTemplate = TemplateType.minimal;
+  TemplateType get draftTemplate => _draftTemplate;
 
+  List<String> get templates => TemplateType.values.map((e) => e.name).toList();
+
+  String get draftSelectedTemplate => _draftTemplate.name;
+
+  void selectDraftTemplate(String value) {
+    _draftTemplate = TemplateType.values.firstWhere((e) => e.name == value);
+    notifyListeners();
+  }
+
+  // ---------- ITEMS ----------
   final List<InvoiceItemModel> _draftItems = [InvoiceItemModel()];
   List<InvoiceItemModel> get draftItems => _draftItems;
 
-  double _draftTaxPercent = 0.0;
+  double _draftTaxPercent = 0;
   double get draftTaxPercent => _draftTaxPercent;
 
-  double _draftDiscountPercent = 0.0;
+  double _draftDiscountPercent = 0;
   double get draftDiscountPercent => _draftDiscountPercent;
 
-  final List<String> templates = ['Minimal', 'Bold', 'Classic'];
+  // ==========================================================
+  // CALCULATIONS
+  // ==========================================================
 
-  // Calculated Getters
-  double get draftSubtotal =>
-      _draftItems.fold(0.0, (sum, item) => sum + item.amount);
+  double get draftSubtotal => _draftItems.fold(0, (s, i) => s + i.amount);
+
   double get draftTaxAmount => draftSubtotal * (_draftTaxPercent / 100);
+
   double get draftDiscountAmount =>
       draftSubtotal * (_draftDiscountPercent / 100);
+
   double get draftTotal => draftSubtotal + draftTaxAmount - draftDiscountAmount;
 
-  bool get canCreateDraftInvoice {
-    if (_draftSelectedClient == null) return false;
-    return _draftItems.every(
-      (item) =>
-          item.description.trim().isNotEmpty && item.qty > 0 && item.rate > 0,
-    );
-  }
+  bool get canCreateDraftInvoice =>
+      _draftSelectedClient != null &&
+      _draftItems.every(
+        (i) => i.description.isNotEmpty && i.qty > 0 && i.rate > 0,
+      );
 
-  // Setters
-  void updateDraftInvoiceNumber(String value) {
-    _draftInvoiceNumber = value;
+  // ==========================================================
+  // DRAFT MUTATORS
+  // ==========================================================
+
+  void updateDraftInvoiceNumber(String v) {
+    _draftInvoiceNumber = v;
     notifyListeners();
   }
 
-  void updateDraftIssuedDate(DateTime date) {
-    _draftIssuedDate = date;
+  void updateDraftIssuedDate(DateTime d) {
+    _draftIssuedDate = d;
     notifyListeners();
   }
 
-  void updateDraftDueDate(DateTime date) {
-    _draftDueDate = date;
+  void updateDraftDueDate(DateTime d) {
+    _draftDueDate = d;
     notifyListeners();
   }
 
-  void selectDraftClient(ClientModel client) {
-    _draftSelectedClient = client;
-    notifyListeners();
-  }
-
-  void selectDraftTemplate(String template) {
-    _draftSelectedTemplate = template;
+  void selectDraftClient(ClientModel c) {
+    _draftSelectedClient = c;
     notifyListeners();
   }
 
@@ -213,61 +281,60 @@ class InvoiceProvider extends BaseViewModel {
     notifyListeners();
   }
 
-  void removeDraftItem(int index) {
+  void removeDraftItem(int i) {
     if (_draftItems.length > 1) {
-      _draftItems.removeAt(index);
+      _draftItems.removeAt(i);
       notifyListeners();
     }
   }
 
-  void updateDraftItemDescription(int index, String description) {
-    _draftItems[index].description = description;
+  void updateDraftItemDescription(int i, String v) {
+    _draftItems[i].description = v;
     notifyListeners();
   }
 
-  void updateDraftItemQuantity(int index, double qty) {
-    if (qty >= 1) {
-      _draftItems[index].qty = qty;
-      _draftItems[index].amount =
-          _draftItems[index].qty * _draftItems[index].rate;
+  void updateDraftItemQuantity(int i, double q) {
+    if (q >= 1) {
+      _draftItems[i].qty = q;
+      _draftItems[i].amount = q * _draftItems[i].rate;
       notifyListeners();
     }
   }
 
-  void incrementDraftQuantity(int index) {
-    _draftItems[index].qty += 1;
-    _draftItems[index].amount =
-        _draftItems[index].qty * _draftItems[index].rate;
+  void incrementDraftQuantity(int i) {
+    _draftItems[i].qty += 1;
+    _draftItems[i].amount = _draftItems[i].qty * _draftItems[i].rate;
     notifyListeners();
   }
 
-  void decrementDraftQuantity(int index) {
-    if (_draftItems[index].qty > 1) {
-      _draftItems[index].qty -= 1;
-      _draftItems[index].amount =
-          _draftItems[index].qty * _draftItems[index].rate;
+  void decrementDraftQuantity(int i) {
+    if (_draftItems[i].qty > 1) {
+      _draftItems[i].qty -= 1;
+      _draftItems[i].amount = _draftItems[i].qty * _draftItems[i].rate;
       notifyListeners();
     }
   }
 
-  void updateDraftItemRate(int index, double rate) {
-    _draftItems[index].rate = rate;
-    _draftItems[index].amount =
-        _draftItems[index].qty * _draftItems[index].rate;
+  void updateDraftItemRate(int i, double r) {
+    _draftItems[i].rate = r;
+    _draftItems[i].amount = r * _draftItems[i].qty;
     notifyListeners();
   }
 
-  void updateDraftTaxPercent(double value) {
-    _draftTaxPercent = value;
+  void updateDraftTaxPercent(double v) {
+    _draftTaxPercent = v;
     notifyListeners();
   }
 
-  void updateDraftDiscountPercent(double value) {
-    _draftDiscountPercent = value;
+  void updateDraftDiscountPercent(double v) {
+    _draftDiscountPercent = v;
     notifyListeners();
   }
 
-  // Invoices List Filters
+  // ==========================================================
+  // LIST FILTERS (USED BY UI)
+  // ==========================================================
+
   InvoiceStatus? _listSelectedStatus;
   InvoiceStatus? get listSelectedStatus => _listSelectedStatus;
 
@@ -280,46 +347,39 @@ class InvoiceProvider extends BaseViewModel {
   String _listSearchQuery = '';
   String get listSearchQuery => _listSearchQuery;
 
-  // Filtered Invoices
   List<InvoiceModel> filteredInvoices(BuildContext context) {
     return _invoices.where((inv) {
-      if (_listSelectedStatus != null && inv.status != _listSelectedStatus) {
+      if (_listSelectedStatus != null && inv.status != _listSelectedStatus)
         return false;
-      }
-      if (_listStartDate != null && inv.due.isBefore(_listStartDate!)) {
+      if (_listStartDate != null && inv.due.isBefore(_listStartDate!))
         return false;
-      }
       if (_listEndDate != null && inv.due.isAfter(_listEndDate!)) return false;
+
       if (_listSearchQuery.isNotEmpty) {
-        final query = _listSearchQuery.toLowerCase();
-        final clientName = inv.getClientName(context);
-        if (!inv.number.toLowerCase().contains(query) &&
-            !clientName.toLowerCase().contains(query)) {
-          return false;
-        }
+        final q = _listSearchQuery.toLowerCase();
+        if (!inv.number.toLowerCase().contains(q)) return false;
       }
       return true;
     }).toList();
   }
 
-  // Setters
-  void setListStatusFilter(InvoiceStatus? status) {
-    _listSelectedStatus = status;
+  void setListStatusFilter(InvoiceStatus? v) {
+    _listSelectedStatus = v;
     notifyListeners();
   }
 
-  void setListStartDate(DateTime? date) {
-    _listStartDate = date;
+  void setListStartDate(DateTime? d) {
+    _listStartDate = d;
     notifyListeners();
   }
 
-  void setListEndDate(DateTime? date) {
-    _listEndDate = date;
+  void setListEndDate(DateTime? d) {
+    _listEndDate = d;
     notifyListeners();
   }
 
-  void setListSearchQuery(String query) {
-    _listSearchQuery = query;
+  void setListSearchQuery(String q) {
+    _listSearchQuery = q;
     notifyListeners();
   }
 
@@ -331,18 +391,74 @@ class InvoiceProvider extends BaseViewModel {
     notifyListeners();
   }
 
-  // Reset draft for new invoice
+  // ==========================================================
+  // PREVIEW INVOICE
+  // ==========================================================
+
+  InvoiceModel previewInvoice(BuildContext context) {
+    return InvoiceModel(
+      id: 'preview',
+      number: _draftInvoiceNumber,
+      clientId: _draftSelectedClient?.id ?? '',
+      issued: _draftIssuedDate,
+      due: _draftDueDate,
+      items: List.from(_draftItems),
+      taxPercent: _draftTaxPercent,
+      discountPercent: _draftDiscountPercent,
+      receivePayment: _draftReceivePayment,
+      paymentMethod: _draftPaymentMethod,
+      paymentDetails: _draftPaymentDetails,
+      templateType: _draftTemplate,
+    );
+  }
+
+  // ==========================================================
+  // PDF
+  // ==========================================================
+
+  Future<File> generatePdf({
+    required InvoiceModel invoice,
+    required CompanyModel company,
+    required ClientModel client,
+  }) async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        margin: const pw.EdgeInsets.all(32),
+        build: (_) => PdfInvoiceTemplate.build(
+          invoice: invoice,
+          company: company,
+          client: client,
+          template: invoice.templateType,
+        ),
+      ),
+    );
+
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/invoice_${invoice.number}.pdf');
+    await file.writeAsBytes(await pdf.save());
+    return file;
+  }
+
+  // ==========================================================
+  // RESET
+  // ==========================================================
+
   void resetDraft() {
-    _draftInvoiceNumber =
-        'INV-${DateTime.now().year}${DateTime.now().month.toString().padLeft(2, '0')}001';
+    _draftInvoiceNumber = 'INV-${DateTime.now().millisecondsSinceEpoch}';
     _draftIssuedDate = DateTime.now();
     _draftDueDate = DateTime.now().add(const Duration(days: 30));
     _draftSelectedClient = null;
-    _draftSelectedTemplate = 'Minimal';
-    _draftItems.clear();
-    _draftItems.add(InvoiceItemModel());
-    _draftTaxPercent = 0.0;
-    _draftDiscountPercent = 0.0;
+    _draftTemplate = TemplateType.minimal;
+    _draftItems
+      ..clear()
+      ..add(InvoiceItemModel());
+    _draftTaxPercent = 0;
+    _draftDiscountPercent = 0;
+    _draftReceivePayment = false;
+    _draftPaymentMethod = 'bank_transfer';
+    _draftPaymentDetails = '';
     notifyListeners();
   }
 }

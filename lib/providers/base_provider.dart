@@ -17,9 +17,9 @@ class BaseViewModel extends ChangeNotifier {
     });
   }
 
-  void setError(String message) {
+  void setError(String message, {StackTrace? s}) {
     _errorMessage = message;
-    log(message);
+    log(message, stackTrace: s);
     notifyListeners();
   }
 

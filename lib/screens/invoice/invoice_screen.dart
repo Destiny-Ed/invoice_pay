@@ -162,7 +162,10 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                         child: SizedBox(height: double.infinity),
                       )
                     : invoiceProvider.filteredInvoices(context).isEmpty
-                    ? emptyState()
+                    ? emptyState(
+                        "No invoices",
+                        'Create your first invoice to get started',
+                      )
                     : ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: invoiceProvider
