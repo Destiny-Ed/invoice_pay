@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:invoice_pay/modal/color_picker_modal.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/dashboard/dashboard.dart';
@@ -62,7 +63,21 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
   ];
 
   Color selectedColor = primaryColor;
-  String selectedFont = 'Manrope';
+  String selectedFont = 'AbeeZee';
+
+  void _pickPrimaryColor(BuildContext context) async {
+    final color = await showColorPickerModal(
+      context: context,
+      initialColor: selectedColor,
+      title: 'Choose Primary Color',
+    );
+
+    if (color != null) {
+      setState(() {
+        selectedColor = color;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -282,7 +297,7 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
                 Center(
                   child: GestureDetector(
                     onTap: () {
-                      // Custom color picker (future)
+                      _pickPrimaryColor(context);
                     },
                     child: Container(
                       width: 40,
