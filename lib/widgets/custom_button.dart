@@ -22,23 +22,19 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
+    return ElevatedButton(
       onPressed: onPressed,
-      style: ButtonStyle(
-        fixedSize: MaterialStateProperty.resolveWith(
-          (states) => Size(width ?? MediaQuery.of(context).size.width, 0),
-        ),
-        backgroundColor: MaterialStateProperty.resolveWith(
-          (states) => bgColor ?? primaryColor,
-        ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: bgColor ?? primaryColor,
+        foregroundColor: textColor,
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        elevation: 8,
+        shadowColor: Colors.black.withOpacity(0.3),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) Icon(icon, color: textColor),
-          if (icon != null) 5.width(),
-          Text(text, style: AppTheme.titleStyle(color: textColor)),
-        ],
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     );
   }
