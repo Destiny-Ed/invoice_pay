@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -151,8 +153,8 @@ class CompanyProvider extends ChangeNotifier {
       }
 
       notifyListeners();
-    } catch (e) {
-      debugPrint('Error uploading logo: $e');
+    } catch (e, s) {
+      log('Error uploading logo: $e', stackTrace: s);
     }
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_text_form_field/flutter_text_form_field.dart';
 import 'package:flutter_utilities/flutter_utilities.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/screens/authentication/forgot_password.dart';
@@ -11,6 +10,7 @@ import 'package:invoice_pay/styles/theme.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
+import 'package:invoice_pay/widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen>
                           // ),
                         ),
 
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 10),
 
                         // Password Field
                         CustomTextField(
@@ -155,6 +155,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                         // Login Button
                         CustomButton(
+                          width: double.infinity,
                           onPressed: () async {
                             final email = auth.emailController.text.trim();
                             final password = auth.passwordController.text

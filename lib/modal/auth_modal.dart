@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_text_form_field/flutter_text_form_field.dart';
-import 'package:invoice_pay/providers/auth_provider.dart';
+ import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/screens/onboarding/splash.dart';
 import 'package:invoice_pay/utils/message.dart';
+import 'package:invoice_pay/widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
 
 void showLogoutDialog(BuildContext context) {

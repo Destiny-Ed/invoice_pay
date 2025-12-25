@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_text_form_field/flutter_text_form_field.dart';
 import 'package:flutter_utilities/flutter_utilities.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/styles/colors.dart';
@@ -7,6 +6,7 @@ import 'package:invoice_pay/styles/theme.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
+import 'package:invoice_pay/widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
@@ -66,6 +66,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                   const SizedBox(height: 40),
 
                   CustomButton(
+                    width: double.infinity,
                     onPressed: () async {
                       final email = auth.emailController.text.trim();
 

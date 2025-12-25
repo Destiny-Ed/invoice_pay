@@ -18,10 +18,7 @@ Future<UploadDocResultModel> uploadDocumentToServer(String docPath) async {
   log("Uploading document to server");
 
   try {
-    Reference ref = FirebaseStorage.instance
-        .ref()
-        .child('loan_doc')
-        .child('/$docName');
+    Reference ref = FirebaseStorage.instance.ref().child('/$docName');
 
     uploadTask = ref.putFile(File(docPath));
 

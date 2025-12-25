@@ -9,6 +9,7 @@ import 'package:invoice_pay/styles/theme.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
+import 'package:invoice_pay/widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
 
 class CompanySetupScreen extends StatefulWidget {
@@ -102,19 +103,12 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
-                TextFormField(
-                  controller: _nameCtrl,
-                  decoration: InputDecoration(
-                    hintText: 'e.g. Acme Studio',
-                    prefixIcon: const Icon(Icons.business),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                  ),
+                CustomTextField(
+                  _nameCtrl,
+                  password: false,
+                  hint: 'e.g. Acme Studio',
+                  prefixIcon: const Icon(Icons.business),
                 ),
-
                 const SizedBox(height: 10),
 
                 // Business Email
@@ -123,18 +117,13 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
-                TextFormField(
-                  controller: _emailCtrl,
+                CustomTextField(
+                  _emailCtrl,
+                  password: false,
+                  hint: 'name@company.com',
                   keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    hintText: 'name@company.com',
-                    prefixIcon: const Icon(Icons.email),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                  ),
+
+                  prefixIcon: const Icon(Icons.email),
                 ),
 
                 const SizedBox(height: 10),
@@ -145,18 +134,14 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
-                TextFormField(
-                  controller: _phoneCtrl,
+
+                CustomTextField(
+                  _phoneCtrl,
+                  password: false,
+                  hint: '+1 (555) 000-0000',
                   keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
-                    hintText: '+1 (555) 000-0000',
-                    prefixIcon: const Icon(Icons.phone),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                  ),
+
+                  prefixIcon: const Icon(Icons.phone),
                 ),
 
                 const SizedBox(height: 10),
@@ -187,23 +172,18 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                 ),
 
                 const SizedBox(height: 8),
-                TextFormField(
-                  controller: _streetCtrl,
-                  decoration: InputDecoration(
-                    hintText: 'Address',
-                    prefixIcon: const Icon(Icons.location_city),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                  ),
+                CustomTextField(
+                  _streetCtrl,
+                  password: false,
+                  hint: 'Address',
+                  prefixIcon: const Icon(Icons.location_city),
                 ),
 
                 const SizedBox(height: 30),
 
                 // Next Button
                 CustomButton(
+                  width: MediaQuery.of(context).size.width / 2,
                   onPressed: () {
                     if (_nameCtrl.text.isEmpty ||
                         _emailCtrl.text.isEmpty ||

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/dashboard/dashboard.dart';
@@ -34,18 +35,28 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
 
   final List<Map<String, String>> fonts = [
     {
-      'family': 'Manrope',
-      'display': 'Modern Sans',
-      'subtitle': 'Manrope (Default)',
+      'family': GoogleFonts.aBeeZee().fontFamily ?? "",
+      'display': GoogleFonts.aBeeZee().fontFamily ?? "",
+      'subtitle': 'AbeeZee',
     },
     {
-      'family': 'Merriweather',
-      'display': 'Classic Serif',
-      'subtitle': 'Merriweather',
+      'family': GoogleFonts.notable().fontFamily ?? "",
+      'display': GoogleFonts.notable().fontFamily ?? "",
+      'subtitle': 'Notable (Default)',
     },
     {
-      'family': 'Roboto Mono',
-      'display': 'Technical Mono',
+      'family': GoogleFonts.dmSans().fontFamily ?? "",
+      'display': GoogleFonts.dmSans().fontFamily ?? "",
+      'subtitle': 'DmSans (Default)',
+    },
+    {
+      'family': GoogleFonts.dmSerifDisplay().fontFamily ?? "",
+      'display': GoogleFonts.dmSerifDisplay().fontFamily ?? "",
+      'subtitle': 'Serif',
+    },
+    {
+      'family': GoogleFonts.robotoMono().fontFamily ?? "",
+      'display': GoogleFonts.robotoMono().fontFamily ?? "",
       'subtitle': 'Roboto Mono',
     },
   ];
@@ -340,15 +351,19 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  display,
-                                  style: const TextStyle(
+                                  display.replaceAll("_", " "),
+                                  style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
+                                    fontFamily: family,
                                   ),
                                 ),
                                 Text(
                                   subtitle,
-                                  style: TextStyle(color: Colors.grey[600]),
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontFamily: family,
+                                  ),
                                 ),
                               ],
                             ),

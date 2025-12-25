@@ -1,16 +1,16 @@
-// screens/authentication/register_screen.dart
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_text_form_field/flutter_text_form_field.dart';
 import 'package:flutter_utilities/flutter_utilities.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/screens/authentication/login.dart';
 import 'package:invoice_pay/screens/onboarding/company_setup.dart';
 import 'package:invoice_pay/styles/colors.dart';
 import 'package:invoice_pay/styles/theme.dart';
+import 'package:invoice_pay/utils/contants.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
+import 'package:invoice_pay/widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -90,7 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                           'Create Account',
                           style: AppTheme.headerStyle().copyWith(fontSize: 32),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 10),
                         Text(
                           'Start sending invoices and getting paid faster',
                           style: TextStyle(
@@ -112,7 +112,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                           // ),
                         ),
 
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 10),
 
                         // Email
                         CustomTextField(
@@ -126,7 +126,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                           // ),
                         ),
 
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 10),
 
                         // Password
                         CustomTextField(
@@ -149,6 +149,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                               onChanged: (v) =>
                                   auth.isTermsAccepted = v ?? false,
                               activeColor: primaryColor,
+                              shape: StadiumBorder(),
                             ),
                             Expanded(
                               child: Text.rich(
@@ -163,9 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                                       ),
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () => launchUrl(
-                                          Uri.parse(
-                                            'https://invoicepay.app/terms',
-                                          ),
+                                          Uri.parse(termsOfService),
                                         ),
                                     ),
                                     const TextSpan(text: ' and '),
@@ -176,11 +175,8 @@ class _RegisterScreenState extends State<RegisterScreen>
                                         fontWeight: FontWeight.bold,
                                       ),
                                       recognizer: TapGestureRecognizer()
-                                        ..onTap = () => launchUrl(
-                                          Uri.parse(
-                                            'https://invoicepay.app/privacy',
-                                          ),
-                                        ),
+                                        ..onTap = () =>
+                                            launchUrl(Uri.parse(privacyPolicy)),
                                     ),
                                   ],
                                 ),
@@ -194,6 +190,7 @@ class _RegisterScreenState extends State<RegisterScreen>
 
                         // Register Button
                         CustomButton(
+                          width: double.infinity,
                           onPressed: () async {
                             final name = auth.userNameController.text.trim();
                             final email = auth.emailController.text.trim();
@@ -264,7 +261,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                           text: 'Create Account',
                         ),
 
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 20),
 
                         // Login Link
                         Text.rich(
