@@ -7,6 +7,7 @@ import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
 import 'package:invoice_pay/screens/invoice/wigets/custom_widgets.dart';
 import 'package:invoice_pay/screens/settings/settings_screen.dart';
 import 'package:invoice_pay/styles/colors.dart';
+import 'package:invoice_pay/utils/greetings.dart';
 import 'package:invoice_pay/widgets/invoice_card.dart';
 import 'package:invoice_pay/widgets/stats_card.dart';
 import 'package:provider/provider.dart';
@@ -67,13 +68,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           final goal = companyProvider.company?.monthlyGoal ?? 15000.0;
           final progress = totalRevenue / goal;
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Greeting
                 Text(
-                  'Good morning!',
+                  getRichGreeting(),
                   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
                 const Text(

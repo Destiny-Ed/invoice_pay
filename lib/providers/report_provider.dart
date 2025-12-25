@@ -13,7 +13,7 @@ class ReportsViewModel extends BaseViewModel {
   final ClientProvider _clientProvider;
 
   ReportsViewModel(this._invoiceProvider, this._clientProvider) {
-    loadData();
+    // loadData();
   }
 
   DateTimeRange? _dateRange;

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -46,7 +47,7 @@ class CompanyProvider extends ChangeNotifier {
 
     try {
       final doc = await FirebaseFirestore.instance
-          .collection('user')
+          .collection('users')
           .doc(user.uid)
           .collection('company')
           .get();
@@ -70,12 +71,12 @@ class CompanyProvider extends ChangeNotifier {
         _company = null;
       }
       _viewState = ViewState.Success;
+      notifyListeners();
     } catch (e) {
       debugPrint('Error loading company: $e');
       _viewState = ViewState.Error;
+      notifyListeners();
     }
-
-    notifyListeners();
   }
 
   // Save all company details (called after onboarding or edit)
@@ -100,7 +101,7 @@ class CompanyProvider extends ChangeNotifier {
         fontFamily: fontFamily,
       );
       await FirebaseFirestore.instance
-          .collection('user')
+          .collection('users')
           .doc(user.uid)
           .collection('company')
           .add(model?.toMap() ?? company.toMap());
@@ -109,6 +110,7 @@ class CompanyProvider extends ChangeNotifier {
       _viewState = ViewState.Success;
       _message = "saved";
       notifyListeners();
+      unawaited(loadCompany());
     } catch (e) {
       debugPrint('Error saving company: $e');
       _company = company;

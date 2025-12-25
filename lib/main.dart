@@ -7,14 +7,16 @@ import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/providers/main_activity_provider.dart';
 import 'package:invoice_pay/providers/report_provider.dart';
 import 'package:invoice_pay/providers/settings_provider.dart';
-import 'package:invoice_pay/screens/main_activity/main_activity.dart';
 import 'package:invoice_pay/screens/onboarding/splash.dart';
 import 'package:invoice_pay/styles/colors.dart';
+import 'package:invoice_pay/utils/app_version.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  await AppVersion.init();
   runApp(
     MultiProvider(
       providers: [

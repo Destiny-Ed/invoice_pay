@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
-import 'package:invoice_pay/styles/colors.dart';
+import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
@@ -11,7 +11,7 @@ void showGoalModal(BuildContext context) {
         context.read<CompanyProvider>().company?.monthlyGoal.toStringAsFixed(
           0,
         ) ??
-        '5000',
+        '15000',
   );
 
   showModalBottomSheet(
@@ -38,15 +38,16 @@ void showGoalModal(BuildContext context) {
               'Motivate yourself with a clear target',
               style: TextStyle(color: Colors.grey[600]),
             ),
-            const SizedBox(height: 32),
-            TextField(
+            const SizedBox(height: 22),
+
+            TextFormField(
               controller: controller,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
               decoration: InputDecoration(
                 prefixText: '\$',
-                hintText: '5000',
+                hintText: '15000',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -54,7 +55,7 @@ void showGoalModal(BuildContext context) {
                 fillColor: Colors.grey[50],
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               child: CustomButton(
@@ -64,12 +65,9 @@ void showGoalModal(BuildContext context) {
                       15000.0;
                   context.read<CompanyProvider>().updateMonthlyGoal(goal);
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Goal updated to \$${NumberFormat('#,##0').format(goal)}',
-                      ),
-                    ),
+                  showMessage(
+                    context,
+                    'Goal updated to \$${NumberFormat('#,##0').format(goal)}',
                   );
                 },
                 text: "Save Goal",

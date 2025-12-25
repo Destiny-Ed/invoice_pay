@@ -63,7 +63,7 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
   ];
 
   Color selectedColor = primaryColor;
-  String selectedFont = 'AbeeZee';
+  String selectedFont = GoogleFonts.aBeeZee().fontFamily ?? "";
 
   void _pickPrimaryColor(BuildContext context) async {
     final color = await showColorPickerModal(
