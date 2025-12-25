@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_utilities/flutter_utilities.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/models/invoice_item_model.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
@@ -307,6 +308,56 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                             ],
                           ),
                         ),
+
+                        if (invoice.paymentMethod.isNotEmpty) ...[
+                          const SizedBox(height: 20),
+                          const Text(
+                            'PAYMENT METHOD',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  invoice.paymentMethod.capitalize(),
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+
+                                if (invoice.paymentDetails.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    invoice.paymentDetails.replaceAll(
+                                      ",",
+                                      "\n",
+                                    ),
+                                    style: TextStyle(color: Colors.grey[700]),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
 
                         const SizedBox(height: 20),
 
