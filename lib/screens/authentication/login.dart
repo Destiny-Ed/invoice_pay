@@ -5,6 +5,7 @@ import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/screens/authentication/forgot_password.dart';
 import 'package:invoice_pay/screens/authentication/register.dart';
 import 'package:invoice_pay/screens/dashboard/dashboard.dart';
+import 'package:invoice_pay/screens/main_activity/main_activity.dart';
 import 'package:invoice_pay/styles/colors.dart';
 import 'package:invoice_pay/styles/theme.dart';
 import 'package:invoice_pay/utils/message.dart';
@@ -134,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen>
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ForgotPasswordScreen(),
@@ -190,11 +191,12 @@ class _LoginScreenState extends State<LoginScreen>
                             if (auth.state == ViewState.Success &&
                                 context.mounted) {
                               showMessage(context, 'Welcome back!');
-                              Navigator.pushReplacement(
+                              Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => DashboardScreen(),
+                                  builder: (context) => MainActivity(),
                                 ),
+                                (_) => false,
                               );
                             }
                           },

@@ -250,11 +250,12 @@ class _RegisterScreenState extends State<RegisterScreen>
                                 'Account created successfully!',
                               );
 
-                              Navigator.pushReplacement(
+                              Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => CompanySetupScreen(),
                                 ),
+                                (_) => false,
                               );
                             }
                           },

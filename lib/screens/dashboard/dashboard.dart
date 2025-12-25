@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:invoice_pay/providers/client_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/providers/main_activity_provider.dart';
@@ -26,6 +27,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     // Fetch invoices and clients on screen load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<InvoiceProvider>().loadInvoices();
+       
     });
   }
 
