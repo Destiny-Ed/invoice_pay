@@ -193,7 +193,7 @@ class AuthenticationProviderImpl extends ChangeNotifier
   }) async {
     if (!isDeleteUser) {
       return await FirebaseFirestore.instance
-          .collection('user')
+          .collection('users')
           .doc(firebaseUser?.uid)
           .set({
             "email": firebaseUser?.email ?? "",

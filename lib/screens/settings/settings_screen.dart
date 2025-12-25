@@ -1,148 +1,242 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:invoice_pay/providers/company_provider.dart';
-import 'package:invoice_pay/screens/settings/widgets/custom_widgets.dart';
-import 'package:invoice_pay/styles/colors.dart';
+import 'package:invoice_pay/modal/auth_modal.dart';
+import 'package:invoice_pay/utils/message.dart';
+import 'package:invoice_pay/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
-import '../../providers/settings_provider.dart';
-import '../../providers/auth_provider.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
+import 'package:invoice_pay/providers/settings_provider.dart';
+import 'package:invoice_pay/styles/colors.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+  void _showGoalModal(BuildContext context) {
+    final companyProvider = context.read<CompanyProvider>();
+    final currentGoal = companyProvider.company?.monthlyGoal ?? 5000.0;
+    final controller = TextEditingController(
+      text: currentGoal.toStringAsFixed(0),
+    );
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      ),
+      builder: (_) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom + 32,
+          left: 32,
+          right: 32,
+          top: 32,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Set Monthly Revenue Goal',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Track your progress on the dashboard',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 20),
+            TextFormField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                prefixText: '  \$ ',
+                hintText: '5000',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                filled: true,
+                fillColor: Colors.grey[50],
+                contentPadding: const EdgeInsets.symmetric(vertical: 24),
+              ),
+            ),
+            const SizedBox(height: 20),
+            CustomButton(
+              onPressed: () {
+                final newGoal =
+                    double.tryParse(
+                      controller.text.replaceAll(RegExp(r'[^0-9]'), ''),
+                    ) ??
+                    currentGoal;
+                companyProvider.updateMonthlyGoal(newGoal);
+                Navigator.pop(context);
+                showMessage(
+                  context,
+                  'Goal updated to \$${NumberFormat('#,##0').format(newGoal)}',
+                );
+              },
+
+              text: 'Save Goal',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer2<SettingsProvider, CompanyProvider>(
-      builder: (context, settings, companyProvider, _) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Settings'),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-          ),
-          body: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              // Profile Section
-              Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: ListTile(
-                  leading: const CircleAvatar(
-                    radius: 30,
+    final settings = context.watch<SettingsProvider>();
+    final company = context.watch<CompanyProvider>().company;
+
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        title: const Text('Settings'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: Colors.black,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          // Profile Card
+          Card(
+            elevation: 8,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 40,
                     backgroundColor: primaryColor,
-                    child: Icon(Icons.person, color: Colors.white, size: 32),
+                    child: const Icon(
+                      Icons.person,
+                      size: 40,
+                      color: Colors.white,
+                    ),
                   ),
-                  title: const Text(
-                    'Alex Freeman',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          company?.name ?? 'Your Business',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          company?.email ?? 'your@email.com',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
                   ),
-                  subtitle: const Text('alex@freelance.com'),
-                  // trailing: const ProBadge(),
-                ),
+                  // ProBadge() // Uncomment when ready
+                ],
               ),
-
-              const SizedBox(height: 32),
-
-              // Preferences
-              const _SectionTitle('Preferences'),
-              _SettingsTile(
-                icon: Icons.track_changes,
-                title: 'Monthly Revenue Goal',
-                subtitle:
-                    'Current: \$${NumberFormat('#,##0').format(companyProvider.company?.monthlyGoal ?? 5000)}',
-                onTap: () => showGoalModal(context),
-              ),
-              _SwitchTile(
-                icon: Icons.notifications_outlined,
-                title: 'Push Notifications',
-                value: settings.notificationsEnabled,
-                onChanged: settings.toggleNotifications,
-              ),
-              _SwitchTile(
-                icon: Icons.dark_mode_outlined,
-                title: 'Dark Mode',
-                value: settings.darkMode,
-                onChanged: settings.toggleDarkMode,
-              ),
-              _SwitchTile(
-                icon: Icons.alarm,
-                title: 'Auto Payment Reminders',
-                value: settings.autoReminders,
-                onChanged: settings.toggleAutoReminders,
-              ),
-
-              const SizedBox(height: 32),
-
-              // Account
-              const _SectionTitle('Account'),
-              _SettingsTile(
-                icon: Icons.account_balance_wallet,
-                title: 'Upgrade to Pro',
-                subtitle: 'Unlimited invoices, custom branding, no ads',
-                // trailing: const ProBadge(),
-                onTap: () {
-                  // context.push('/pro');
-                },
-              ),
-              _SettingsTile(
-                icon: Icons.security,
-                title: 'Privacy & Security',
-                onTap: () {
-                  // context.push('/privacy');
-                },
-              ),
-              _SettingsTile(
-                icon: Icons.help_outline,
-                title: 'Help & Support',
-                onTap: () => settings.openUrl('https://invoicepay.app/support'),
-              ),
-              _SettingsTile(
-                icon: Icons.update,
-                title: 'Check for Updates',
-                onTap: settings.checkForUpdate,
-              ),
-
-              const SizedBox(height: 32),
-
-              // Danger Zone
-              const _SectionTitle('Danger Zone', color: Colors.red),
-              _SettingsTile(
-                icon: Icons.logout,
-                title: 'Log Out',
-                color: Colors.orange,
-                onTap: () async {
-                  await context.read<AuthenticationProviderImpl>().logoutUser();
-                  // context.go('/login');
-                },
-              ),
-              _SettingsTile(
-                icon: Icons.delete_forever,
-                title: 'Delete Account',
-                color: Colors.red,
-                onTap: () {
-                  // Show confirmation + password re-entry
-                },
-              ),
-
-              const SizedBox(height: 40),
-
-              // App Version
-              const Center(
-                child: Text(
-                  'InvoicePay v1.0.0',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-              ),
-            ],
+            ),
           ),
-        );
-      },
+
+          const SizedBox(height: 40),
+
+          // Preferences
+          const _SectionTitle('Preferences'),
+          _SettingsTile(
+            icon: Icons.track_changes,
+            title: 'Monthly Revenue Goal',
+            subtitle:
+                'Current: \$${NumberFormat('#,##0').format(company?.monthlyGoal ?? 15000)}',
+            onTap: () => _showGoalModal(context),
+          ),
+          _SwitchTile(
+            icon: Icons.notifications_outlined,
+            title: 'Push Notifications',
+            value: settings.notificationsEnabled,
+            onChanged: settings.toggleNotifications,
+          ),
+          _SwitchTile(
+            icon: Icons.dark_mode_outlined,
+            title: 'Dark Mode',
+            value: settings.darkMode,
+            onChanged: settings.toggleDarkMode,
+          ),
+          _SwitchTile(
+            icon: Icons.alarm,
+            title: 'Auto Payment Reminders',
+            value: settings.autoReminders,
+            onChanged: settings.toggleAutoReminders,
+          ),
+
+          const SizedBox(height: 40),
+
+          // Account
+          const _SectionTitle('Account'),
+          _SettingsTile(
+            icon: Icons.account_balance_wallet,
+            title: 'Upgrade to Pro',
+            subtitle: 'Unlimited invoices, custom branding, no ads',
+            onTap: () {
+              // Navigate to pro screen
+            },
+          ),
+          _SettingsTile(
+            icon: Icons.security,
+            title: 'Privacy & Security',
+            onTap: () {
+              settings.openUrl('https://invoicepay.app/privacy');
+            },
+          ),
+          _SettingsTile(
+            icon: Icons.help_outline,
+            title: 'Help & Support',
+            onTap: () => settings.openUrl('https://invoicepay.app/support'),
+          ),
+          _SettingsTile(
+            icon: Icons.update,
+            title: 'Check for Updates',
+            onTap: settings.checkForUpdate,
+          ),
+
+          const SizedBox(height: 40),
+
+          // Danger Zone
+          const _SectionTitle('Danger Zone', color: Colors.red),
+          _SettingsTile(
+            icon: Icons.logout,
+            title: 'Log Out',
+            color: Colors.orange,
+            onTap: () => showLogoutDialog(context),
+          ),
+          _SettingsTile(
+            icon: Icons.delete_forever,
+            title: 'Delete Account',
+            color: Colors.red,
+            onTap: () => showDeleteAccountDialog(context),
+          ),
+
+          const SizedBox(height: 60),
+
+          // App Version
+          Center(
+            child: Text(
+              'InvoicePay v1.0.0',
+              style: TextStyle(color: Colors.grey[500], fontSize: 14),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
+// Reusable widgets (same as before, just slightly polished)
 class _SectionTitle extends StatelessWidget {
   final String title;
   final Color? color;
@@ -156,9 +250,9 @@ class _SectionTitle extends StatelessWidget {
       child: Text(
         title,
         style: TextStyle(
-          fontSize: 16,
+          fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: color ?? Colors.grey[800],
+          color: color ?? Colors.black87,
         ),
       ),
     );
@@ -181,13 +275,25 @@ class _SwitchTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: SwitchListTile(
-        secondary: Icon(icon, color: primaryColor),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+        secondary: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: primaryColor.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: primaryColor),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+        ),
         value: value,
         onChanged: onChanged,
         activeColor: primaryColor,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       ),
     );
   }
@@ -213,16 +319,34 @@ class _SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: ListTile(
-        leading: Icon(icon, color: color ?? primaryColor),
+        leading: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: (color ?? primaryColor).withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: color ?? primaryColor),
+        ),
         title: Text(
           title,
-          style: TextStyle(fontWeight: FontWeight.w600, color: color),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+            color: color,
+          ),
         ),
-        subtitle: subtitle != null ? Text(subtitle!) : null,
+        subtitle: subtitle != null
+            ? Text(subtitle!, style: TextStyle(color: Colors.grey[600]))
+            : null,
         trailing: trailing ?? const Icon(Icons.chevron_right),
         onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 12,
+        ),
       ),
     );
   }
