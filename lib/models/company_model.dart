@@ -22,7 +22,7 @@ class CompanyModel {
     required this.city,
     required this.zip,
     this.logoUrl,
-    this.primaryColor = Colors.blue,
+    required this.primaryColor,
     this.fontFamily = 'Manrope',
     this.monthlyGoal = 15000.0,
   });
@@ -37,7 +37,7 @@ class CompanyModel {
       city: map['city'] ?? '',
       zip: map['zip'] ?? '',
       logoUrl: map['logo_url'],
-      primaryColor: Color(map['primary_color'] ?? Colors.blue.value),
+      primaryColor: Color(map['primary_color']),
       fontFamily: map['font_family'] ?? 'Manrope',
       monthlyGoal: (map['monthly_goal'] ?? 15000.0).toDouble(),
     );

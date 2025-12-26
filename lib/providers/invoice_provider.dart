@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -421,6 +422,7 @@ class InvoiceProvider extends BaseViewModel {
     required CompanyModel company,
     required ClientModel client,
   }) async {
+    log(company.toMap().toString());
     final pdf = await PdfInvoiceTemplate.generate(
       invoice: invoice,
       company: company,

@@ -70,7 +70,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           final goal = companyProvider.company?.monthlyGoal ?? 15000.0;
           final progress = totalRevenue / goal;
           return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

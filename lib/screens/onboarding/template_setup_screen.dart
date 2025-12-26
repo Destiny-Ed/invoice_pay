@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:invoice_pay/modal/color_picker_modal.dart';
@@ -147,13 +148,20 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
                           CircleAvatar(
                             radius: 24,
                             backgroundColor: Colors.grey[300],
-                            child: const Text(
-                              'LOGO',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            backgroundImage: provider.logoUrl == null
+                                ? null
+                                : CachedNetworkImageProvider(
+                                    provider.logoUrl ?? "",
+                                  ),
+                            child: provider.logoUrl == null
+                                ? const Text(
+                                    'LOGO',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                : SizedBox(),
                           ),
                           const SizedBox(width: 16),
                           Expanded(

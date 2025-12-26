@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/utils/contants.dart';
@@ -30,6 +32,10 @@ class PdfInvoiceTemplate {
     } catch (_) {}
 
     final accentColor = PdfColor.fromInt(company.primaryColor.value);
+
+    log(company.primaryColor.toString());
+    log("company logo :${company.logoUrl}");
+    log(accentColor.toString());
 
     pdf.addPage(
       pw.MultiPage(
