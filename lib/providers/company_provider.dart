@@ -79,6 +79,14 @@ class CompanyProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> updateCurrency(String code, String symbol) async {
+    final updated = company!.copyWith(
+      currencyCode: code,
+      currencySymbol: symbol,
+    );
+    await saveCompanyDetails(model: updated);
+  }
+
   // Save all company details (called after onboarding or edit)
   Future<void> saveCompanyDetails({CompanyModel? model}) async {
     final user = FirebaseAuth.instance.currentUser;

@@ -5,10 +5,13 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/invoice/wigets/invoice_template.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:provider/provider.dart';
 
 import '../providers/base_provider.dart';
 import '../models/invoice_model.dart';
@@ -151,6 +154,8 @@ class InvoiceProvider extends BaseViewModel {
 
       setLoading(ViewState.Success);
       unawaited(loadInvoices());
+
+      requestReview();
       return true;
     } catch (e) {
       setError('Failed to create invoice: $e');
@@ -289,9 +294,34 @@ class InvoiceProvider extends BaseViewModel {
         (i) => i.description.isNotEmpty && i.qty > 0 && i.rate > 0,
       );
 
+  bool _draftUseCompanyCurrency = true;
+  bool get draftUseCompanyCurrency => _draftUseCompanyCurrency;
+
+  String _draftCurrencyCode = 'USD';
+  String get draftCurrencyCode => _draftCurrencyCode;
+
+  String _draftCurrencySymbol = '\$';
+  String get draftCurrencySymbol => _draftCurrencySymbol;
+
   // ==========================================================
   // DRAFT MUTATORS
   // ==========================================================
+
+  void toggleDraftCurrency(CompanyProvider model, bool useCompany) {
+    _draftUseCompanyCurrency = useCompany;
+    if (useCompany) {
+      final company = model.company;
+      _draftCurrencyCode = company?.currencyCode ?? 'USD';
+      _draftCurrencySymbol = company?.currencySymbol ?? '\$';
+    }
+    notifyListeners();
+  }
+
+  void setDraftCurrency(String code, String symbol) {
+    _draftCurrencyCode = code;
+    _draftCurrencySymbol = symbol;
+    notifyListeners();
+  }
 
   void updateDraftInvoiceNumber(String v) {
     _draftInvoiceNumber = v;
@@ -491,5 +521,10 @@ class InvoiceProvider extends BaseViewModel {
     _draftPaymentMethod = 'bank_transfer';
     _draftPaymentDetails = '';
     notifyListeners();
+  }
+
+  Future<void> requestReview() async {
+    final review = InAppReview.instance;
+    if (await review.isAvailable()) review.requestReview();
   }
 }

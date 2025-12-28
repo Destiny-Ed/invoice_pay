@@ -4,8 +4,6 @@ enum InvoiceStatus { draft, sent, pending, paid, overdue, partial }
 
 enum TemplateType { minimal, bold, classic, modern, creative }
 
-
-
 class InvoiceModel {
   final String id;
   final String number;
@@ -22,6 +20,9 @@ class InvoiceModel {
   bool receivePayment;
   String paymentMethod; // bank_transfer, paypal, stripe, upi
   String paymentDetails; // e.g. Account number, PayPal email, etc.
+  final String currencyCode;
+  final String currencySymbol;
+  final bool useCompanyCurrency; // true = use company default, false = custom
 
   InvoiceModel({
     required this.id,
@@ -39,6 +40,9 @@ class InvoiceModel {
     this.receivePayment = false,
     this.paymentDetails = "bank_transfer",
     this.paymentMethod = "",
+    this.currencyCode = 'USD',
+    this.currencySymbol = '\$',
+    this.useCompanyCurrency = true,
   });
 
   // Calculated getters
@@ -100,6 +104,9 @@ class InvoiceModel {
       receivePayment: map['receive_payment'] ?? false,
       paymentMethod: map['payment_method'] ?? 'bank_transfer',
       paymentDetails: map['payment_details'] ?? '',
+      currencyCode: map['currency_code'] ?? 'USD',
+      currencySymbol: map['currency_symbol'] ?? '\$',
+      useCompanyCurrency: map['use_company_currency'] ?? true,
     );
   }
 
@@ -119,6 +126,9 @@ class InvoiceModel {
       'receive_payment': receivePayment,
       'payment_method': paymentMethod,
       'payment_details': paymentDetails,
+      'currency_code': currencyCode,
+      'currency_symbol': currencySymbol,
+      'use_company_currency': useCompanyCurrency,
     };
   }
 
@@ -140,6 +150,9 @@ class InvoiceModel {
     bool? receivePayment,
     String? paymentMethod,
     String? paymentDetails,
+    String? currencyCode,
+    String? currencySymbol,
+    bool? useCompanyCurrency,
   }) {
     return InvoiceModel(
       id: id ?? this.id,
@@ -157,6 +170,9 @@ class InvoiceModel {
       receivePayment: receivePayment ?? this.receivePayment,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       paymentDetails: paymentDetails ?? this.paymentDetails,
+      currencyCode: currencyCode ?? this.currencyCode,
+      currencySymbol: currencySymbol ?? this.currencySymbol,
+      useCompanyCurrency: useCompanyCurrency ?? this.useCompanyCurrency,
     );
   }
 }

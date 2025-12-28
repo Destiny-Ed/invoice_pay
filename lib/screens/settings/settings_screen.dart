@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/modal/auth_modal.dart';
@@ -103,6 +104,24 @@ class SettingsScreen extends StatelessWidget {
                 subtitle:
                     'Current: \$${NumberFormat('#,##0').format(company?.monthlyGoal ?? 15000)}',
                 onTap: () => showGoalModal(context),
+              ),
+
+              _SettingsTile(
+                icon: Icons.currency_exchange,
+                title: 'Default Currency',
+                subtitle:
+                    '${company?.currencySymbol ?? '\$'} ${company?.currencyCode ?? 'USD'}',
+                onTap: () {
+                  // You said you'll handle the dropdown modal yourself
+                  // Just trigger your custom currency picker here
+                  // e.g. showCurrencyPickerModal(context);
+                  showCurrencyPicker(
+                    context: context,
+                    onSelect: (c) {
+                      companyVm.updateCurrency(c.code, c.symbol);
+                    },
+                  );
+                },
               ),
 
               // _SwitchTile(

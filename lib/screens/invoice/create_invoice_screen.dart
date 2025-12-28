@@ -3,6 +3,7 @@ import 'package:invoice_pay/config/extension.dart';
 import 'package:invoice_pay/modal/single_select_modal.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/invoice/invoice_preview.dart';
 import 'package:invoice_pay/screens/invoice/wigets/custom_widgets.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
@@ -102,8 +103,8 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
             ),
           ],
         ),
-        body: Consumer2<InvoiceProvider, ClientProvider>(
-          builder: (context, invoiceProvider, clientProvider, _) {
+        body: Consumer3<InvoiceProvider, ClientProvider, CompanyProvider>(
+          builder: (context, invoiceProvider, clientProvider, companyProvider, _) {
             return BusyOverlay(
               show: invoiceProvider.viewState == ViewState.Busy,
               child: SingleChildScrollView(
@@ -140,7 +141,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                       onPress: invoiceProvider.updateDraftInvoiceNumber,
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
 
                     // Template Selection
                     // ================= TEMPLATE SELECTION =================
@@ -224,7 +225,6 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     //     },
                     //   ),
                     // ),
-                    const SizedBox(height: 20),
 
                     // Client Selection
                     const Text(
@@ -234,7 +234,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     GestureDetector(
                       onTap: () async {
                         final clients = clientProvider.clients;
@@ -322,7 +322,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
 
                     // Dates
                     const Text(
@@ -332,7 +332,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
                         Expanded(
@@ -355,7 +355,71 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                       ],
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
+
+                    // Currency Section
+                    Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        children: [
+                          SwitchListTile(
+                            title: const Text(
+                              'Use Default Currency',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                              'Company default: ${companyProvider.company?.currencySymbol ?? '\$'} ${companyProvider.company?.currencyCode ?? 'USD'}',
+                            ),
+                            value: invoiceProvider.draftUseCompanyCurrency,
+                            onChanged: (value) {
+                              invoiceProvider.toggleDraftCurrency(
+                                companyProvider,
+                                value,
+                              );
+                            },
+                            activeColor: primaryColor,
+                          ),
+                          if (!invoiceProvider.draftUseCompanyCurrency)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                              child: GestureDetector(
+                                onTap: () {
+                                  // Call your custom currency picker modal
+                                  // e.g. showCustomCurrencyModal(context);
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[50],
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        '${invoiceProvider.draftCurrencySymbol} ${invoiceProvider.draftCurrencyCode}',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const Icon(Icons.arrow_drop_down),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
 
                     // Line Items
                     Row(
@@ -386,7 +450,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                       (e) => itemCard(e.value, e.key, invoiceProvider),
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
 
                     // Tax & Discount
                     Row(
@@ -431,7 +495,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                       ],
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
 
                     // Receive Payment Toggle
                     Card(
@@ -451,7 +515,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     ),
 
                     if (invoiceProvider.draftReceivePayment) ...[
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       const Text(
                         'Payment Method',
                         style: TextStyle(
@@ -482,7 +546,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                           _paymentMethodChip('UPI', 'upi', invoiceProvider),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       TextField(
                         decoration: InputDecoration(
                           labelText: _getPaymentLabel(
@@ -501,7 +565,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                       ),
                     ],
 
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 30),
 
                     // Summary
                     Container(
@@ -535,7 +599,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 30),
 
                     // Generate Button
                     SizedBox(
