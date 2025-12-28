@@ -226,28 +226,30 @@ Widget itemCard(InvoiceItemModel item, int index, InvoiceProvider provider) {
             ),
             const SizedBox(width: 12),
 
-            Column(
-              spacing: 10,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text("Amount"),
-                Container(
-                  height: 50,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    '\$${NumberFormat('#,##0.00').format(item.amount.abs())}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor,
+            Expanded(
+              child: Column(
+                spacing: 10,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text("Amount"),
+                  Container(
+                    height: 50,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    textAlign: TextAlign.center,
+                    child: Text(
+                      '\$${NumberFormat('#,##0.00').format(item.amount.abs())}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -268,19 +270,27 @@ Widget summaryRow(
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: isLarge ? 16 : 14,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+        Expanded(
+          child: Text(
+            label,
+            maxLines: 2,
+            style: TextStyle(
+              fontSize: isLarge ? 16 : 14,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
         ),
-        Text(
-          '${isNegative ? '-' : ''}\$${NumberFormat('#,##0.00').format(value.abs())}',
-          style: TextStyle(
-            fontSize: isLarge ? 20 : 16,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-            color: isLarge ? primaryColor : null,
+        Expanded(
+          child: Text(
+            '${isNegative ? '-' : ''}\$${NumberFormat('#,##0.00').format(value.abs())}',
+            maxLines: 2,
+            textAlign: TextAlign.end,
+            style: TextStyle(
+              fontSize: isLarge ? 20 : 16,
+          
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+              color: isLarge ? primaryColor : null,
+            ),
           ),
         ),
       ],

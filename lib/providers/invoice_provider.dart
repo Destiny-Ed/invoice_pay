@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -121,23 +121,39 @@ class InvoiceProvider extends BaseViewModel {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return false;
 
-    try {
-      setLoading(ViewState.Busy);
+    setLoading(ViewState.Busy);
+    clearError();
 
+    try {
+      // Create initial activity
+      final createdActivity = InvoiceActivityModel(
+        type: InvoiceActivityType.created,
+        timestamp: DateTime.now(),
+      );
+
+      // Add activity to the invoice before saving
+      final invoiceWithActivity = invoice.copyWith(
+        activities: [createdActivity],
+      );
+
+      // Save with activity included
       final ref = await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('invoices')
-          .add(invoice.toMap());
+          .add(invoiceWithActivity.toMap());
 
-      _invoices.insert(0, invoice.copyWith(id: ref.id));
+      final newInvoice = invoiceWithActivity.copyWith(id: ref.id);
+
+      // Insert into local list
+      _invoices.insert(0, newInvoice);
       notifyListeners();
 
       setLoading(ViewState.Success);
       unawaited(loadInvoices());
       return true;
-    } catch (_) {
-      setError('Failed to create invoice');
+    } catch (e) {
+      setError('Failed to create invoice: $e');
       setLoading(ViewState.Error);
       return false;
     }
@@ -193,6 +209,26 @@ class InvoiceProvider extends BaseViewModel {
       setLoading(ViewState.Error);
       return false;
     }
+  }
+
+  Future<void> addActivity(
+    InvoiceModel invoice,
+    InvoiceActivityType type, {
+    double? amount,
+  }) async {
+    final newActivity = InvoiceActivityModel(
+      type: type,
+      timestamp: DateTime.now(),
+      amount: amount,
+    );
+
+    final updatedActivities = List<InvoiceActivityModel>.from(
+      invoice.activities,
+    )..add(newActivity);
+
+    final updatedInvoice = invoice.copyWith(activities: updatedActivities);
+
+    await updateInvoice(updatedInvoice);
   }
 
   // ==========================================================
@@ -408,6 +444,7 @@ class InvoiceProvider extends BaseViewModel {
       discountPercent: _draftDiscountPercent,
       receivePayment: _draftReceivePayment,
       paymentMethod: _draftPaymentMethod,
+      activities: [],
       paymentDetails: _draftPaymentDetails,
       templateType: _draftTemplate,
     );
@@ -422,7 +459,6 @@ class InvoiceProvider extends BaseViewModel {
     required CompanyModel company,
     required ClientModel client,
   }) async {
-    log(company.toMap().toString());
     final pdf = await PdfInvoiceTemplate.generate(
       invoice: invoice,
       company: company,

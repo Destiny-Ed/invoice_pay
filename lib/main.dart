@@ -49,6 +49,7 @@ void main() async {
       ],
       child: MaterialApp(
         title: 'Invoice Pay',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
           scaffoldBackgroundColor: Colors.white,

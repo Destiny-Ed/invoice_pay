@@ -479,29 +479,46 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        if (invoice.status != InvoiceStatus.draft)
-                          _activityItem(
-                            'Invoice Sent',
-                            DateFormat(
-                              'MMM dd, yyyy • h:mm a',
-                            ).format(invoice.sentDate!),
-                            Icons.send,
-                            Colors.blue,
-                          ),
-                        if (invoice.paidAmount > 0)
-                          _activityItem(
-                            'Payment Received',
-                            '+\$${invoice.paidAmount.toStringAsFixed(2)}',
-                            Icons.payment,
-                            Colors.green,
-                          ),
-                        _activityItem(
-                          'Invoice Created',
-                          DateFormat('MMM dd, yyyy').format(invoice.issued),
-                          Icons.note_add,
-                          Colors.grey,
-                        ),
+                        ...invoice.activities.reversed.map((activity) {
+                          final iconColor = _getActivityIconAndColor(
+                            activity.type,
+                          );
+                          final subtitle = activity.amount != null
+                              ? '+\$${activity.amount!.toStringAsFixed(2)} • ${DateFormat('MMM dd, yyyy • h:mm a').format(activity.timestamp)}'
+                              : DateFormat(
+                                  'MMM dd, yyyy • h:mm a',
+                                ).format(activity.timestamp);
 
+                          return _activityItem(
+                            activity.title,
+                            subtitle,
+                            iconColor.icons,
+                            iconColor.color,
+                          );
+                        }),
+
+                        // if (invoice.status != InvoiceStatus.draft)
+                        //   _activityItem(
+                        //     'Invoice Sent',
+                        //     DateFormat(
+                        //       'MMM dd, yyyy • h:mm a',
+                        //     ).format(invoice.sentDate!),
+                        //     Icons.send,
+                        //     Colors.blue,
+                        //   ),
+                        // if (invoice.paidAmount > 0)
+                        //   _activityItem(
+                        //     'Payment Received',
+                        //     '+\$${invoice.paidAmount.toStringAsFixed(2)}',
+                        //     Icons.payment,
+                        //     Colors.green,
+                        //   ),
+                        // _activityItem(
+                        //   'Invoice Created',
+                        //   DateFormat('MMM dd, yyyy').format(invoice.issued),
+                        //   Icons.note_add,
+                        //   Colors.grey,
+                        // ),
                         const SizedBox(height: 50),
                       ],
                     ),
@@ -510,6 +527,23 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         );
       },
     );
+  }
+
+  ({IconData icons, Color color}) _getActivityIconAndColor(
+    InvoiceActivityType type,
+  ) {
+    switch (type) {
+      case InvoiceActivityType.created:
+        return (icons: Icons.note_add, color: Colors.grey);
+      case InvoiceActivityType.sent:
+        return (icons: Icons.send, color: Colors.blue);
+      case InvoiceActivityType.viewed:
+        return (icons: Icons.visibility, color: Colors.purple);
+      case InvoiceActivityType.paymentReceived:
+        return (icons: Icons.payment, color: Colors.green);
+      case InvoiceActivityType.overdue:
+        return (icons: Icons.warning, color: Colors.red);
+    }
   }
 
   Widget _actionChip({
@@ -656,7 +690,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
       leading: CircleAvatar(
         radius: 20,
         backgroundColor: color.withOpacity(0.1),
-        child: Icon(icon, color: color, size: 16),
+        child: Icon(icon, color: color, size: 20),
       ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
       subtitle: Text(subtitle),

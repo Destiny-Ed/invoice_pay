@@ -17,7 +17,17 @@ class ClientCard extends StatelessWidget {
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
-        // onTap: () => context.push('/client_detail', extra: client),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ClientDetailScreen(
+                client: client,
+                invoices: context.read<InvoiceProvider>().invoices,
+              ),
+            ),
+          );
+        },
         borderRadius: BorderRadius.circular(20),
         child: Padding(
           padding: const EdgeInsets.all(16),

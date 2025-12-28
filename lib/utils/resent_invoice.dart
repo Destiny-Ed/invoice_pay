@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/models/company_model.dart';
 import 'package:invoice_pay/models/client_model.dart';
+import 'package:invoice_pay/models/invoice_item_model.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/screens/invoice/wigets/invoice_template.dart';
+import 'package:invoice_pay/utils/message.dart';
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -217,5 +219,11 @@ ${company.name}
     status: InvoiceStatus.sent, // auto becomes Pending if getter is implemented
     sentDate: DateTime.now(),
   );
-  await context.read<InvoiceProvider>().updateInvoice(updatedInvoice);
+  // Add sent activity
+  await context.read<InvoiceProvider>().addActivity(
+    updatedInvoice,
+    InvoiceActivityType.sent,
+  );
+
+  showMessage(context, 'Invoice sent successfully!');
 }

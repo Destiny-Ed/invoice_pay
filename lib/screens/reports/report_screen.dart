@@ -94,7 +94,7 @@ Generated with ❤️ by InvoicePay
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisCount: isSmallScreen ? 1 : 2,
-                    childAspectRatio: isSmallScreen ? 3.5 : 3,
+                    childAspectRatio: isSmallScreen ? 3 : 3.5,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
                     children: [

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoice_pay/models/invoice_item_model.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/utils/message.dart';
@@ -78,8 +79,14 @@ void showRecordPayment(BuildContext context, InvoiceModel currentInvoice) {
                     status: updatedStatus,
                   );
 
-                  await context.read<InvoiceProvider>().updateInvoice(
+                  // await context.read<InvoiceProvider>().updateInvoice(
+                  //   updatedInvoice,
+                  // );
+                  // Add payment activity
+                  await context.read<InvoiceProvider>().addActivity(
                     updatedInvoice,
+                    InvoiceActivityType.paymentReceived,
+                    amount: payment,
                   );
                   Navigator.pop(context);
                   showMessage(

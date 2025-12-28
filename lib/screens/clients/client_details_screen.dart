@@ -45,14 +45,24 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     switch (index) {
       case 0: // Open
         return widget.invoices
-            .where((inv) => inv.status != InvoiceStatus.paid)
+            .where(
+              (inv) =>
+                  inv.status != InvoiceStatus.paid &&
+                  inv.clientId == widget.client.id,
+            )
             .toList();
       case 1: // Paid
         return widget.invoices
-            .where((inv) => inv.status == InvoiceStatus.paid)
+            .where(
+              (inv) =>
+                  inv.status == InvoiceStatus.paid &&
+                  inv.clientId == widget.client.id,
+            )
             .toList();
       case 2: // Projects (future use — show all for now)
-        return widget.invoices;
+        return widget.invoices
+            .where((inv) => inv.clientId == widget.client.id)
+            .toList();
       default:
         return [];
     }
@@ -360,8 +370,8 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                 bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
               child: DraggableScrollableSheet(
-                initialChildSize: 0.5,
-                minChildSize: 0.5,
+                initialChildSize: 0.6,
+                minChildSize: 0.6,
                 expand: false,
                 builder: (_, controller) {
                   return Column(
@@ -430,7 +440,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                           width: double.infinity,
                           child: CustomButton(
                             onPressed: () async {
-                              if (isSaving) return;
+                              if (isSaving || notesCtrl.text.isEmpty) return;
                               setStateModal(() => isSaving = true);
                               await context
                                   .read<ClientProvider>()

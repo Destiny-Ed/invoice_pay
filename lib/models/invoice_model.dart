@@ -4,6 +4,8 @@ enum InvoiceStatus { draft, sent, pending, paid, overdue, partial }
 
 enum TemplateType { minimal, bold, classic, modern, creative }
 
+
+
 class InvoiceModel {
   final String id;
   final String number;
@@ -11,12 +13,12 @@ class InvoiceModel {
   final DateTime issued;
   final DateTime due;
   final List<InvoiceItemModel> items;
+  final List<InvoiceActivityModel> activities;
   final double taxPercent;
   final double discountPercent;
   final double paidAmount;
   final InvoiceStatus status;
   final TemplateType templateType;
-  DateTime? sentDate;
   bool receivePayment;
   String paymentMethod; // bank_transfer, paypal, stripe, upi
   String paymentDetails; // e.g. Account number, PayPal email, etc.
@@ -28,11 +30,11 @@ class InvoiceModel {
     required this.issued,
     required this.due,
     required this.items,
+    this.activities = const [],
     this.taxPercent = 0.0,
     this.discountPercent = 0.0,
     this.paidAmount = 0.0,
     this.status = InvoiceStatus.draft,
-    this.sentDate,
     required this.templateType,
     this.receivePayment = false,
     this.paymentDetails = "bank_transfer",
@@ -70,6 +72,11 @@ class InvoiceModel {
         .map((e) => InvoiceItemModel.fromMap(e as Map<String, dynamic>))
         .toList();
 
+    final List<dynamic> activitiesList = map['activities'] ?? [];
+    final List<InvoiceActivityModel> activities = activitiesList
+        .map((e) => InvoiceActivityModel.fromMap(e as Map<String, dynamic>))
+        .toList();
+
     return InvoiceModel(
       id: id,
       number: map['number'] ?? '',
@@ -79,11 +86,10 @@ class InvoiceModel {
       ),
       clientId: map['client_id'] ?? '',
       issued: DateTime.parse(map['issued'] ?? DateTime.now().toIso8601String()),
-      sentDate: DateTime.parse(
-        map['sent_date'] ?? DateTime.now().toIso8601String(),
-      ),
+
       due: DateTime.parse(map['due'] ?? DateTime.now().toIso8601String()),
       items: items,
+      activities: activities,
       taxPercent: (map['tax_percent'] ?? 0.0).toDouble(),
       discountPercent: (map['discount_percent'] ?? 0.0).toDouble(),
       paidAmount: (map['paid_amount'] ?? 0.0).toDouble(),
@@ -102,9 +108,9 @@ class InvoiceModel {
       'number': number,
       'client_id': clientId,
       'issued': issued.toIso8601String(),
-      'sent_date': sentDate?.toIso8601String(),
       'due': due.toIso8601String(),
       'items': items.map((e) => e.toMap()).toList(),
+      'activities': activities.map((e) => e.toMap()).toList(),
       'tax_percent': taxPercent,
       'discount_percent': discountPercent,
       'paid_amount': paidAmount,
@@ -125,6 +131,7 @@ class InvoiceModel {
     DateTime? sentDate,
     DateTime? due,
     List<InvoiceItemModel>? items,
+    List<InvoiceActivityModel>? activities,
     double? taxPercent,
     double? discountPercent,
     double? paidAmount,
@@ -140,9 +147,9 @@ class InvoiceModel {
       clientId: clientId ?? this.clientId,
       templateType: templateType ?? this.templateType,
       issued: issued ?? this.issued,
-      sentDate: sentDate ?? this.sentDate,
       due: due ?? this.due,
       items: items ?? this.items,
+      activities: activities ?? this.activities,
       taxPercent: taxPercent ?? this.taxPercent,
       discountPercent: discountPercent ?? this.discountPercent,
       paidAmount: paidAmount ?? this.paidAmount,

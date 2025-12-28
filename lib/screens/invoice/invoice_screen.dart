@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_utilities/flutter_utilities.dart';
-import 'package:intl/intl.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
 import 'package:invoice_pay/screens/invoice/wigets/custom_widgets.dart';
