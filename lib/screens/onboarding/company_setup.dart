@@ -58,236 +58,239 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<CompanyProvider>();
 
-    return Scaffold(
-      body: SafeArea(
-        child: BusyOverlay(
-          show: provider.viewState == ViewState.Busy,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const OnboardingProgress(currentStep: 0, totalSteps: 2),
-
-                const SizedBox(height: 10),
-
-                Text(
-                  'Set up your profile',
-                  style: AppTheme.headerStyle().copyWith(fontSize: 30),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Add your company details to look professional on your invoices.',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Logo Upload
-                Center(
-                  child: GestureDetector(
-                    onTap: () => provider.uploadLogo(),
-                    child: CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.grey[200],
-                      child: (provider.logoUrl ?? "").isEmpty
-                          ? const Icon(
-                              Icons.camera_alt,
-                              size: 40,
-                              color: Colors.grey,
-                            )
-                          : ClipOval(
-                              child: CachedNetworkImage(
-                                imageUrl: provider.logoUrl!,
-                                fit: BoxFit.cover,
-                                width: 120,
-                                height: 120,
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        body: SafeArea(
+          child: BusyOverlay(
+            show: provider.viewState == ViewState.Busy,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const OnboardingProgress(currentStep: 0, totalSteps: 2),
+      
+                  const SizedBox(height: 10),
+      
+                  Text(
+                    'Set up your profile',
+                    style: AppTheme.headerStyle().copyWith(fontSize: 30),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Add your company details to look professional on your invoices.',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+      
+                  const SizedBox(height: 20),
+      
+                  // Logo Upload
+                  Center(
+                    child: GestureDetector(
+                      onTap: () => provider.uploadLogo(),
+                      child: CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Colors.grey[200],
+                        child: (provider.logoUrl ?? "").isEmpty
+                            ? const Icon(
+                                Icons.camera_alt,
+                                size: 40,
+                                color: Colors.grey,
+                              )
+                            : ClipOval(
+                                child: CachedNetworkImage(
+                                  imageUrl: provider.logoUrl!,
+                                  fit: BoxFit.cover,
+                                  width: 120,
+                                  height: 120,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Center(
+                    child: GestureDetector(
+                      onTap: () => provider.uploadLogo(),
+                      child: Text(
+                        'Tap to upload logo',
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+      
+                  const SizedBox(height: 20),
+      
+                  // Company Name
+                  const Text(
+                    'Company Name',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  CustomTextField(
+                    _nameCtrl,
+                    password: false,
+                    hint: 'e.g. Acme Studio',
+                    prefixIcon: const Icon(Icons.business),
+                  ),
+                  const SizedBox(height: 10),
+      
+                  // Business Email
+                  const Text(
+                    'Business Email',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  CustomTextField(
+                    _emailCtrl,
+                    password: false,
+                    hint: 'name@company.com',
+                    keyboardType: TextInputType.emailAddress,
+      
+                    prefixIcon: const Icon(Icons.email),
+                  ),
+      
+                  const SizedBox(height: 10),
+      
+                  // Phone Number
+                  const Text(
+                    'Phone Number',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+      
+                  CustomTextField(
+                    _phoneCtrl,
+                    password: false,
+                    hint: '+1 (555) 000-0000',
+                    keyboardType: TextInputType.phone,
+      
+                    prefixIcon: const Icon(Icons.phone),
+                  ),
+      
+                  const SizedBox(height: 10),
+      
+                  //Address
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Address',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+      
+                      // TextButton(
+                      //   onPressed: () {},
+                      //   child: Text(
+                      //     'Use current location',
+                      //     style: TextStyle(
+                      //       color: primaryColor,
+                      //       fontWeight: FontWeight.w600,
+                      //     ),
+                      //   ),
+                      // ),
+                    ],
+                  ),
+      
+                  const SizedBox(height: 8),
+                  CustomTextField(
+                    _streetCtrl,
+                    password: false,
+                    hint: 'Address',
+                    prefixIcon: const Icon(Icons.location_city),
+                  ),
+                  const SizedBox(height: 8),
+      
+                  const Text(
+                    'Default Currency',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      showCurrencyPicker(
+                        context: context,
+                        onSelect: (c) {
+                          setState(() {
+                            provider.selectedCurrencyCode = c.code;
+                            provider.selectedCurrencySymbol = c.symbol;
+                          });
+                        },
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.currency_exchange, color: Colors.grey[600]),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              '${provider.selectedCurrencySymbol} ${provider.selectedCurrencyCode}',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Center(
-                  child: GestureDetector(
-                    onTap: () => provider.uploadLogo(),
-                    child: Text(
-                      'Tap to upload logo',
-                      style: TextStyle(
-                        color: primaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Company Name
-                const Text(
-                  'Company Name',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 8),
-                CustomTextField(
-                  _nameCtrl,
-                  password: false,
-                  hint: 'e.g. Acme Studio',
-                  prefixIcon: const Icon(Icons.business),
-                ),
-                const SizedBox(height: 10),
-
-                // Business Email
-                const Text(
-                  'Business Email',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 8),
-                CustomTextField(
-                  _emailCtrl,
-                  password: false,
-                  hint: 'name@company.com',
-                  keyboardType: TextInputType.emailAddress,
-
-                  prefixIcon: const Icon(Icons.email),
-                ),
-
-                const SizedBox(height: 10),
-
-                // Phone Number
-                const Text(
-                  'Phone Number',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 8),
-
-                CustomTextField(
-                  _phoneCtrl,
-                  password: false,
-                  hint: '+1 (555) 000-0000',
-                  keyboardType: TextInputType.phone,
-
-                  prefixIcon: const Icon(Icons.phone),
-                ),
-
-                const SizedBox(height: 10),
-
-                //Address
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Address',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    // TextButton(
-                    //   onPressed: () {},
-                    //   child: Text(
-                    //     'Use current location',
-                    //     style: TextStyle(
-                    //       color: primaryColor,
-                    //       fontWeight: FontWeight.w600,
-                    //     ),
-                    //   ),
-                    // ),
-                  ],
-                ),
-
-                const SizedBox(height: 8),
-                CustomTextField(
-                  _streetCtrl,
-                  password: false,
-                  hint: 'Address',
-                  prefixIcon: const Icon(Icons.location_city),
-                ),
-                const SizedBox(height: 8),
-
-                const Text(
-                  'Default Currency',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 8),
-                GestureDetector(
-                  onTap: () async {
-                    showCurrencyPicker(
-                      context: context,
-                      onSelect: (c) {
-                        setState(() {
-                          provider.selectedCurrencyCode = c.code;
-                          provider.selectedCurrencySymbol = c.symbol;
-                        });
-                      },
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 20,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[50],
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.currency_exchange, color: Colors.grey[600]),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Text(
-                            '${provider.selectedCurrencySymbol} ${provider.selectedCurrencyCode}',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
                           ),
-                        ),
-                        const Icon(Icons.arrow_drop_down),
-                      ],
+                          const Icon(Icons.arrow_drop_down),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // Next Button
-                CustomButton(
-                  width: MediaQuery.of(context).size.width / 2,
-                  onPressed: () {
-                    if (_nameCtrl.text.isEmpty ||
-                        _emailCtrl.text.isEmpty ||
-                        _phoneCtrl.text.isEmpty ||
-                        _streetCtrl.text.isEmpty) {
-                      showMessage(
+      
+                  const SizedBox(height: 30),
+      
+                  // Next Button
+                  CustomButton(
+                    width: MediaQuery.of(context).size.width / 2,
+                    onPressed: () {
+                      if (_nameCtrl.text.isEmpty ||
+                          _emailCtrl.text.isEmpty ||
+                          _phoneCtrl.text.isEmpty ||
+                          _streetCtrl.text.isEmpty) {
+                        showMessage(
+                          context,
+                          "All Fields are required",
+                          isError: true,
+                        );
+                        return;
+                      }
+      
+                      provider.companyName = _nameCtrl.text;
+                      provider.email = _emailCtrl.text;
+                      provider.phone = _phoneCtrl.text;
+                      provider.street = _streetCtrl.text;
+                      // provider.city = _cityCtrl.text;
+                      // provider.zip = _zipCtrl.text;
+      
+                      Navigator.push(
                         context,
-                        "All Fields are required",
-                        isError: true,
+                        MaterialPageRoute(
+                          builder: (context) => InvoiceTemplateSetupScreen(),
+                        ),
                       );
-                      return;
-                    }
-
-                    provider.companyName = _nameCtrl.text;
-                    provider.email = _emailCtrl.text;
-                    provider.phone = _phoneCtrl.text;
-                    provider.street = _streetCtrl.text;
-                    // provider.city = _cityCtrl.text;
-                    // provider.zip = _zipCtrl.text;
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => InvoiceTemplateSetupScreen(),
-                      ),
-                    );
-                  },
-                  text: "Next Step →",
-                ),
-              ],
+                    },
+                    text: "Next Step →",
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/services/upload_doc_utils.dart';
-import 'package:uuid/uuid.dart';
 import 'dart:io';
 
 import '../models/company_model.dart';
@@ -89,45 +88,63 @@ class CompanyProvider extends ChangeNotifier {
     await saveCompanyDetails(model: updated);
   }
 
-  // Save all company details (called after onboarding or edit)
+  // Save all company details
   Future<void> saveCompanyDetails({CompanyModel? model}) async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      _message = 'User not authenticated';
+      _viewState = ViewState.Error;
+      notifyListeners();
+      return;
+    }
 
     _viewState = ViewState.Busy;
     notifyListeners();
 
     try {
-      final company = CompanyModel(
-        id: Uuid().v4(),
-        name: companyName.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-        street: street.trim(),
-        city: city.trim(),
-        zip: zip.trim(),
-        logoUrl: logoUrl,
-        currencyCode: selectedCurrencyCode,
-        currencySymbol: selectedCurrencySymbol,
-        primaryColor: primaryColor,
-        fontFamily: fontFamily,
-      );
+      const String companyDocId = 'details'; // Fixed ID
+
+      final CompanyModel companyToSave;
+
+      if (model != null) {
+        companyToSave = model;
+      } else {
+        companyToSave = CompanyModel(
+          id: companyDocId,
+          name: companyName.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          street: street.trim(),
+          city: city.trim(),
+          zip: zip.trim(),
+          logoUrl: logoUrl,
+          primaryColor: primaryColor,
+          fontFamily: fontFamily,
+          currencyCode: selectedCurrencyCode,
+          currencySymbol: selectedCurrencySymbol,
+        );
+      }
+
+      // Use .set() with merge: true to update/override the same document
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('company')
-          .add(model?.toMap() ?? company.toMap());
+          .doc(companyDocId)
+          .set(companyToSave.toMap(), SetOptions(merge: true));
 
-      _company = company;
+      _company = companyToSave;
       _viewState = ViewState.Success;
-      _message = "saved";
+      _message = 'Company details saved successfully!';
       notifyListeners();
+
+      // Optional: reload to confirm
       unawaited(loadCompany());
     } catch (e) {
       debugPrint('Error saving company: $e');
-      _company = company;
-      _message = 'Error saving company: $e';
+      _message = 'Failed to save company details';
       _viewState = ViewState.Error;
+      notifyListeners();
     }
   }
 

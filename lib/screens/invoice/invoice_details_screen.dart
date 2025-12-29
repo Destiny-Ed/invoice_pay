@@ -58,6 +58,10 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             actionIcon: Icons.person,
           ),
         );
+        final currency =
+            invoice?.currencySymbol ??
+            companyProvider.company?.currencySymbol ??
+            "\$";
         return Scaffold(
           backgroundColor: Colors.grey[50],
           appBar: AppBar(
@@ -194,7 +198,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
                         // Amount Due
                         Text(
-                          '${companyProvider.company?.currencySymbol ?? '\$'}}${NumberFormat('#,##0.00').format(invoice.balanceDue)}',
+                          '$currency${NumberFormat('#,##0.00').format(invoice.balanceDue)}',
                           style: TextStyle(
                             fontSize: 38,
                             fontWeight: FontWeight.bold,
@@ -385,7 +389,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        ...invoice.items.map((item) => _itemRow(item)),
+                        ...invoice.items.map(
+                          (item) => _itemRow(currency, item),
+                        ),
 
                         const SizedBox(height: 20),
 
@@ -401,28 +407,37 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           ),
                           child: Column(
                             children: [
-                              _summaryRow('Subtotal', invoice.subtotal),
                               _summaryRow(
+                                currency,
+                                'Subtotal',
+                                invoice.subtotal,
+                              ),
+                              _summaryRow(
+                                currency,
                                 'Tax (${invoice.taxPercent.toStringAsFixed(0)}%)',
                                 invoice.taxAmount,
                               ),
                               _summaryRow(
+                                currency,
                                 'Discount (${invoice.discountPercent.toStringAsFixed(0)}%)',
                                 -invoice.discountAmount,
                               ),
                               const Divider(),
                               _summaryRow(
+                                currency,
                                 'Total Due',
                                 invoice.total,
                                 isLarge: true,
                               ),
                               if (invoice.paidAmount > 0)
                                 _summaryRow(
+                                  currency,
                                   'Amount Paid',
                                   invoice.paidAmount,
                                   color: Colors.green,
                                 ),
                               _summaryRow(
+                                currency,
                                 'Balance Due',
                                 invoice.balanceDue,
                                 isLarge: true,
@@ -584,7 +599,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     );
   }
 
-  Widget _itemRow(InvoiceItemModel item) {
+  Widget _itemRow(String currency, InvoiceItemModel item) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(15),
@@ -611,14 +626,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${item.qty} × ${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${item.rate.toStringAsFixed(2)}',
+                  '${item.qty} × $currency${item.rate.toStringAsFixed(2)}',
                   style: TextStyle(color: Colors.grey[600]),
                 ),
               ],
             ),
           ),
           Text(
-            '${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${item.amount.toStringAsFixed(2)}',
+            '$currency${item.amount.toStringAsFixed(2)}',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
@@ -627,6 +642,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   }
 
   Widget _summaryRow(
+    String currency,
     String label,
     double value, {
     Color? color,
@@ -646,7 +662,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             ),
           ),
           Text(
-            '${isNegative ? '-' : ''}${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${NumberFormat('#,##0.00').format(value.abs())}',
+            '${isNegative ? '-' : ''}$currency${NumberFormat('#,##0.00').format(value.abs())}',
             style: TextStyle(
               fontSize: isLarge ? 20 : 14,
               fontWeight: FontWeight.bold,

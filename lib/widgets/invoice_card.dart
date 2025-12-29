@@ -96,7 +96,7 @@ class InvoiceCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${NumberFormat('#,##0.00').format(invoice.balanceDue)}',
+                          '${invoice.currencySymbol ?? context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${NumberFormat('#,##0.00').format(invoice.balanceDue)}',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -165,6 +165,7 @@ class InvoiceCard extends StatelessWidget {
       case InvoiceStatus.partial:
         return 'PARTIAL';
       case InvoiceStatus.sent:
+        return "SENT";
       case InvoiceStatus.pending:
         return 'PENDING';
       case InvoiceStatus.draft:

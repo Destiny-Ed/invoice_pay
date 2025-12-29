@@ -20,8 +20,8 @@ class InvoiceModel {
   bool receivePayment;
   String paymentMethod; // bank_transfer, paypal, stripe, upi
   String paymentDetails; // e.g. Account number, PayPal email, etc.
-  final String currencyCode;
-  final String currencySymbol;
+  final String? currencyCode;
+  final String? currencySymbol;
   final bool useCompanyCurrency; // true = use company default, false = custom
 
   InvoiceModel({
@@ -40,8 +40,8 @@ class InvoiceModel {
     this.receivePayment = false,
     this.paymentDetails = "bank_transfer",
     this.paymentMethod = "",
-    this.currencyCode = 'USD',
-    this.currencySymbol = '\$',
+    this.currencyCode,
+    this.currencySymbol,
     this.useCompanyCurrency = true,
   });
 
@@ -105,7 +105,7 @@ class InvoiceModel {
       paymentMethod: map['payment_method'] ?? 'bank_transfer',
       paymentDetails: map['payment_details'] ?? '',
       currencyCode: map['currency_code'] ?? 'USD',
-      currencySymbol: map['currency_symbol'] ?? '\$',
+      currencySymbol: map['currency_symbol'],
       useCompanyCurrency: map['use_company_currency'] ?? true,
     );
   }
