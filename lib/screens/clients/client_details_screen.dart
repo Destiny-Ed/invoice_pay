@@ -5,6 +5,7 @@ import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/client_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
+import 'package:invoice_pay/utils/contants.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
 import 'package:invoice_pay/widgets/invoice_list_item.dart';
 import 'package:provider/provider.dart';
@@ -194,7 +195,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                                 () => launchUrl(
                                   Uri.parse(
                                     widget.client.website.isEmpty
-                                        ? 'https://invoicepay.netlify.app'
+                                        ? appUrl
                                         : widget.client.website,
                                   ),
                                 ),

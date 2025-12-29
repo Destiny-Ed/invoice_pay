@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/models/company_model.dart';
@@ -9,6 +11,7 @@ import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/screens/invoice/wigets/invoice_template.dart';
 import 'package:invoice_pay/utils/message.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -78,19 +81,25 @@ Future<void> shareInvoicePdf({
 
     final fileName = 'Invoice_${invoice.number}.pdf';
 
-    await Share.shareXFiles([
-      XFile.fromData(pdfBytes, name: fileName, mimeType: 'application/pdf'),
-    ], text: 'Invoice #${invoice.number} from ${company.name}');
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    await SharePlus.instance.share(
+      ShareParams(
+        title: 'Invoice #${invoice.number}',
+        files: [
+          XFile.fromData(pdfBytes, name: fileName, mimeType: 'application/pdf'),
+        ],
+        text: 'Invoice #${invoice.number} from ${company.name}',
+        sharePositionOrigin: Offset.zero & overlay.size,
+      ),
+    );
   } catch (e) {
     if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to share PDF: $e')));
+      showMessage(context, 'Failed to share PDF: $e', isError: true);
     }
   }
 }
 
-/// modal for sending invoice via email, WhatsApp, or other apps
+/// Unified method to send invoice via Email, WhatsApp, or other apps with PDF attachment
 Future<void> resendInvoiceAndMarkSent({
   required BuildContext context,
   required ClientModel client,
@@ -98,23 +107,30 @@ Future<void> resendInvoiceAndMarkSent({
   required CompanyModel company,
   TemplateType template = TemplateType.minimal,
 }) async {
-  final formattedDue = DateFormat('MMM dd, yyyy').format(invoice.due);
-  final formattedTotal = invoice.total.toStringAsFixed(2);
+  final formattedDue = DateFormat('MMMM dd, yyyy').format(invoice.due);
+  final formattedTotal = NumberFormat('#,##0.00').format(invoice.total);
 
+  // Professional & clean message body
   final messageBody =
       '''
-Hi ${client.contactName.isEmpty ? client.companyName : client.contactName},
+Hi ${client.contactName.isNotEmpty ? client.contactName : client.companyName},
 
-Please find your invoice attached.
+Please find your invoice attached for your review.
 
-Invoice #: ${invoice.number}
-Amount: ${company.currencySymbol}$formattedTotal
-Due Date: $formattedDue
+Invoice Details:
+• Invoice: ${invoice.number}
+• Amount Due: ${company.currencySymbol}$formattedTotal
+• Due Date: $formattedDue
 
-Thank you for your business!
+Thank you for your business! We appreciate your prompt payment.
+
+Best regards,
 ${company.name}
+${company.email}
+${company.phone}
   ''';
 
+  // Generate PDF
   Uint8List pdfBytes;
   try {
     final pdfDoc = await PdfInvoiceTemplate.generate(
@@ -126,13 +142,20 @@ ${company.name}
     pdfBytes = await pdfDoc.save();
   } catch (e) {
     if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to generate PDF: $e')));
+      showMessage(context, 'Failed to generate PDF', isError: true);
     }
     return;
   }
 
+  // Save PDF to temporary file for sharing
+  final tempDir = await getTemporaryDirectory();
+  final pdfFile = File('${tempDir.path}/Invoice_${invoice.number}.pdf');
+  await pdfFile.writeAsBytes(pdfBytes);
+  final xFile = XFile(pdfFile.path);
+
+  final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+
+  // Show send options
   final choice = await showModalBottomSheet<String>(
     context: context,
     shape: const RoundedRectangleBorder(
@@ -143,87 +166,123 @@ ${company.name}
         mainAxisSize: MainAxisSize.min,
         children: [
           const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
+            padding: EdgeInsets.symmetric(vertical: 16),
             child: Text(
               'Send Invoice',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
+          const Divider(height: 1),
           ListTile(
-            leading: const Icon(Icons.email),
+            leading: const Icon(Icons.email_outlined, color: Colors.red),
             title: const Text('Email'),
             subtitle: Text(client.email),
             onTap: () => Navigator.pop(context, 'email'),
           ),
           ListTile(
-            leading: const Icon(Icons.chat),
+            leading: const Icon(Icons.chat_bubble_outline, color: Colors.green),
             title: const Text('WhatsApp'),
             subtitle: Text(client.phone),
             onTap: () => Navigator.pop(context, 'whatsapp'),
           ),
           ListTile(
-            leading: const Icon(Icons.share),
+            leading: const Icon(Icons.share_outlined),
             title: const Text('Other Apps'),
             onTap: () => Navigator.pop(context, 'share'),
           ),
+          const SizedBox(height: 10),
         ],
       ),
     ),
   );
 
-  if (choice == null) return;
+  if (choice == null || !context.mounted) return;
+
+  bool sent = false;
 
   switch (choice) {
     case 'email':
+      // Try url_launcher first (some devices support attachment in query)
       final emailUri = Uri(
         scheme: 'mailto',
         path: client.email,
         queryParameters: {
-          'subject': 'Invoice #${invoice.number}',
+          'subject': 'Invoice #${invoice.number} - ${company.name}',
           'body': messageBody,
+          'attachment': [xFile.path],
         },
       );
+
       if (await canLaunchUrl(emailUri)) {
-        await launchUrl(emailUri);
+        await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+        sent = true;
+      }
+
+      // Fallback: Use share_plus (guaranteed attachment)
+      if (!sent) {
+        await SharePlus.instance.share(
+          ShareParams(
+            subject: 'Invoice #${invoice.number}',
+            files: [xFile],
+            text: messageBody,
+            sharePositionOrigin: Offset.zero & overlay.size,
+          ),
+        );
+        sent = true;
       }
       break;
 
     case 'whatsapp':
+      // Open WhatsApp with pre-filled message
+      final encodedBody = Uri.encodeComponent(messageBody);
       final whatsappUrl =
-          'https://wa.me/${client.phone.replaceAll(RegExp(r'[^0-9]'), '')}?text=${Uri.encodeComponent(messageBody)}';
+          'https://wa.me/${client.phone.replaceAll(RegExp(r'[^0-9+]'), '')}?text=$encodedBody';
+
       if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
-        await launchUrl(Uri.parse(whatsappUrl));
+        await launchUrl(
+          Uri.parse(whatsappUrl),
+          mode: LaunchMode.externalApplication,
+        );
       }
+
+      // Always follow up with share (so user can attach PDF manually)
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [xFile],
+          text: messageBody,
+          sharePositionOrigin: Offset.zero & overlay.size,
+        ),
+      );
+      sent = true;
       break;
 
     case 'share':
-      if (context.mounted) {
-        final overlay =
-            Overlay.of(context).context.findRenderObject() as RenderBox;
-        await Share.shareXFiles(
-          [
-            XFile.fromData(
-              pdfBytes,
-              name: 'Invoice_${invoice.number}.pdf',
-              mimeType: 'application/pdf',
-            ),
-          ],
+      await SharePlus.instance.share(
+        ShareParams(
+          subject: 'Invoice #${invoice.number}',
+          files: [xFile],
           text: messageBody,
           sharePositionOrigin: Offset.zero & overlay.size,
-        );
-      }
+        ),
+      );
+      sent = true;
       break;
   }
 
-  final updatedInvoice = invoice.copyWith(
-    status: InvoiceStatus.sent, // auto becomes Pending if getter is implemented
-    sentDate: DateTime.now(),
-  );
-  // Add sent activity
-  await context.read<InvoiceProvider>().addActivity(
-    updatedInvoice,
-    InvoiceActivityType.sent,
-  );
+  // Only mark as sent if successfully shared
+  if (sent) {
+    final updatedInvoice = invoice.copyWith(
+      status: InvoiceStatus.sent,
+      sentDate: DateTime.now(),
+    );
 
-  showMessage(context, 'Invoice sent successfully!');
+    await context.read<InvoiceProvider>().addActivity(
+      updatedInvoice,
+      InvoiceActivityType.sent,
+    );
+
+    if (context.mounted) {
+      showMessage(context, 'Invoice sent successfully!');
+    }
+  }
 }
