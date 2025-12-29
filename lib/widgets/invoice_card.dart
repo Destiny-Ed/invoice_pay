@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/config/extension.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/invoice/invoice_details_screen.dart';
+import 'package:provider/provider.dart';
 
 class InvoiceCard extends StatelessWidget {
   final InvoiceModel invoice;
@@ -94,7 +96,7 @@ class InvoiceCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '\$${NumberFormat('#,##0.00').format(invoice.balanceDue)}',
+                          '${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${NumberFormat('#,##0.00').format(invoice.balanceDue)}',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,

@@ -27,7 +27,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     // Fetch invoices and clients on screen load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<InvoiceProvider>().loadInvoices();
-       
     });
   }
 
@@ -139,7 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ],
                         ),
                         Text(
-                          '\$${NumberFormat('#,##0').format(totalRevenue)}',
+                          '${companyProvider.company?.currencySymbol ?? '\$'}${NumberFormat('#,##0').format(totalRevenue)}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 40,
@@ -154,7 +153,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         const SizedBox(height: 8),
 
                         Text(
-                          'Target: \$${NumberFormat('#,##0').format(goal)} / month • ${(progress * 100).toStringAsFixed(0)}% achieved',
+                          'Target: ${companyProvider.company?.currencySymbol ?? '\$'}${NumberFormat('#,##0').format(goal)} / month • ${(progress * 100).toStringAsFixed(0)}% achieved',
                           style: TextStyle(color: Colors.white70),
                         ),
                       ],
@@ -168,7 +167,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: statCard(
+                      child: statCard(context,
                         title: 'Outstanding',
                         amount: outstanding,
                         count: totalInvoices,
@@ -178,6 +177,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: statCard(
+                        context,
                         title: 'Overdue',
                         amount: invoiceProvider.invoices
                             .where((i) => i.isOverdue)

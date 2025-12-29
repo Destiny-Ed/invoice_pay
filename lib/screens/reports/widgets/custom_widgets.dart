@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/styles/colors.dart';
+import 'package:provider/provider.dart';
 
 Widget summaryCard(
+  BuildContext context,
   String title,
   double amount,
   IconData icon,
@@ -42,7 +45,7 @@ Widget summaryCard(
           ],
         ),
         Text(
-          '\$${NumberFormat('#,##0').format(amount)}',
+          '${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${NumberFormat('#,##0').format(amount)}',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 25,

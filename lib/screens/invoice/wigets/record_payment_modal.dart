@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:invoice_pay/models/invoice_item_model.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
@@ -43,7 +44,8 @@ void showRecordPayment(BuildContext context, InvoiceModel currentInvoice) {
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'Payment Amount',
-                prefixText: '\$ ',
+                prefixText:
+                    '${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'} ',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -91,7 +93,7 @@ void showRecordPayment(BuildContext context, InvoiceModel currentInvoice) {
                   Navigator.pop(context);
                   showMessage(
                     context,
-                    'Payment of \$${payment.toStringAsFixed(2)} recorded!',
+                    'Payment of ${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${payment.toStringAsFixed(2)} recorded!',
                   );
                 },
                 text: "Record Payment",

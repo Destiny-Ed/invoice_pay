@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
+import 'package:provider/provider.dart';
 
-Widget statCard({
+Widget statCard(
+  BuildContext context, {
   required String title,
   required double amount,
   required int count,
@@ -30,7 +33,7 @@ Widget statCard({
             ),
           ),
           Text(
-            '\$${NumberFormat('#,##0').format(amount)}',
+            '${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${NumberFormat('#,##0').format(amount)}',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,

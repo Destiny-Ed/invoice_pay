@@ -6,12 +6,9 @@ import 'package:invoice_pay/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
 void showGoalModal(BuildContext context) {
+  final companyProvider = context.read<CompanyProvider>();
   final controller = TextEditingController(
-    text:
-        context.read<CompanyProvider>().company?.monthlyGoal.toStringAsFixed(
-          0,
-        ) ??
-        '15000',
+    text: companyProvider.company?.monthlyGoal.toStringAsFixed(0) ?? '15000',
   );
 
   showModalBottomSheet(
@@ -46,7 +43,7 @@ void showGoalModal(BuildContext context) {
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
               decoration: InputDecoration(
-                prefixText: '\$',
+                prefixText: companyProvider.company?.currencySymbol ?? '\$',
                 hintText: '15000',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -67,7 +64,7 @@ void showGoalModal(BuildContext context) {
                   Navigator.pop(context);
                   showMessage(
                     context,
-                    'Goal updated to \$${NumberFormat('#,##0').format(goal)}',
+                    'Goal updated to ${companyProvider.company?.currencySymbol ?? '\$'}${NumberFormat('#,##0').format(goal)}',
                   );
                 },
                 text: "Save Goal",

@@ -108,7 +108,7 @@ Hi ${client.contactName.isEmpty ? client.companyName : client.contactName},
 Please find your invoice attached.
 
 Invoice #: ${invoice.number}
-Amount: \$${formattedTotal}
+Amount: ${company.currencySymbol}$formattedTotal
 Due Date: $formattedDue
 
 Thank you for your business!

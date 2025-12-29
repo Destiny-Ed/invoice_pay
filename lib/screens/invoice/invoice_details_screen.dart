@@ -194,7 +194,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
                         // Amount Due
                         Text(
-                          '\$${NumberFormat('#,##0.00').format(invoice.balanceDue)}',
+                          '${companyProvider.company?.currencySymbol ?? '\$'}}${NumberFormat('#,##0.00').format(invoice.balanceDue)}',
                           style: TextStyle(
                             fontSize: 38,
                             fontWeight: FontWeight.bold,
@@ -484,7 +484,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                             activity.type,
                           );
                           final subtitle = activity.amount != null
-                              ? '+\$${activity.amount!.toStringAsFixed(2)} • ${DateFormat('MMM dd, yyyy • h:mm a').format(activity.timestamp)}'
+                              ? '+${companyProvider.company?.currencySymbol ?? '\$'}${activity.amount!.toStringAsFixed(2)} • ${DateFormat('MMM dd, yyyy • h:mm a').format(activity.timestamp)}'
                               : DateFormat(
                                   'MMM dd, yyyy • h:mm a',
                                 ).format(activity.timestamp);
@@ -497,28 +497,6 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           );
                         }),
 
-                        // if (invoice.status != InvoiceStatus.draft)
-                        //   _activityItem(
-                        //     'Invoice Sent',
-                        //     DateFormat(
-                        //       'MMM dd, yyyy • h:mm a',
-                        //     ).format(invoice.sentDate!),
-                        //     Icons.send,
-                        //     Colors.blue,
-                        //   ),
-                        // if (invoice.paidAmount > 0)
-                        //   _activityItem(
-                        //     'Payment Received',
-                        //     '+\$${invoice.paidAmount.toStringAsFixed(2)}',
-                        //     Icons.payment,
-                        //     Colors.green,
-                        //   ),
-                        // _activityItem(
-                        //   'Invoice Created',
-                        //   DateFormat('MMM dd, yyyy').format(invoice.issued),
-                        //   Icons.note_add,
-                        //   Colors.grey,
-                        // ),
                         const SizedBox(height: 50),
                       ],
                     ),
@@ -633,14 +611,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${item.qty} × \$${item.rate.toStringAsFixed(2)}',
+                  '${item.qty} × ${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${item.rate.toStringAsFixed(2)}',
                   style: TextStyle(color: Colors.grey[600]),
                 ),
               ],
             ),
           ),
           Text(
-            '\$${item.amount.toStringAsFixed(2)}',
+            '${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${item.amount.toStringAsFixed(2)}',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
@@ -668,7 +646,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             ),
           ),
           Text(
-            '${isNegative ? '-' : ''}\$${NumberFormat('#,##0.00').format(value.abs())}',
+            '${isNegative ? '-' : ''}${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${NumberFormat('#,##0.00').format(value.abs())}',
             style: TextStyle(
               fontSize: isLarge ? 20 : 14,
               fontWeight: FontWeight.bold,

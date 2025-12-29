@@ -44,8 +44,9 @@ void showGoalModal(BuildContext context) {
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             decoration: InputDecoration(
-              prefixText: '  \$ ',
-              hintText: '5000',
+              prefixText:
+                  '  ${companyProvider.company?.currencySymbol ?? '\$'} ',
+              hintText: '15000',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(24),
               ),

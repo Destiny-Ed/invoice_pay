@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/models/invoice_item_model.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/styles/colors.dart';
+import 'package:provider/provider.dart';
 
 Widget emptyState(String title, String subtitle) {
   return Center(
@@ -110,7 +112,12 @@ Widget dateField(
   );
 }
 
-Widget itemCard(InvoiceItemModel item, int index, InvoiceProvider provider) {
+Widget itemCard(
+  BuildContext context,
+  InvoiceItemModel item,
+  int index,
+  InvoiceProvider provider,
+) {
   return Container(
     margin: const EdgeInsets.only(bottom: 20),
     padding: const EdgeInsets.all(20),
@@ -209,7 +216,8 @@ Widget itemCard(InvoiceItemModel item, int index, InvoiceProvider provider) {
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         hintText: '0',
-                        prefixText: '\$ ',
+                        prefixText:
+                            '${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'} ',
                         isDense: true,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -240,7 +248,7 @@ Widget itemCard(InvoiceItemModel item, int index, InvoiceProvider provider) {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
-                      '\$${NumberFormat('#,##0.00').format(item.amount.abs())}',
+                      '${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${NumberFormat('#,##0.00').format(item.amount.abs())}',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: primaryColor,
@@ -259,6 +267,7 @@ Widget itemCard(InvoiceItemModel item, int index, InvoiceProvider provider) {
 }
 
 Widget summaryRow(
+  BuildContext context,
   String label,
   double value, {
   bool isBold = false,
@@ -282,12 +291,12 @@ Widget summaryRow(
         ),
         Expanded(
           child: Text(
-            '${isNegative ? '-' : ''}\$${NumberFormat('#,##0.00').format(value.abs())}',
+            '${isNegative ? '-' : ''}${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${NumberFormat('#,##0.00').format(value.abs())}',
             maxLines: 2,
             textAlign: TextAlign.end,
             style: TextStyle(
               fontSize: isLarge ? 20 : 16,
-          
+
               fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
               color: isLarge ? primaryColor : null,
             ),

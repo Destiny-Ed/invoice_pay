@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/report_provider.dart';
 import 'package:invoice_pay/screens/reports/widgets/custom_widgets.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
@@ -15,9 +16,10 @@ class ReportsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ReportsViewModel>(
-      builder: (context, vm, _) {
+    return Consumer2<ReportsViewModel, CompanyProvider>(
+      builder: (context, vm, companyProvider, _) {
         final isSmallScreen = MediaQuery.of(context).size.width < 600;
+        final currency = companyProvider.company?.currencySymbol ?? '\$';
         return Scaffold(
           backgroundColor: Colors.grey[50],
           appBar: AppBar(
@@ -61,9 +63,9 @@ class ReportsScreen extends StatelessWidget {
 📊 InvoicePay Financial Report
 
 📅 Period: $period
-💰 Total Revenue: \$${NumberFormat('#,##0').format(vm.totalRevenue)}
-⚠️ Outstanding: \$${NumberFormat('#,##0').format(vm.outstanding)}
-🔴 Overdue: \$${NumberFormat('#,##0').format(vm.overdue)}
+💰 Total Revenue: $currency${NumberFormat('#,##0').format(vm.totalRevenue)}
+⚠️ Outstanding: $currency${NumberFormat('#,##0').format(vm.outstanding)}
+🔴 Overdue: $currency${NumberFormat('#,##0').format(vm.overdue)}
 
 Generated with ❤️ by InvoicePay
                   ''';
@@ -99,18 +101,21 @@ Generated with ❤️ by InvoicePay
                     mainAxisSpacing: 16,
                     children: [
                       summaryCard(
+                        context,
                         'Total Revenue',
                         vm.totalRevenue,
                         Icons.trending_up,
                         Colors.green,
                       ),
                       summaryCard(
+                        context,
                         'Outstanding',
                         vm.outstanding,
                         Icons.account_balance_wallet,
                         Colors.orange,
                       ),
                       summaryCard(
+                        context,
                         'Overdue',
                         vm.overdue,
                         Icons.warning_amber,
@@ -215,7 +220,7 @@ Generated with ❤️ by InvoicePay
                                     showTitles: true,
                                     reservedSize: 60,
                                     getTitlesWidget: (value, meta) => Text(
-                                      '\$${value.toInt()}',
+                                      '$currency${value.toInt()}',
                                       style: const TextStyle(fontSize: 12),
                                     ),
                                   ),
@@ -285,7 +290,7 @@ Generated with ❤️ by InvoicePay
                                   getTooltipItems: (touchedSpots) {
                                     return touchedSpots.map((spot) {
                                       return LineTooltipItem(
-                                        '\$${spot.y.toStringAsFixed(0)}',
+                                        '$currency${spot.y.toStringAsFixed(0)}',
                                         const TextStyle(
                                           color: greyColor,
                                           fontWeight: FontWeight.bold,
@@ -370,7 +375,7 @@ Generated with ❤️ by InvoicePay
                               ),
                             ),
                             Text(
-                              '\$${NumberFormat('#,##0').format(entry.value)}',
+                              '$currency${NumberFormat('#,##0').format(entry.value)}',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,

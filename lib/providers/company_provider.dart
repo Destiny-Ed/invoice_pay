@@ -30,6 +30,8 @@ class CompanyProvider extends ChangeNotifier {
   String city = '';
   String zip = '';
   String? logoUrl;
+  String selectedCurrencyCode = 'USD';
+  String selectedCurrencySymbol = '\$';
   Color primaryColor = const Color(0xFF10B981); // Default green
   String fontFamily = 'Manrope';
 
@@ -105,6 +107,8 @@ class CompanyProvider extends ChangeNotifier {
         city: city.trim(),
         zip: zip.trim(),
         logoUrl: logoUrl,
+        currencyCode: selectedCurrencyCode,
+        currencySymbol: selectedCurrencySymbol,
         primaryColor: primaryColor,
         fontFamily: fontFamily,
       );

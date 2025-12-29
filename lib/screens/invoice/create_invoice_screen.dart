@@ -1,3 +1,4 @@
+import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:invoice_pay/config/extension.dart';
 import 'package:invoice_pay/modal/single_select_modal.dart';
@@ -358,65 +359,63 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     const SizedBox(height: 10),
 
                     // Currency Section
-                    Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        children: [
-                          SwitchListTile(
-                            title: const Text(
-                              'Use Default Currency',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(
-                              'Company default: ${companyProvider.company?.currencySymbol ?? '\$'} ${companyProvider.company?.currencyCode ?? 'USD'}',
-                            ),
-                            value: invoiceProvider.draftUseCompanyCurrency,
-                            onChanged: (value) {
-                              invoiceProvider.toggleDraftCurrency(
-                                companyProvider,
-                                value,
+                    Column(
+                      children: [
+                        SwitchListTile(
+                          contentPadding: const EdgeInsets.all(0),
+                          title: const Text(
+                            'Use Default Currency',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            'Company default: ${companyProvider.company?.currencySymbol ?? '\$'} ${companyProvider.company?.currencyCode ?? 'USD'}',
+                          ),
+                          value: invoiceProvider.draftUseCompanyCurrency,
+                          onChanged: (value) {
+                            invoiceProvider.toggleDraftCurrency(
+                              companyProvider,
+                              value,
+                            );
+                          },
+                          activeColor: primaryColor,
+                        ),
+                        if (!invoiceProvider.draftUseCompanyCurrency)
+                          GestureDetector(
+                            onTap: () {
+                              showCurrencyPicker(
+                                context: context,
+                                onSelect: (c) {
+                                  invoiceProvider.setDraftCurrency(
+                                    c.code,
+                                    c.symbol,
+                                  );
+                                },
                               );
                             },
-                            activeColor: primaryColor,
-                          ),
-                          if (!invoiceProvider.draftUseCompanyCurrency)
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                              child: GestureDetector(
-                                onTap: () {
-                                  // Call your custom currency picker modal
-                                  // e.g. showCustomCurrencyModal(context);
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[50],
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: Colors.grey[300]!,
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '${invoiceProvider.draftCurrencySymbol} ${invoiceProvider.draftCurrencyCode}',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        '${invoiceProvider.draftCurrencySymbol} ${invoiceProvider.draftCurrencyCode}',
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const Icon(Icons.arrow_drop_down),
-                                    ],
-                                  ),
-                                ),
+                                  const Icon(Icons.arrow_drop_down),
+                                ],
                               ),
                             ),
-                        ],
-                      ),
+                          ),
+                      ],
                     ),
 
                     const SizedBox(height: 10),
@@ -447,7 +446,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     ),
                     const SizedBox(height: 12),
                     ...invoiceProvider.draftItems.asMap().entries.map(
-                      (e) => itemCard(e.value, e.key, invoiceProvider),
+                      (e) => itemCard(context, e.value, e.key, invoiceProvider),
                     ),
 
                     const SizedBox(height: 10),
@@ -579,17 +578,24 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                       ),
                       child: Column(
                         children: [
-                          summaryRow('Subtotal', invoiceProvider.draftSubtotal),
                           summaryRow(
+                            context,
+                            'Subtotal',
+                            invoiceProvider.draftSubtotal,
+                          ),
+                          summaryRow(
+                            context,
                             'Tax (${invoiceProvider.draftTaxPercent.toStringAsFixed(0)}%)',
                             invoiceProvider.draftTaxAmount,
                           ),
                           summaryRow(
+                            context,
                             'Discount (${invoiceProvider.draftDiscountPercent.toStringAsFixed(0)}%)',
                             -invoiceProvider.draftDiscountAmount,
                           ),
                           const Divider(),
                           summaryRow(
+                            context,
                             'Total Due',
                             invoiceProvider.draftTotal,
                             isBold: true,
@@ -636,6 +642,16 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                                         invoiceProvider.draftSelectedTemplate,
                                     orElse: () => TemplateType.minimal,
                                   ),
+                                  currencyCode:
+                                      invoiceProvider.draftUseCompanyCurrency
+                                      ? companyProvider.company!.currencyCode
+                                      : invoiceProvider.draftCurrencyCode,
+                                  currencySymbol:
+                                      invoiceProvider.draftUseCompanyCurrency
+                                      ? companyProvider.company!.currencySymbol
+                                      : invoiceProvider.draftCurrencySymbol,
+                                  useCompanyCurrency:
+                                      invoiceProvider.draftUseCompanyCurrency,
                                 );
 
                                 final success = widget.invoiceToEdit == null

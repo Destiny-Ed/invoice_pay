@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/utils/contants.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -244,7 +245,7 @@ abstract class BasePdfTemplate extends pw.StatelessWidget {
             ),
           ),
           pw.Text(
-            '${isNegative ? '-' : ''}\$${value.abs().toStringAsFixed(2)}',
+            '${isNegative ? '-' : ''}${CompanyProvider().company?.currencySymbol ?? '\$'}${value.abs().toStringAsFixed(2)}',
             style: pw.TextStyle(
               fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
               fontSize: large ? 20 : 14,
@@ -389,11 +390,11 @@ class MinimalTemplate extends BasePdfTemplate {
                 align: pw.Alignment.centerRight,
               ),
               _tableCell(
-                '\$${item.rate.toStringAsFixed(2)}',
+                '${CompanyProvider().company?.currencySymbol ?? '\$'}${item.rate.toStringAsFixed(2)}',
                 align: pw.Alignment.centerRight,
               ),
               _tableCell(
-                '\$${item.amount.toStringAsFixed(2)}',
+                '${CompanyProvider().company?.currencySymbol ?? '\$'}${item.amount.toStringAsFixed(2)}',
                 align: pw.Alignment.centerRight,
               ),
             ],

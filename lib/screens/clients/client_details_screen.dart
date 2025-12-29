@@ -3,6 +3,7 @@ import 'package:invoice_pay/config/extension.dart';
 import 'package:invoice_pay/models/client_model.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/client_provider.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
 import 'package:invoice_pay/widgets/invoice_list_item.dart';
@@ -138,7 +139,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                         ),
                         child: Text(
                           outstanding > 0
-                              ? 'Outstanding: \$${outstanding.toStringAsFixed(2)}'
+                              ? 'Outstanding: ${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${outstanding.toStringAsFixed(2)}'
                               : 'All caught up',
                           style: TextStyle(
                             color: outstanding > 0 ? Colors.red : Colors.green,

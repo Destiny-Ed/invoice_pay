@@ -102,7 +102,7 @@ class SettingsScreen extends StatelessWidget {
                 icon: Icons.track_changes,
                 title: 'Monthly Revenue Goal',
                 subtitle:
-                    'Current: \$${NumberFormat('#,##0').format(company?.monthlyGoal ?? 15000)}',
+                    'Current: ${company?.currencySymbol ?? '\$'}${NumberFormat('#,##0').format(company?.monthlyGoal ?? 15000)}',
                 onTap: () => showGoalModal(context),
               ),
 
@@ -112,9 +112,6 @@ class SettingsScreen extends StatelessWidget {
                 subtitle:
                     '${company?.currencySymbol ?? '\$'} ${company?.currencyCode ?? 'USD'}',
                 onTap: () {
-                  // You said you'll handle the dropdown modal yourself
-                  // Just trigger your custom currency picker here
-                  // e.g. showCurrencyPickerModal(context);
                   showCurrencyPicker(
                     context: context,
                     onSelect: (c) {

@@ -1,5 +1,6 @@
 // models/client_model.dart
 import 'package:flutter/material.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/styles/colors.dart';
 
 class ClientModel {
@@ -52,7 +53,8 @@ class ClientModel {
     Color color;
 
     if (outstanding > 0) {
-      tag = '\$${outstanding.toStringAsFixed(0)} Outstanding';
+      tag =
+          '${CompanyProvider().company?.currencySymbol ?? '\$'}${outstanding.toStringAsFixed(0)} Outstanding';
       color = Colors.orange;
     } else if (outstanding < 0) {
       tag = 'Overpaid';
@@ -113,7 +115,8 @@ class ClientModel {
     Color newColor;
 
     if (newOutstanding > 0) {
-      newTag = '\$${newOutstanding.toStringAsFixed(0)} Outstanding';
+      newTag =
+          '${CompanyProvider().company?.currencySymbol ?? '\$'}${newOutstanding.toStringAsFixed(0)} Outstanding';
       newColor = Colors.orange;
     } else if (newOutstanding < 0) {
       newTag = 'Overpaid';

@@ -187,7 +187,7 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
                             ),
                           ),
                           Text(
-                            '\$4,250.00',
+                            '${provider.selectedCurrencySymbol}4,250.00',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

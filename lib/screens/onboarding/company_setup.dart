@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
@@ -46,6 +47,10 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
       _streetCtrl.text = company.street;
       _cityCtrl.text = company.city;
       _zipCtrl.text = company.zip;
+
+      provider.selectedCurrencyCode = company.currencyCode;
+      provider.selectedCurrencySymbol = company.currencySymbol;
+      setState(() {});
     }
   }
 
@@ -168,12 +173,12 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
 
                 const SizedBox(height: 10),
 
-                // Business Address
+                //Address
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Business Address',
+                      'Address',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -199,6 +204,53 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                   password: false,
                   hint: 'Address',
                   prefixIcon: const Icon(Icons.location_city),
+                ),
+                const SizedBox(height: 8),
+
+                const Text(
+                  'Default Currency',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () async {
+                    showCurrencyPicker(
+                      context: context,
+                      onSelect: (c) {
+                        setState(() {
+                          provider.selectedCurrencyCode = c.code;
+                          provider.selectedCurrencySymbol = c.symbol;
+                        });
+                      },
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.currency_exchange, color: Colors.grey[600]),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            '${provider.selectedCurrencySymbol} ${provider.selectedCurrencyCode}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const Icon(Icons.arrow_drop_down),
+                      ],
+                    ),
+                  ),
                 ),
 
                 const SizedBox(height: 30),
