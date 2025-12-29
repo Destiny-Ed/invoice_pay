@@ -12,6 +12,8 @@ import 'dart:io';
 import '../models/company_model.dart';
 
 class CompanyProvider extends ChangeNotifier {
+  String _companyDocId = 'details'; // Fixed ID
+  //
   CompanyModel? _company;
   CompanyModel? get company => _company;
 
@@ -51,11 +53,12 @@ class CompanyProvider extends ChangeNotifier {
           .collection('users')
           .doc(user.uid)
           .collection('company')
+          .doc(_companyDocId)
           .get();
 
-      if (doc.docs.isNotEmpty) {
-        final data = doc.docs.first.data();
-        _company = CompanyModel.fromMap(doc.docs.first.id, data);
+      if (doc.exists) {
+        final data = doc.data();
+        _company = CompanyModel.fromMap(doc.id, data!);
 
         // Populate temporary fields for editing
         companyName = _company!.name;
@@ -102,15 +105,13 @@ class CompanyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      const String companyDocId = 'details'; // Fixed ID
-
       final CompanyModel companyToSave;
 
       if (model != null) {
         companyToSave = model;
       } else {
         companyToSave = CompanyModel(
-          id: companyDocId,
+          id: _companyDocId,
           name: companyName.trim(),
           email: email.trim(),
           phone: phone.trim(),
@@ -130,7 +131,7 @@ class CompanyProvider extends ChangeNotifier {
           .collection('users')
           .doc(user.uid)
           .collection('company')
-          .doc(companyDocId)
+          .doc(_companyDocId)
           .set(companyToSave.toMap(), SetOptions(merge: true));
 
       _company = companyToSave;

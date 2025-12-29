@@ -92,6 +92,22 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     _controller.forward();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadSavedDetails();
+    });
+  }
+
+  void _loadSavedDetails() {
+    final provider = context.read<CompanyProvider>();
+    final company = provider.company;
+
+    if (company != null) {
+      selectedColor = company.primaryColor;
+      selectedFont = company.fontFamily;
+
+      setState(() {});
+    }
   }
 
   @override
@@ -411,11 +427,12 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
                     Expanded(
                       child: CustomButton(
                         onPressed: () {
-                          Navigator.push(
+                          Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => DashboardScreen(),
+                              builder: (context) => MainActivity(),
                             ),
+                            (_) => false,
                           );
                         },
                         text: "Skip",

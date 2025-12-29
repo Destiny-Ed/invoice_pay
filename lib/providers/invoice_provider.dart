@@ -416,10 +416,12 @@ class InvoiceProvider extends BaseViewModel {
 
   List<InvoiceModel> filteredInvoices(BuildContext context) {
     return _invoices.where((inv) {
-      if (_listSelectedStatus != null && inv.status != _listSelectedStatus)
+      if (_listSelectedStatus != null && inv.status != _listSelectedStatus) {
         return false;
-      if (_listStartDate != null && inv.due.isBefore(_listStartDate!))
+      }
+      if (_listStartDate != null && inv.due.isBefore(_listStartDate!)) {
         return false;
+      }
       if (_listEndDate != null && inv.due.isAfter(_listEndDate!)) return false;
 
       if (_listSearchQuery.isNotEmpty) {

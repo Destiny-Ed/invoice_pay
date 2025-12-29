@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
+import 'package:invoice_pay/screens/invoice/invoice_details_screen.dart';
 import 'package:invoice_pay/styles/colors.dart';
 
 class InvoiceListItem extends StatelessWidget {
@@ -32,7 +33,10 @@ class InvoiceListItem extends StatelessWidget {
 
     return Card(
       child: ListTile(
-        leading: CircleAvatar(backgroundColor: primaryColor),
+        leading: CircleAvatar(
+          backgroundColor: primaryColor,
+          child: Text(invoice.currencySymbol ?? '\$'),
+        ),
         title: Text('Invoice #${invoice.number}'),
         subtitle: Text(DateFormat('MMM dd, yyyy').format(invoice.due)),
         trailing: Container(
@@ -46,7 +50,14 @@ class InvoiceListItem extends StatelessWidget {
             style: TextStyle(color: statusColor, fontWeight: FontWeight.bold),
           ),
         ),
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InvoiceDetailScreen(invoiceId: invoice.id),
+            ),
+          );
+        },
       ),
     );
   }

@@ -88,203 +88,308 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
         //   ),
         // ],
       ),
-      body: Column(
-        children: [
-          // Header Section
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                // Avatar + Name
-                Center(
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundColor: primaryColor.withOpacity(0.2),
-                        child: Text(
-                          widget.client.companyName.isNotEmpty
-                              ? widget.client.companyName[0].toUpperCase()
-                              : '?',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: primaryColor,
-                            fontWeight: FontWeight.bold,
+      body: DefaultTabController(
+        length: 3,
+        child: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            SliverToBoxAdapter(
+              //headerSilverBuilder only accepts slivers
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        // Avatar + Name
+                        Center(
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                radius: 40,
+                                backgroundColor: primaryColor.withOpacity(0.2),
+                                child: Text(
+                                  widget.client.companyName.isNotEmpty
+                                      ? widget.client.companyName[0]
+                                            .toUpperCase()
+                                      : '?',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                widget.client.companyName,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                widget.client.contactName,
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: outstanding > 0
+                                      ? Colors.red.shade100
+                                      : Colors.green.shade100,
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Text(
+                                  outstanding > 0
+                                      ? 'Outstanding: ${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${outstanding.toStringAsFixed(2)}'
+                                      : 'All caught up',
+                                  style: TextStyle(
+                                    color: outstanding > 0
+                                        ? Colors.red
+                                        : Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        widget.client.companyName,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+
+                        const SizedBox(height: 32),
+
+                        // Action Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            if (widget.client.phone.isNotEmpty)
+                              _actionButton(
+                                Icons.call,
+                                'Call',
+                                () => launchUrl(
+                                  Uri(scheme: 'tel', path: widget.client.phone),
+                                ),
+                              ),
+                            _actionButton(
+                              Icons.email,
+                              'Email',
+                              () => launchUrl(
+                                Uri(
+                                  scheme: 'mailto',
+                                  path: widget.client.email,
+                                ),
+                              ),
+                            ),
+                            if (widget.client.website.isNotEmpty)
+                              _actionButton(
+                                Icons.language,
+                                'Website',
+                                () => launchUrl(
+                                  Uri.parse(
+                                    widget.client.website.isEmpty
+                                        ? 'https://invoicepay.netlify.app'
+                                        : widget.client.website,
+                                  ),
+                                ),
+                              ),
+                            _actionButton(
+                              Icons.add_circle,
+                              'Create',
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      NewInvoiceScreen(client: widget.client),
+                                ),
+                              ),
+                              primaryColor,
+                            ),
+                          ],
                         ),
-                      ),
-                      Text(
-                        widget.client.contactName,
-                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: outstanding > 0
-                              ? Colors.red.shade100
-                              : Colors.green.shade100,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Text(
-                          outstanding > 0
-                              ? 'Outstanding: ${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${outstanding.toStringAsFixed(2)}'
-                              : 'All caught up',
-                          style: TextStyle(
-                            color: outstanding > 0 ? Colors.red : Colors.green,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Action Buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  Container(
+                    color: Colors.grey[100],
+                    child: TabBar(
+                      controller: _tabController,
+                      labelColor: primaryColor,
+                      unselectedLabelColor: Colors.grey[600],
+                      indicatorColor: primaryColor,
+                      tabs: const [
+                        Tab(text: 'Open'),
+                        Tab(text: 'Paid'),
+                        Tab(text: 'Projects'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          body: Column(
+            children: [
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
                   children: [
-                    if (widget.client.phone.isNotEmpty)
-                      _actionButton(
-                        Icons.call,
-                        'Call',
-                        () => launchUrl(
-                          Uri(scheme: 'tel', path: widget.client.phone),
-                        ),
-                      ),
-                    _actionButton(
-                      Icons.email,
-                      'Email',
-                      () => launchUrl(
-                        Uri(scheme: 'mailto', path: widget.client.email),
-                      ),
-                    ),
-                    if (widget.client.website.isNotEmpty)
-                      _actionButton(
-                        Icons.language,
-                        'Website',
-                        () => launchUrl(
-                          Uri.parse(
-                            widget.client.website.isEmpty
-                                ? 'https://invoicepay.netlify.app'
-                                : widget.client.website,
-                          ),
-                        ),
-                      ),
-                    _actionButton(
-                      Icons.add_circle,
-                      'Create',
-                      () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              NewInvoiceScreen(client: widget.client),
-                        ),
-                      ),
-                      primaryColor,
-                    ),
+                    // Open Tab
+                    _buildInvoiceList(_getInvoicesForTab(0)),
+
+                    // Paid Tab
+                    _buildInvoiceList(_getInvoicesForTab(1)),
+
+                    // Projects Tab (Placeholder or future use)
+                    _buildProjectsTab(),
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          // Tabs
-          Container(
-            color: Colors.grey[100],
-            child: TabBar(
-              controller: _tabController,
-              labelColor: primaryColor,
-              unselectedLabelColor: Colors.grey[600],
-              indicatorColor: primaryColor,
-              tabs: const [
-                Tab(text: 'Open'),
-                Tab(text: 'Paid'),
-                Tab(text: 'Projects'),
-              ],
-            ),
-          ),
-
-          // Tab Views
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                // Open Tab
-                _buildInvoiceList(_getInvoicesForTab(0)),
-
-                // Paid Tab
-                _buildInvoiceList(_getInvoicesForTab(1)),
-
-                // Projects Tab (Placeholder or future use)
-                _buildProjectsTab(),
-              ],
-            ),
-          ),
-
-          Container(
-            margin: const EdgeInsets.all(20),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
                   spacing: 10,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(Icons.note, color: primaryColor),
-                    const Text(
-                      'CLIENT NOTES',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: primaryColor,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            spacing: 10,
+                            children: [
+                              const Icon(Icons.note, color: primaryColor),
+                              const Text(
+                                'CLIENT NOTES',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: primaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            widget.client.notes.isEmpty
+                                ? 'No notes yet. Tap right icon to add.' * 10
+                                : widget.client.notes,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[800],
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
+                    FloatingActionButton(
+                      backgroundColor: primaryColor,
+                      onPressed: () {
+                        showNotesModal(context: context, client: widget.client);
+                      },
+                      child: const Icon(Icons.note_add),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  widget.client.notes.isEmpty
-                      ? 'No notes yet. Tap right icon to add.'
-                      : widget.client.notes,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[800],
-                    height: 1.5,
-                  ),
-                ),
-              ],
-            ),
+              ),
+
+              30.height(),
+            ],
           ),
-
-          80.height(),
-        ],
+        ),
       ),
 
-      // Floating Notes Button
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        onPressed: () {
-          showNotesModal(context: context, client: widget.client);
-        },
-        child: const Icon(Icons.note_add),
-      ),
+      // body: Column(
+      //   children: [
+      //     // Header Section
+
+      //     // Tabs
+
+      //     // Tab Views
+      // Expanded(
+      //   child: TabBarView(
+      //     controller: _tabController,
+      //     children: [
+      //       // Open Tab
+      //       _buildInvoiceList(_getInvoicesForTab(0)),
+
+      //       // Paid Tab
+      //       _buildInvoiceList(_getInvoicesForTab(1)),
+
+      //       // Projects Tab (Placeholder or future use)
+      //       _buildProjectsTab(),
+      //     ],
+      //   ),
+      // ),
+
+      // Container(
+      //   margin: const EdgeInsets.symmetric(horizontal: 20),
+      //   padding: const EdgeInsets.all(20),
+      //   decoration: BoxDecoration(
+      //     color: primaryColor.withOpacity(0.1),
+      //     borderRadius: BorderRadius.circular(16),
+      //   ),
+      //   child: Row(
+      //     spacing: 10,
+      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //     children: [
+      //       Expanded(
+      //         child: Column(
+      //           crossAxisAlignment: CrossAxisAlignment.start,
+      //           children: [
+      //             Row(
+      //               spacing: 10,
+      //               children: [
+      //                 const Icon(Icons.note, color: primaryColor),
+      //                 const Text(
+      //                   'CLIENT NOTES',
+      //                   style: TextStyle(
+      //                     fontWeight: FontWeight.bold,
+      //                     color: primaryColor,
+      //                   ),
+      //                 ),
+      //               ],
+      //             ),
+      //             const SizedBox(height: 10),
+      //             Text(
+      //               widget.client.notes.isEmpty
+      //                   ? 'No notes yet. Tap right icon to add.' * 10
+      //                   : widget.client.notes,
+      //               style: TextStyle(
+      //                 fontSize: 12,
+      //                 color: Colors.grey[800],
+      //                 height: 1.5,
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       ),
+      //       FloatingActionButton(
+      //         backgroundColor: primaryColor,
+      //         onPressed: () {
+      //           showNotesModal(context: context, client: widget.client);
+      //         },
+      //         child: const Icon(Icons.note_add),
+      //       ),
+      //     ],
+      //   ),
+      // ),
+
+      // 30.height(),
+      //   ],
+      // ),
     );
   }
 
@@ -296,6 +401,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     }
 
     return ListView.builder(
+      shrinkWrap: true,
       padding: const EdgeInsets.all(16),
       itemCount: invoices.length,
       itemBuilder: (context, index) {

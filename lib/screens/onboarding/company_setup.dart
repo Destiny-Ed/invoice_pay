@@ -71,9 +71,9 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const OnboardingProgress(currentStep: 0, totalSteps: 2),
-      
+
                   const SizedBox(height: 10),
-      
+
                   Text(
                     'Set up your profile',
                     style: AppTheme.headerStyle().copyWith(fontSize: 30),
@@ -83,9 +83,9 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                     'Add your company details to look professional on your invoices.',
                     style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
-      
+
                   const SizedBox(height: 20),
-      
+
                   // Logo Upload
                   Center(
                     child: GestureDetector(
@@ -123,9 +123,9 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                       ),
                     ),
                   ),
-      
+
                   const SizedBox(height: 20),
-      
+
                   // Company Name
                   const Text(
                     'Company Name',
@@ -139,7 +139,7 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                     prefixIcon: const Icon(Icons.business),
                   ),
                   const SizedBox(height: 10),
-      
+
                   // Business Email
                   const Text(
                     'Business Email',
@@ -151,30 +151,30 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                     password: false,
                     hint: 'name@company.com',
                     keyboardType: TextInputType.emailAddress,
-      
+
                     prefixIcon: const Icon(Icons.email),
                   ),
-      
+
                   const SizedBox(height: 10),
-      
+
                   // Phone Number
                   const Text(
                     'Phone Number',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 8),
-      
+
                   CustomTextField(
                     _phoneCtrl,
                     password: false,
                     hint: '+1 (555) 000-0000',
                     keyboardType: TextInputType.phone,
-      
+
                     prefixIcon: const Icon(Icons.phone),
                   ),
-      
+
                   const SizedBox(height: 10),
-      
+
                   //Address
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -186,7 +186,7 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-      
+
                       // TextButton(
                       //   onPressed: () {},
                       //   child: Text(
@@ -199,7 +199,7 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                       // ),
                     ],
                   ),
-      
+
                   const SizedBox(height: 8),
                   CustomTextField(
                     _streetCtrl,
@@ -208,7 +208,7 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                     prefixIcon: const Icon(Icons.location_city),
                   ),
                   const SizedBox(height: 8),
-      
+
                   const Text(
                     'Default Currency',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -238,7 +238,10 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.currency_exchange, color: Colors.grey[600]),
+                          Icon(
+                            Icons.currency_exchange,
+                            color: Colors.grey[600],
+                          ),
                           const SizedBox(width: 16),
                           Expanded(
                             child: Text(
@@ -254,9 +257,9 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                       ),
                     ),
                   ),
-      
+
                   const SizedBox(height: 30),
-      
+
                   // Next Button
                   CustomButton(
                     width: MediaQuery.of(context).size.width / 2,
@@ -272,14 +275,14 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                         );
                         return;
                       }
-      
+
                       provider.companyName = _nameCtrl.text;
                       provider.email = _emailCtrl.text;
                       provider.phone = _phoneCtrl.text;
                       provider.street = _streetCtrl.text;
                       // provider.city = _cityCtrl.text;
                       // provider.zip = _zipCtrl.text;
-      
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
