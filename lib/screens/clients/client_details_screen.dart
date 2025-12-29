@@ -283,7 +283,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                           const SizedBox(height: 10),
                           Text(
                             widget.client.notes.isEmpty
-                                ? 'No notes yet. Tap right icon to add.' * 10
+                                ? 'No notes yet. Tap right icon to add.'
                                 : widget.client.notes,
                             style: TextStyle(
                               fontSize: 12,
@@ -310,86 +310,6 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           ),
         ),
       ),
-
-      // body: Column(
-      //   children: [
-      //     // Header Section
-
-      //     // Tabs
-
-      //     // Tab Views
-      // Expanded(
-      //   child: TabBarView(
-      //     controller: _tabController,
-      //     children: [
-      //       // Open Tab
-      //       _buildInvoiceList(_getInvoicesForTab(0)),
-
-      //       // Paid Tab
-      //       _buildInvoiceList(_getInvoicesForTab(1)),
-
-      //       // Projects Tab (Placeholder or future use)
-      //       _buildProjectsTab(),
-      //     ],
-      //   ),
-      // ),
-
-      // Container(
-      //   margin: const EdgeInsets.symmetric(horizontal: 20),
-      //   padding: const EdgeInsets.all(20),
-      //   decoration: BoxDecoration(
-      //     color: primaryColor.withOpacity(0.1),
-      //     borderRadius: BorderRadius.circular(16),
-      //   ),
-      //   child: Row(
-      //     spacing: 10,
-      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //     children: [
-      //       Expanded(
-      //         child: Column(
-      //           crossAxisAlignment: CrossAxisAlignment.start,
-      //           children: [
-      //             Row(
-      //               spacing: 10,
-      //               children: [
-      //                 const Icon(Icons.note, color: primaryColor),
-      //                 const Text(
-      //                   'CLIENT NOTES',
-      //                   style: TextStyle(
-      //                     fontWeight: FontWeight.bold,
-      //                     color: primaryColor,
-      //                   ),
-      //                 ),
-      //               ],
-      //             ),
-      //             const SizedBox(height: 10),
-      //             Text(
-      //               widget.client.notes.isEmpty
-      //                   ? 'No notes yet. Tap right icon to add.' * 10
-      //                   : widget.client.notes,
-      //               style: TextStyle(
-      //                 fontSize: 12,
-      //                 color: Colors.grey[800],
-      //                 height: 1.5,
-      //               ),
-      //             ),
-      //           ],
-      //         ),
-      //       ),
-      //       FloatingActionButton(
-      //         backgroundColor: primaryColor,
-      //         onPressed: () {
-      //           showNotesModal(context: context, client: widget.client);
-      //         },
-      //         child: const Icon(Icons.note_add),
-      //       ),
-      //     ],
-      //   ),
-      // ),
-
-      // 30.height(),
-      //   ],
-      // ),
     );
   }
 

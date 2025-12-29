@@ -337,7 +337,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  invoice.paymentMethod.capitalize(),
+                                  invoice.paymentMethod
+                                      .replaceAll("_", " ")
+                                      .capitalize(),
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,

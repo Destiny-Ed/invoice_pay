@@ -62,12 +62,6 @@ class _InvoicePreviewScreenState extends State<InvoicePreviewScreen> {
       appBar: AppBar(
         title: const Text('Invoice Preview'),
         actions: [
-          // IconButton(
-          //   icon: const Icon(Icons.picture_as_pdf_outlined),
-          //   onPressed: () {},
-          // ),
-          // IconButton(icon: const Icon(Icons.share_outlined), onPressed: () {
-          // }),
           IconButton(
             icon: const Icon(Icons.picture_as_pdf_outlined),
             onPressed: () => downloadInvoicePdf(

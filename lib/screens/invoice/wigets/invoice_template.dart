@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
@@ -33,10 +34,6 @@ class PdfInvoiceTemplate {
     } catch (_) {}
 
     final accentColor = PdfColor.fromInt(company.primaryColor.value);
-
-    log(company.primaryColor.toString());
-    log("company logo :${company.logoUrl}");
-    log(accentColor.toString());
 
     pdf.addPage(
       pw.MultiPage(
@@ -280,7 +277,14 @@ class MinimalTemplate extends BasePdfTemplate {
       children: [
         pw.Row(
           children: [
-            pw.Image(logo, width: 100, height: 100),
+            pw.Container(
+              height: 80,
+              width: 80,
+              decoration: pw.BoxDecoration(
+                shape: pw.BoxShape.circle,
+                image: pw.DecorationImage(image: logo),
+              ),
+            ),
             pw.SizedBox(width: 16),
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -409,7 +413,7 @@ class MinimalTemplate extends BasePdfTemplate {
     return pw.Align(
       alignment: pw.Alignment.centerRight,
       child: pw.Container(
-        width: 300,
+        width: double.infinity,
         padding: const pw.EdgeInsets.all(16),
         decoration: pw.BoxDecoration(
           color: accentColor.shade(0.05),
@@ -443,7 +447,7 @@ class MinimalTemplate extends BasePdfTemplate {
 
   @override
   pw.Widget paymentInstructions() {
-    if (invoice.paymentMethod == null || invoice.paymentMethod!.isEmpty) {
+    if (invoice.paymentMethod.isEmpty) {
       return pw.SizedBox();
     }
     String methodLabel =
@@ -455,6 +459,7 @@ class MinimalTemplate extends BasePdfTemplate {
         }[invoice.paymentMethod] ??
         invoice.paymentMethod;
     return pw.Container(
+      width: double.infinity,
       margin: const pw.EdgeInsets.only(top: 30),
       padding: const pw.EdgeInsets.all(16),
       decoration: pw.BoxDecoration(
@@ -468,12 +473,11 @@ class MinimalTemplate extends BasePdfTemplate {
           pw.Text('Payment Method', style: boldStyle.copyWith(fontSize: 14)),
           pw.SizedBox(height: 4),
           pw.Text(methodLabel, style: accentStyle),
-          if (invoice.paymentDetails != null &&
-              invoice.paymentDetails!.isNotEmpty) ...[
+          if (invoice.paymentDetails.isNotEmpty) ...[
             pw.SizedBox(height: 8),
             pw.Text('Payment Details', style: boldStyle.copyWith(fontSize: 14)),
             pw.SizedBox(height: 4),
-            pw.Text(invoice.paymentDetails!, style: baseStyle),
+            pw.Text(invoice.paymentDetails, style: baseStyle),
           ],
         ],
       ),

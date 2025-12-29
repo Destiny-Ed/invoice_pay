@@ -71,6 +71,7 @@ class ClientsScreen extends StatelessWidget {
     final TextEditingController companyCtrl = TextEditingController();
     final TextEditingController emailCtrl = TextEditingController();
     final TextEditingController phoneCtrl = TextEditingController();
+    final TextEditingController websiteCtrl = TextEditingController();
     String selectedIndustry = 'Technology'; // Default
 
     final List<String> industries = [
@@ -125,7 +126,7 @@ class ClientsScreen extends StatelessWidget {
                       Expanded(
                         child: ListView(
                           controller: controller,
-                          padding: const EdgeInsets.all(24),
+                          padding: const EdgeInsets.all(14),
                           children: [
                             const Text(
                               'New Client',
@@ -143,7 +144,7 @@ class ClientsScreen extends StatelessWidget {
                               ),
                             ),
 
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 22),
 
                             // Contact Name
                             TextField(
@@ -159,7 +160,7 @@ class ClientsScreen extends StatelessWidget {
                               ),
                             ),
 
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 10),
 
                             // Company Name
                             TextField(
@@ -175,7 +176,21 @@ class ClientsScreen extends StatelessWidget {
                               ),
                             ),
 
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 10),
+                            TextField(
+                              controller: websiteCtrl,
+                              decoration: InputDecoration(
+                                labelText: 'Company Website',
+                                prefixIcon: const Icon(Icons.web),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[50],
+                              ),
+                            ),
+
+                            const SizedBox(height: 10),
 
                             // Email
                             TextField(
@@ -192,7 +207,7 @@ class ClientsScreen extends StatelessWidget {
                               ),
                             ),
 
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 10),
 
                             // Phone
                             TextField(
@@ -209,7 +224,7 @@ class ClientsScreen extends StatelessWidget {
                               ),
                             ),
 
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 10),
 
                             // Industry Dropdown
                             GestureDetector(
@@ -253,7 +268,7 @@ class ClientsScreen extends StatelessWidget {
                               ),
                             ),
 
-                            const SizedBox(height: 40),
+                            const SizedBox(height: 30),
 
                             // Add Client Button
                             SizedBox(
@@ -267,6 +282,7 @@ class ClientsScreen extends StatelessWidget {
                                     companyName: companyCtrl.text.trim(),
                                     email: emailCtrl.text.trim(),
                                     phone: phoneCtrl.text.trim(),
+                                    website: websiteCtrl.text.trim(),
                                     statusTag: '',
                                     statusColor: primaryColor,
                                     actionIcon: Icons.person,
