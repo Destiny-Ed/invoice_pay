@@ -474,7 +474,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                             if (invoice.balanceDue > 0)
                               Expanded(
                                 child: CustomButton(
-                                  bgColor: greyColor,
+                                  bgColor: greenColor,
                                   icon: Icons.picture_as_pdf,
                                   onPressed: () {
                                     showRecordPayment(context, invoice);

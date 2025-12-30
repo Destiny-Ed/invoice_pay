@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/authentication/onboarding.dart';
-import 'package:invoice_pay/screens/dashboard/dashboard.dart';
 import 'package:invoice_pay/screens/main_activity/main_activity.dart';
 import 'package:invoice_pay/screens/onboarding/company_setup.dart';
+import 'package:invoice_pay/styles/colors.dart';
 import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:provider/provider.dart';
 
@@ -88,7 +88,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF10B981), // Beautiful green
+      backgroundColor: primaryColor,
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -115,15 +115,15 @@ class _SplashScreenState extends State<SplashScreen>
                   child: const Icon(
                     Icons.receipt_long,
                     size: 70,
-                    color: Color(0xFF10B981),
+                    color: primaryColor,
                   ),
                 ),
 
                 const SizedBox(height: 32),
 
                 // App Name
-                  Text(
-                   AppLocale.appName.getString(context),
+                Text(
+                  AppLocale.appName.getString(context),
                   style: TextStyle(
                     fontSize: 42,
                     fontWeight: FontWeight.bold,
@@ -136,7 +136,7 @@ class _SplashScreenState extends State<SplashScreen>
 
                 // Tagline
                 Text(
-                   AppLocale.onboardingTitle2.getString(context),
+                  AppLocale.onboardingTitle2.getString(context),
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.white.withOpacity(0.9),

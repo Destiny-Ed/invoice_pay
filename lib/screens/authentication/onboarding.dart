@@ -28,7 +28,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       "title": AppLocale.onboardingTitle2.getString(context),
       "description": AppLocale.onboardingDesc2.getString(context),
       "icon": Icons.payment,
-      "color": primaryColor,
+      "color": Colors.blue,
     },
     {
       "title": AppLocale.onboardingTitle3.getString(context),
@@ -122,8 +122,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           }
                         },
                         text: _currentPage == _pages(context).length - 1
-                            ?  AppLocale.getStarted.getString(context)
-                            :  AppLocale.next.getString(context),
+                            ? AppLocale.getStarted.getString(context)
+                            : AppLocale.next.getString(context),
                       ),
                     ),
                   ),
@@ -134,8 +134,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   if (_currentPage < _pages(context).length - 1)
                     TextButton(
                       onPressed: _completeOnboarding,
-                      child:   Text(
-                         AppLocale.skip.getString(context),
+                      child: Text(
+                        AppLocale.skip.getString(context),
                         style: TextStyle(color: Colors.white70, fontSize: 16),
                       ),
                     ),
