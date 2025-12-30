@@ -262,6 +262,7 @@ mixin AppLocale {
   static const String industryHospitality = 'industryHospitality';
   static const String industryOther = 'industryOther';
   static const String bankHintExample = 'bankHintExample';
+  static const String yourBusiness = 'yourBusiness';
 
   // General
   static const String appName = 'appName';
@@ -271,6 +272,7 @@ mixin AppLocale {
     clients: "Clients",
     invoices: "Invoices",
     reports: "Reports",
+    yourBusiness: "Your Business",
 
     onboardingTitle1: "Send Invoices in Seconds",
     onboardingDesc1:
@@ -531,6 +533,7 @@ mixin AppLocale {
     clients: "Clientes",
     invoices: "Facturas",
     reports: "Informes",
+    yourBusiness: "Tu Negocio",
 
     onboardingTitle1: "Envía Facturas en Segundos",
     onboardingDesc1:
@@ -790,6 +793,7 @@ mixin AppLocale {
     clients: "Clientes",
     invoices: "Faturas",
     reports: "Relatórios",
+    yourBusiness: "Seu Negócio",
 
     onboardingTitle1: "Envie Faturas em Segundos",
     onboardingDesc1:
@@ -1063,6 +1067,7 @@ mixin AppLocale {
     getStarted: "शुरू करें",
     next: "अगला",
     skip: "स्किप",
+    yourBusiness: "आपका व्यवसाय",
 
     settingsTitle: "सेटिंग्स",
     language: "भाषा",
@@ -1329,6 +1334,7 @@ mixin AppLocale {
     getStarted: "Commencer",
     next: "Suivant",
     skip: "Passer",
+    yourBusiness: "Votre Entreprise",
 
     welcomeBack: "Bienvenue",
     logInToManage: "Connectez-vous pour gérer vos factures",
@@ -1577,6 +1583,7 @@ mixin AppLocale {
     clients: "Kunden",
     invoices: "Rechnungen",
     reports: "Berichte",
+    yourBusiness: "Ihr Unternehmen",
 
     settingsTitle: "Einstellungen",
     language: "Sprache",
@@ -1862,6 +1869,7 @@ mixin AppLocale {
     getStarted: "Mulai",
     next: "Lanjut",
     skip: "Lewati",
+    yourBusiness: "Bisnis Anda",
 
     welcomeBack: "Selamat Datang Kembali",
     logInToManage: "Masuk untuk mengelola faktur Anda",

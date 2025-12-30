@@ -67,7 +67,8 @@ class SettingsScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              company?.name ?? 'Your Business',
+                              company?.name ??
+                                  AppLocale.yourBusiness.getString(context),
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
