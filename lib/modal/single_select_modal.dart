@@ -133,11 +133,13 @@ Future<String?> showSingleClientSelectModal({
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     IconButton(

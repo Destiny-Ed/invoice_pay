@@ -47,10 +47,10 @@ extension InvoiceExtension on InvoiceModel {
         : client.companyName;
   }
 
-  ClientModel? getClient(BuildContext context) {
+  ClientModel? getClient(BuildContext context, {String? id}) {
     final clientProvider = Provider.of<ClientProvider>(context, listen: false);
     try {
-      return clientProvider.clients.firstWhere((c) => c.id == clientId);
+      return clientProvider.clients.firstWhere((c) => c.id == (id ?? clientId));
     } catch (e) {
       return null;
     }

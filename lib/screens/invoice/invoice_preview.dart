@@ -31,7 +31,10 @@ class _InvoicePreviewScreenState extends State<InvoicePreviewScreen> {
   Future<void> _buildPdf() async {
     final invoiceProvider = context.read<InvoiceProvider>();
     final company = context.read<CompanyProvider>().company!;
-    final client = invoiceProvider.singleInvoice?.getClient(context)!;
+
+    final client = widget.fromAdd
+        ? invoiceProvider.draftSelectedClient
+        : invoiceProvider.singleInvoice?.getClient(context)!;
 
     if (client == null) return;
 
@@ -59,7 +62,9 @@ class _InvoicePreviewScreenState extends State<InvoicePreviewScreen> {
         : invoiceProvider.singleInvoice;
 
     final company = context.read<CompanyProvider>().company!;
-    final client = invoice?.getClient(context)!;
+    final client = widget.fromAdd
+        ? invoiceProvider.draftSelectedClient
+        : invoice?.getClient(context)!;
 
     return Scaffold(
       appBar: AppBar(

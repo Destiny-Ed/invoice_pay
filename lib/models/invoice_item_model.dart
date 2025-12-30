@@ -1,4 +1,6 @@
-import 'package:invoice_pay/models/invoice_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 
 class InvoiceItemModel {
   String description;
@@ -46,18 +48,18 @@ class InvoiceActivityModel {
     this.amount,
   });
 
-  String get title {
+  String title(BuildContext context) {
     switch (type) {
       case InvoiceActivityType.created:
-        return 'Invoice Created';
+        return AppLocale.invoiceCreated.getString(context);
       case InvoiceActivityType.sent:
-        return 'Invoice Sent';
+        return AppLocale.invoiceSent.getString(context);
       case InvoiceActivityType.viewed:
-        return 'Invoice Viewed';
+        return AppLocale.invoiceViewed.getString(context);
       case InvoiceActivityType.paymentReceived:
-        return 'Payment Received';
+        return AppLocale.paymentReceived.getString(context);
       case InvoiceActivityType.overdue:
-        return 'Invoice Overdue';
+        return AppLocale.invoiceOverdue.getString(context);
     }
   }
 

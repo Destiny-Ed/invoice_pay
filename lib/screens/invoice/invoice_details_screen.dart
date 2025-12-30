@@ -526,7 +526,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                 ).format(activity.timestamp);
 
                           return _activityItem(
-                            activity.title,
+                            activity.title(context),
                             subtitle,
                             iconColor.icons,
                             iconColor.color,

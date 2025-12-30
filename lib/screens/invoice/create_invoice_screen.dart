@@ -88,22 +88,23 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title:   Text(AppLocale.createInvoice.getString(context)),
+          title: Text(AppLocale.createInvoice.getString(context)),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const InvoicePreviewScreen(fromAdd: true),
-                  ),
-                );
-              },
-              child: Text(
-                AppLocale.preview.getString(context),
-                style: TextStyle(color: primaryColor),
+            if (context.read<InvoiceProvider>().canCreateDraftInvoice)
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const InvoicePreviewScreen(fromAdd: true),
+                    ),
+                  );
+                },
+                child: Text(
+                  AppLocale.preview.getString(context),
+                  style: TextStyle(color: primaryColor),
+                ),
               ),
-            ),
           ],
         ),
         body: Consumer3<InvoiceProvider, ClientProvider, CompanyProvider>(
@@ -680,8 +681,12 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                                   showMessage(
                                     context,
                                     widget.invoiceToEdit == null
-                                        ? AppLocale.invoiceCreated.getString(context)
-                                        : AppLocale.invoiceUpdated.getString(context),
+                                        ? AppLocale.invoiceCreated.getString(
+                                            context,
+                                          )
+                                        : AppLocale.invoiceUpdated.getString(
+                                            context,
+                                          ),
                                   );
                                   invoiceProvider.resetDraft();
                                   Navigator.pop(context);
@@ -690,7 +695,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                             : null,
                         text: widget.invoiceToEdit == null
                             ? AppLocale.generateAndSend.getString(context)
-                            :AppLocale.updateInvoice.getString(context),
+                            : AppLocale.updateInvoice.getString(context),
                       ),
                     ),
 

@@ -268,6 +268,9 @@ mixin AppLocale {
   static const String industryOther = 'industryOther';
   static const String bankHintExample = 'bankHintExample';
   static const String yourBusiness = 'yourBusiness';
+  static const String invoiceViewed = 'invoiceViewed';
+  static const String paymentReceived = 'paymentReceived';
+  static const String invoiceOverdue = 'invoiceOverdue';
 
   // General
   static const String appName = 'appName';
@@ -282,6 +285,10 @@ mixin AppLocale {
     invoices: "Invoices",
     reports: "Reports",
     yourBusiness: "Your Business",
+
+    invoiceViewed: "Invoice Viewed",
+    paymentReceived: "Payment Received",
+    invoiceOverdue: "Invoice Overdue",
 
     onboardingTitle1: "Send Invoices in Seconds",
     onboardingDesc1:
@@ -549,6 +556,10 @@ mixin AppLocale {
     goodEvening: "¡Buenas tardes!",
     goodNight: "¡Buenas noches!",
 
+    invoiceViewed: "Factura Vista",
+    paymentReceived: "Pago Recibido",
+    invoiceOverdue: "Factura Vencida",
+
     onboardingTitle1: "Envía Facturas en Segundos",
     onboardingDesc1:
         "Crea facturas profesionales con tu logo y marca — sin hojas de cálculo.",
@@ -814,6 +825,10 @@ mixin AppLocale {
     goodEvening: "Boa tarde!",
     goodNight: "Boa noite!",
 
+    invoiceViewed: "Fatura Visualizada",
+    paymentReceived: "Pagamento Recebido",
+    invoiceOverdue: "Fatura Vencida",
+
     onboardingTitle1: "Envie Faturas em Segundos",
     onboardingDesc1:
         "Crie faturas profissionais com seu logo e marca — sem planilhas necessárias.",
@@ -1078,6 +1093,10 @@ mixin AppLocale {
     goodAfternoon: "नमस्ते!",
     goodEvening: "शुभ संध्या!",
     goodNight: "शुभ रात्रि!",
+
+    invoiceViewed: "इनवॉइस देखा गया",
+    paymentReceived: "भुगतान प्राप्त हुआ",
+    invoiceOverdue: "इनवॉइस अतिदेय",
 
     onboardingTitle1: "सेकंड में इनवॉइस भेजें",
     onboardingDesc1:
@@ -1345,6 +1364,10 @@ mixin AppLocale {
     goodAfternoon: "Bon après-midi !",
     goodEvening: "Bonsoir !",
     goodNight: "Bonne nuit !",
+
+    invoiceViewed: "Facture Consultée",
+    paymentReceived: "Paiement Reçu",
+    invoiceOverdue: "Facture En Retard",
 
     settingsTitle: "Paramètres",
     language: "Langue",
@@ -1618,6 +1641,10 @@ mixin AppLocale {
     goodAfternoon: "Guten Tag!",
     goodEvening: "Guten Abend!",
     goodNight: "Gute Nacht!",
+
+    invoiceViewed: "Rechnung Angesehen",
+    paymentReceived: "Zahlung Eingegangen",
+    invoiceOverdue: "Rechnung Überfällig",
 
     settingsTitle: "Einstellungen",
     language: "Sprache",
@@ -1895,6 +1922,10 @@ mixin AppLocale {
     language: "Bahasa",
     selectLanguage: "Pilih Bahasa",
     systemDefault: "Default Sistem",
+
+    invoiceViewed: "Faktur Dilihat",
+    paymentReceived: "Pembayaran Diterima",
+    invoiceOverdue: "Faktur Terlambat",
 
     onboardingTitle1: "Kirim Faktur dalam Hitungan Detik",
     onboardingDesc1:
