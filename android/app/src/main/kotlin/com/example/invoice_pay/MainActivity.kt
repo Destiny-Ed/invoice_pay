@@ -1,4 +1,4 @@
-package com.example.invoice_pay
+package app.invoicepay.com
 
 import io.flutter.embedding.android.FlutterActivity
 

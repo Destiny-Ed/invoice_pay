@@ -29,6 +29,13 @@
             {
               "client_id": "733179330588-7di3eq55jo90o18m9mlga0aqhdt97gaf.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "733179330588-jv2rgng60u824b1tumsmep5gs404nr15.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.invoicePay"
+              }
             }
           ]
         }

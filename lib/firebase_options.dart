@@ -87,4 +87,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'invoice-pay-ef942.firebasestorage.app',
     measurementId: 'G-5NT2TFBEWP',
   );
+
 }

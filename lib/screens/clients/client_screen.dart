@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:invoice_pay/modal/single_select_modal.dart';
 import 'package:invoice_pay/models/client_model.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/client_provider.dart';
 import 'package:invoice_pay/styles/colors.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
@@ -17,7 +19,10 @@ class ClientsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Clients'), centerTitle: false),
+      appBar: AppBar(
+        title: Text(AppLocale.clients.getString(context)),
+        centerTitle: false,
+      ),
       body: Consumer<ClientProvider>(
         builder: (context, provider, _) {
           if (provider.viewState == ViewState.Busy) {
@@ -37,13 +42,13 @@ class ClientsScreen extends StatelessWidget {
                     color: Colors.grey[400],
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'No clients found',
+                  Text(
+                    AppLocale.noClientsFound.getString(context),
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Tap + to add your first client',
+                    AppLocale.tapToAddClient.getString(context),
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ],
@@ -128,8 +133,8 @@ class ClientsScreen extends StatelessWidget {
                           controller: controller,
                           padding: const EdgeInsets.all(14),
                           children: [
-                            const Text(
-                              'New Client',
+                              Text(
+                              AppLocale.newClient.getString(context),
                               style: TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold,
@@ -137,7 +142,7 @@ class ClientsScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Add client details to start invoicing',
+                             AppLocale.addClientDetails.getString(context),
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey[600],
@@ -150,7 +155,7 @@ class ClientsScreen extends StatelessWidget {
                             TextField(
                               controller: nameCtrl,
                               decoration: InputDecoration(
-                                labelText: 'Contact Name',
+                                labelText: AppLocale.contactName.getString(context),
                                 prefixIcon: const Icon(Icons.person_outline),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -166,7 +171,7 @@ class ClientsScreen extends StatelessWidget {
                             TextField(
                               controller: companyCtrl,
                               decoration: InputDecoration(
-                                labelText: 'Company Name',
+                                labelText: AppLocale.companyName.getString(context),
                                 prefixIcon: const Icon(Icons.business),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -180,7 +185,7 @@ class ClientsScreen extends StatelessWidget {
                             TextField(
                               controller: websiteCtrl,
                               decoration: InputDecoration(
-                                labelText: 'Company Website',
+                                labelText: AppLocale.companyWebsite.getString(context),
                                 prefixIcon: const Icon(Icons.web),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -197,7 +202,7 @@ class ClientsScreen extends StatelessWidget {
                               controller: emailCtrl,
                               keyboardType: TextInputType.emailAddress,
                               decoration: InputDecoration(
-                                labelText: 'Email',
+                                labelText: AppLocale.email.getString(context),
                                 prefixIcon: const Icon(Icons.email_outlined),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -214,7 +219,7 @@ class ClientsScreen extends StatelessWidget {
                               controller: phoneCtrl,
                               keyboardType: TextInputType.phone,
                               decoration: InputDecoration(
-                                labelText: 'Phone Number',
+                                labelText: AppLocale.phoneNumber.getString(context),
                                 prefixIcon: const Icon(Icons.phone_outlined),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -231,7 +236,7 @@ class ClientsScreen extends StatelessWidget {
                               onTap: () async {
                                 final selected = await showSingleSelectModal(
                                   context: context,
-                                  title: 'Select Industry',
+                                  title: AppLocale.selectIndustry.getString(context),
                                   items: industries,
                                   selectedItem: selectedIndustry,
                                 );
@@ -293,7 +298,7 @@ class ClientsScreen extends StatelessWidget {
                                       emailCtrl.text.isEmpty) {
                                     showMessage(
                                       context,
-                                      "All fields are required",
+                                     AppLocale.allFieldsRequired.getString(context),
                                     );
                                     return;
                                   }
@@ -307,7 +312,7 @@ class ClientsScreen extends StatelessWidget {
                                   Navigator.pop(context);
                                 },
 
-                                text: "Add Client",
+                                text: AppLocale.addClient.getString(context),
                               ),
                             ),
 

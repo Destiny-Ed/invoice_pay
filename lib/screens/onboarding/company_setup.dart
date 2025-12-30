@@ -1,12 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/onboarding/onboarding_progress.dart';
 import 'package:invoice_pay/screens/onboarding/template_setup_screen.dart';
 import 'package:invoice_pay/styles/colors.dart';
 import 'package:invoice_pay/styles/theme.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
@@ -75,12 +77,12 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                   const SizedBox(height: 10),
 
                   Text(
-                    'Set up your profile',
+                    AppLocale.setUpProfile.getString(context),
                     style: AppTheme.headerStyle().copyWith(fontSize: 30),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Add your company details to look professional on your invoices.',
+                  Text(
+                    AppLocale.companyDetailsDesc.getString(context),
                     style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
 
@@ -115,7 +117,7 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                     child: GestureDetector(
                       onTap: () => provider.uploadLogo(),
                       child: Text(
-                        'Tap to upload logo',
+                        AppLocale.tapToUploadLogo.getString(context),
                         style: TextStyle(
                           color: primaryColor,
                           fontWeight: FontWeight.w600,
@@ -127,8 +129,8 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                   const SizedBox(height: 20),
 
                   // Company Name
-                  const Text(
-                    'Company Name',
+                  Text(
+                    AppLocale.companyName.getString(context),
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 8),
@@ -141,8 +143,8 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                   const SizedBox(height: 10),
 
                   // Business Email
-                  const Text(
-                    'Business Email',
+                  Text(
+                    AppLocale.businessEmail.getString(context),
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 8),
@@ -158,8 +160,8 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                   const SizedBox(height: 10),
 
                   // Phone Number
-                  const Text(
-                    'Phone Number',
+                  Text(
+                    AppLocale.phoneNumber.getString(context),
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 8),
@@ -179,8 +181,8 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Address',
+                      Text(
+                        AppLocale.address.getString(context),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -204,13 +206,13 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                   CustomTextField(
                     _streetCtrl,
                     password: false,
-                    hint: 'Address',
+                    hint: AppLocale.address.getString(context),
                     prefixIcon: const Icon(Icons.location_city),
                   ),
                   const SizedBox(height: 8),
 
-                  const Text(
-                    'Default Currency',
+                  Text(
+                    AppLocale.defaultCurrency.getString(context),
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 8),
@@ -270,7 +272,7 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                           _streetCtrl.text.isEmpty) {
                         showMessage(
                           context,
-                          "All Fields are required",
+                          AppLocale.allFieldsRequired.getString(context),
                           isError: true,
                         );
                         return;
@@ -290,7 +292,7 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                         ),
                       );
                     },
-                    text: "Next Step →",
+                    text: AppLocale.nextStep.getString(context),
                   ),
                 ],
               ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_utilities/flutter_utilities.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
 import 'package:invoice_pay/screens/invoice/wigets/custom_widgets.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
@@ -28,7 +30,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Invoices'),
+        title:   Text(AppLocale.invoices.getString(context)),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
@@ -168,8 +170,8 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 50),
 
                         child: emptyState(
-                          "No invoices",
-                          'Create your first invoice to get started',
+                         AppLocale.noInvoices.getString(context),
+                         AppLocale.createFirstInvoice.getString(context),
                         ),
                       )
                     : ListView.builder(

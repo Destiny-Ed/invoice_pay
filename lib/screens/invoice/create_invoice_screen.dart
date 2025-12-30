@@ -1,5 +1,6 @@
 import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:invoice_pay/config/extension.dart';
 import 'package:invoice_pay/modal/single_select_modal.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
@@ -7,6 +8,7 @@ import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/invoice/invoice_preview.dart';
 import 'package:invoice_pay/screens/invoice/wigets/custom_widgets.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
 import 'package:invoice_pay/widgets/custom_text_field.dart';
@@ -97,8 +99,8 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                   ),
                 );
               },
-              child: const Text(
-                'Preview',
+              child: Text(
+                AppLocale.preview.getString(context),
                 style: TextStyle(color: primaryColor),
               ),
             ),
@@ -113,15 +115,15 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'New Invoice',
+                    Text(
+                      AppLocale.newInvoice.getString(context),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      'Professional invoices in seconds',
+                      AppLocale.professionalInvoices.getString(context),
                       style: TextStyle(color: Colors.grey[600]),
                     ),
 
@@ -228,8 +230,8 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     // ),
 
                     // Client Selection
-                    const Text(
-                      'Client',
+                    Text(
+                      AppLocale.client.getString(context),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -241,7 +243,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                         final clients = clientProvider.clients;
                         final selectedName = await showSingleClientSelectModal(
                           context: context,
-                          title: 'Select Client',
+                          title: AppLocale.selectAClient.getString(context),
                           items: clients
                               .map(
                                 (c) => c.contactName.isEmpty
@@ -296,7 +298,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                             Expanded(
                               child: Text(
                                 invoiceProvider.draftSelectedClient == null
-                                    ? 'Select a client'
+                                    ? AppLocale.selectAClient.getString(context)
                                     : invoiceProvider
                                           .draftSelectedClient!
                                           .contactName
@@ -326,8 +328,8 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     const SizedBox(height: 10),
 
                     // Dates
-                    const Text(
-                      'Dates',
+                    Text(
+                      AppLocale.dates.getString(context),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -339,7 +341,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                         Expanded(
                           child: dateField(
                             context,
-                            'Issued',
+                            AppLocale.issued.getString(context),
                             invoiceProvider.draftIssuedDate,
                             invoiceProvider.updateDraftIssuedDate,
                           ),
@@ -348,7 +350,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                         Expanded(
                           child: dateField(
                             context,
-                            'Due',
+                            AppLocale.due.getString(context),
                             invoiceProvider.draftDueDate,
                             invoiceProvider.updateDraftDueDate,
                           ),
@@ -363,12 +365,12 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                       children: [
                         SwitchListTile(
                           contentPadding: const EdgeInsets.all(0),
-                          title: const Text(
-                            'Use Default Currency',
+                          title: Text(
+                            AppLocale.useDefaultCurrency.getString(context),
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
-                            'Company default: ${companyProvider.company?.currencySymbol ?? '\$'} ${companyProvider.company?.currencyCode ?? 'USD'}',
+                            '${AppLocale.defaultCurrency.getString(context)}: ${companyProvider.company?.currencySymbol ?? '\$'} ${companyProvider.company?.currencyCode ?? 'USD'}',
                           ),
                           value: invoiceProvider.draftUseCompanyCurrency,
                           onChanged: (value) {
@@ -424,8 +426,8 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Line Items',
+                        Text(
+                          AppLocale.lineItems.getString(context),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -437,8 +439,8 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                             Icons.add_circle,
                             color: primaryColor,
                           ),
-                          label: const Text(
-                            'Add Item',
+                          label: Text(
+                            AppLocale.addItem.getString(context),
                             style: TextStyle(color: primaryColor),
                           ),
                         ),
@@ -458,7 +460,9 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                           child: TextField(
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                              labelText: 'Tax %',
+                              labelText: AppLocale.taxPercent.getString(
+                                context,
+                              ),
                               suffixText: '%',
                               filled: true,
                               fillColor: Colors.grey[50],
@@ -477,7 +481,9 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                           child: TextField(
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                              labelText: 'Discount %',
+                              labelText: AppLocale.discountPercent.getString(
+                                context,
+                              ),
                               suffixText: '%',
                               filled: true,
                               fillColor: Colors.grey[50],
@@ -502,11 +508,15 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: SwitchListTile(
-                        title: const Text(
-                          'Accept Payment with Invoice',
+                        title: Text(
+                          AppLocale.acceptPaymentWithInvoice.getString(context),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        subtitle: const Text('Include payment instructions'),
+                        subtitle: Text(
+                          AppLocale.includePaymentInstructions.getString(
+                            context,
+                          ),
+                        ),
                         value: invoiceProvider.draftReceivePayment,
                         onChanged: invoiceProvider.toggleDraftReceivePayment,
                         activeColor: primaryColor,
@@ -515,8 +525,8 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
 
                     if (invoiceProvider.draftReceivePayment) ...[
                       const SizedBox(height: 10),
-                      const Text(
-                        'Payment Method',
+                      Text(
+                        AppLocale.paymentMethod.getString(context),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -528,21 +538,25 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                         runSpacing: 12,
                         children: [
                           _paymentMethodChip(
-                            'Bank Transfer',
+                            AppLocale.bankAccountDetails.getString(context),
                             'bank_transfer',
                             invoiceProvider,
                           ),
                           _paymentMethodChip(
-                            'PayPal',
+                            AppLocale.paypalEmail.getString(context),
                             'paypal',
                             invoiceProvider,
                           ),
                           _paymentMethodChip(
-                            'Stripe',
+                            AppLocale.stripeLink.getString(context),
                             'stripe',
                             invoiceProvider,
                           ),
-                          _paymentMethodChip('UPI', 'upi', invoiceProvider),
+                          _paymentMethodChip(
+                            AppLocale.upiId.getString(context),
+                            'upi',
+                            invoiceProvider,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 10),
@@ -580,23 +594,23 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                         children: [
                           summaryRow(
                             context,
-                            'Subtotal',
+                            AppLocale.subtotal.getString(context),
                             invoiceProvider.draftSubtotal,
                           ),
                           summaryRow(
                             context,
-                            'Tax (${invoiceProvider.draftTaxPercent.toStringAsFixed(0)}%)',
+                            '${AppLocale.taxPercent.getString(context).replaceAll("%", "")} (${invoiceProvider.draftTaxPercent.toStringAsFixed(0)}%)',
                             invoiceProvider.draftTaxAmount,
                           ),
                           summaryRow(
                             context,
-                            'Discount (${invoiceProvider.draftDiscountPercent.toStringAsFixed(0)}%)',
+                            '${AppLocale.discountPercent.getString(context).replaceAll("%", "")} (${invoiceProvider.draftDiscountPercent.toStringAsFixed(0)}%)',
                             -invoiceProvider.draftDiscountAmount,
                           ),
                           const Divider(),
                           summaryRow(
                             context,
-                            'Total Due',
+                            AppLocale.totalDue.getString(context),
                             invoiceProvider.draftTotal,
                             isBold: true,
                             isLarge: true,
@@ -666,8 +680,8 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                                   showMessage(
                                     context,
                                     widget.invoiceToEdit == null
-                                        ? 'Invoice created!'
-                                        : 'Invoice updated!',
+                                        ? AppLocale.invoiceCreated.getString(context)
+                                        : AppLocale.invoiceUpdated.getString(context),
                                   );
                                   invoiceProvider.resetDraft();
                                   Navigator.pop(context);
@@ -675,8 +689,8 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                               }
                             : null,
                         text: widget.invoiceToEdit == null
-                            ? "Generate & Send"
-                            : "Update Invoice",
+                            ? AppLocale.generateAndSend.getString(context)
+                            :AppLocale.updateInvoice.getString(context),
                       ),
                     ),
 
@@ -715,13 +729,13 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
   String _getPaymentLabel(String method) {
     switch (method) {
       case 'bank_transfer':
-        return 'Bank Account Details';
+        return AppLocale.bankAccountDetails.getString(context);
       case 'paypal':
-        return 'PayPal Email';
+        return AppLocale.paypalEmail.getString(context);
       case 'stripe':
-        return 'Stripe Account / Payment Link';
+        return AppLocale.stripeLink.getString(context);
       case 'upi':
-        return 'UPI ID';
+        return AppLocale.upiId.getString(context);
       default:
         return 'Payment Details';
     }

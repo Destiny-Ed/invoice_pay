@@ -9,6 +9,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_core
   firebase_storage
   flutter_inappwebview_windows
+  flutter_localization
   printing
   share_plus
   url_launcher_windows

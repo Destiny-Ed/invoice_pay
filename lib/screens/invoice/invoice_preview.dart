@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:invoice_pay/config/extension.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/resent_invoice.dart';
 import 'package:provider/provider.dart';
 
@@ -60,7 +62,7 @@ class _InvoicePreviewScreenState extends State<InvoicePreviewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Invoice Preview'),
+        title:   Text(AppLocale.invoicePreview.getString(context)),
         actions: [
           IconButton(
             icon: const Icon(Icons.picture_as_pdf_outlined),

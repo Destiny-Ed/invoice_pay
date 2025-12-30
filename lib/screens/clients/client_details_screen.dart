@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:invoice_pay/config/extension.dart';
 import 'package:invoice_pay/models/client_model.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/client_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/contants.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
 import 'package:invoice_pay/widgets/invoice_list_item.dart';
@@ -79,7 +81,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Client Details'),
+        title: Text(AppLocale.clientDetails.getString(context)),
         // actions: [
         //   TextButton(
         //     onPressed: () {
@@ -150,8 +152,8 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                                 ),
                                 child: Text(
                                   outstanding > 0
-                                      ? 'Outstanding: ${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${outstanding.toStringAsFixed(2)}'
-                                      : 'All caught up',
+                                      ? '${AppLocale.outstanding.getString(context)}: ${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${outstanding.toStringAsFixed(2)}'
+                                      : AppLocale.allCaughtUp.getString(context),
                                   style: TextStyle(
                                     color: outstanding > 0
                                         ? Colors.red
@@ -173,14 +175,14 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                             if (widget.client.phone.isNotEmpty)
                               _actionButton(
                                 Icons.call,
-                                'Call',
+                                AppLocale.call.getString(context),
                                 () => launchUrl(
                                   Uri(scheme: 'tel', path: widget.client.phone),
                                 ),
                               ),
                             _actionButton(
                               Icons.email,
-                              'Email',
+                              AppLocale.email.getString(context),
                               () => launchUrl(
                                 Uri(
                                   scheme: 'mailto',
@@ -191,7 +193,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                             if (widget.client.website.isNotEmpty)
                               _actionButton(
                                 Icons.language,
-                                'Website',
+                                AppLocale.website.getString(context),
                                 () => launchUrl(
                                   Uri.parse(
                                     widget.client.website.isEmpty
@@ -202,7 +204,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                               ),
                             _actionButton(
                               Icons.add_circle,
-                              'Create',
+                              AppLocale.create.getString(context),
                               () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -224,10 +226,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                       labelColor: primaryColor,
                       unselectedLabelColor: Colors.grey[600],
                       indicatorColor: primaryColor,
-                      tabs: const [
-                        Tab(text: 'Open'),
-                        Tab(text: 'Paid'),
-                        Tab(text: 'Projects'),
+                      tabs:   [
+                        Tab(text: AppLocale.open.getString(context)),
+                        Tab(text: AppLocale.paid.getString(context)),
+                        Tab(text: AppLocale.projects.getString(context)),
                       ],
                     ),
                   ),
@@ -272,8 +274,8 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                             spacing: 10,
                             children: [
                               const Icon(Icons.note, color: primaryColor),
-                              const Text(
-                                'CLIENT NOTES',
+                                Text(
+                               AppLocale.clientNotes.getString(context).toUpperCase(),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
@@ -284,7 +286,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                           const SizedBox(height: 10),
                           Text(
                             widget.client.notes.isEmpty
-                                ? 'No notes yet. Tap right icon to add.'
+                                ? AppLocale.noNotesYet.getString(context)
                                 : widget.client.notes,
                             style: TextStyle(
                               fontSize: 12,
@@ -316,8 +318,8 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
 
   Widget _buildInvoiceList(List<InvoiceModel> invoices) {
     if (invoices.isEmpty) {
-      return const Center(
-        child: Text('No invoices', style: TextStyle(color: Colors.grey)),
+      return   Center(
+        child: Text(AppLocale.noInvoices.getString(context), style: TextStyle(color: Colors.grey)),
       );
     }
 
@@ -419,8 +421,8 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                         padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
                         child: Row(
                           children: [
-                            const Text(
-                              'Client Notes',
+                              Text(
+                              AppLocale.clientNotes.getString(context),
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -429,8 +431,8 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                             const Spacer(),
                             TextButton(
                               onPressed: () => Navigator.pop(context),
-                              child: const Text(
-                                'Cancel',
+                              child:   Text(
+                                AppLocale.cancel.getString(context),
                                 style: TextStyle(color: Colors.grey),
                               ),
                             ),
@@ -476,7 +478,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                               if (context.mounted) Navigator.pop(context);
                             },
 
-                            text: isSaving ? "Please wait..." : "Save Notes",
+                            text: isSaving ? AppLocale.pleaseWait.getString(context) : AppLocale.saveNotes.getString(context),
                           ),
                         ),
                       ),

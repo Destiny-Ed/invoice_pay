@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/screens/authentication/onboarding.dart';
 import 'package:invoice_pay/screens/dashboard/dashboard.dart';
 import 'package:invoice_pay/screens/main_activity/main_activity.dart';
 import 'package:invoice_pay/screens/onboarding/company_setup.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -120,8 +122,8 @@ class _SplashScreenState extends State<SplashScreen>
                 const SizedBox(height: 32),
 
                 // App Name
-                const Text(
-                  'InvoicePay',
+                  Text(
+                   AppLocale.appName.getString(context),
                   style: TextStyle(
                     fontSize: 42,
                     fontWeight: FontWeight.bold,
@@ -134,7 +136,7 @@ class _SplashScreenState extends State<SplashScreen>
 
                 // Tagline
                 Text(
-                  'Get Paid Faster',
+                   AppLocale.onboardingTitle2.getString(context),
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.white.withOpacity(0.9),

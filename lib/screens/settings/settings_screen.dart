@@ -1,11 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/modal/auth_modal.dart';
 import 'package:invoice_pay/screens/onboarding/company_setup.dart';
 import 'package:invoice_pay/screens/settings/support_screen.dart';
 import 'package:invoice_pay/screens/settings/widgets/custom_widgets.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/app_version.dart';
 import 'package:invoice_pay/utils/contants.dart';
 import 'package:provider/provider.dart';
@@ -100,7 +102,7 @@ class SettingsScreen extends StatelessWidget {
               const _SectionTitle('Preferences'),
               _SettingsTile(
                 icon: Icons.track_changes,
-                title: 'Monthly Revenue Goal',
+                title: AppLocale.monthlyRevenueGoal.getString(context),
                 subtitle:
                     'Current: ${company?.currencySymbol ?? '\$'}${NumberFormat('#,##0').format(company?.monthlyGoal ?? 15000)}',
                 onTap: () => showGoalModal(context),
@@ -108,7 +110,7 @@ class SettingsScreen extends StatelessWidget {
 
               _SettingsTile(
                 icon: Icons.currency_exchange,
-                title: 'Default Currency',
+                title: AppLocale.defaultCurrency.getString(context),
                 subtitle:
                     '${company?.currencySymbol ?? '\$'} ${company?.currencyCode ?? 'USD'}',
                 onTap: () {
@@ -143,24 +145,24 @@ class SettingsScreen extends StatelessWidget {
 
               // Account
               const _SectionTitle('Account'),
-              _SettingsTile(
-                icon: Icons.account_balance_wallet,
-                title: 'Upgrade to Pro',
-                subtitle: 'Unlimited invoices, custom branding, no ads',
-                onTap: () {
-                  // Navigate to pro screen
-                },
-              ),
+              // _SettingsTile(
+              //   icon: Icons.account_balance_wallet,
+              //   title: AppLocale.upgradeToPro.getString(context),
+              //   subtitle: 'Unlimited invoices, custom branding, no ads',
+              //   onTap: () {
+              //     // Navigate to pro screen
+              //   },
+              // ),
               _SettingsTile(
                 icon: Icons.security,
-                title: 'Privacy & Security',
+                title: AppLocale.privacyAndSecurity.getString(context),
                 onTap: () {
                   settings.openUrl(privacyPolicy);
                 },
               ),
               _SettingsTile(
                 icon: Icons.help_outline,
-                title: 'Help & Support',
+                title: AppLocale.helpAndSupport.getString(context),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -170,7 +172,7 @@ class SettingsScreen extends StatelessWidget {
               ),
               _SettingsTile(
                 icon: Icons.update,
-                title: 'Check for Updates',
+                title: AppLocale.checkForUpdates.getString(context),
                 onTap: settings.checkForUpdate,
               ),
 
@@ -180,13 +182,13 @@ class SettingsScreen extends StatelessWidget {
               const _SectionTitle('Danger Zone', color: Colors.red),
               _SettingsTile(
                 icon: Icons.logout,
-                title: 'Log Out',
+                title: AppLocale.logOut.getString(context),
                 color: Colors.orange,
                 onTap: () => showLogoutDialog(context),
               ),
               _SettingsTile(
                 icon: Icons.delete_forever,
-                title: 'Delete Account',
+                title: AppLocale.deleteAccount.getString(context),
                 color: Colors.red,
                 onTap: () => showDeleteAccountDialog(context),
               ),

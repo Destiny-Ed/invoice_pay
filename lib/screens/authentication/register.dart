@@ -1,11 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_utilities/flutter_utilities.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/screens/authentication/login.dart';
 import 'package:invoice_pay/screens/onboarding/company_setup.dart';
 import 'package:invoice_pay/styles/colors.dart';
 import 'package:invoice_pay/styles/theme.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/contants.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
@@ -87,12 +89,12 @@ class _RegisterScreenState extends State<RegisterScreen>
                         const SizedBox(height: 40),
 
                         Text(
-                          'Create Account',
+                          AppLocale.createAccount.getString(context),
                           style: AppTheme.headerStyle().copyWith(fontSize: 32),
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'Start sending invoices and getting paid faster',
+                          AppLocale.startSendingInvoices.getString(context),
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],
@@ -104,7 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                         // Name
                         CustomTextField(
                           auth.userNameController,
-                          hint: 'Full Name',
+                          hint: AppLocale.fullName.getString(context),
                           password: false,
                           // prefixIcon: const Icon(Icons.person_outline),
                           // border: OutlineInputBorder(
@@ -117,7 +119,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                         // Email
                         CustomTextField(
                           auth.emailController,
-                          hint: 'Email Address',
+                          hint: AppLocale.emailAddress.getString(context),
                           password: false,
                           keyboardType: TextInputType.emailAddress,
                           // prefixIcon: const Icon(Icons.email_outlined),
@@ -131,7 +133,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                         // Password
                         CustomTextField(
                           auth.passwordController,
-                          hint: 'Password',
+                          hint: AppLocale.password.getString(context),
                           password: true,
                           // prefixIcon: const Icon(Icons.lock_outline),
                           // border: OutlineInputBorder(
@@ -154,10 +156,12 @@ class _RegisterScreenState extends State<RegisterScreen>
                             Expanded(
                               child: Text.rich(
                                 TextSpan(
-                                  text: 'I agree to the ',
+                                  text: AppLocale.iAgreeTo.getString(context),
                                   children: [
                                     TextSpan(
-                                      text: 'Terms of Service',
+                                      text: AppLocale.termsOfService.getString(
+                                        context,
+                                      ),
                                       style: TextStyle(
                                         color: primaryColor,
                                         fontWeight: FontWeight.bold,
@@ -167,9 +171,13 @@ class _RegisterScreenState extends State<RegisterScreen>
                                           Uri.parse(termsOfService),
                                         ),
                                     ),
-                                    const TextSpan(text: ' and '),
                                     TextSpan(
-                                      text: 'Privacy Policy',
+                                      text: AppLocale.and.getString(context),
+                                    ),
+                                    TextSpan(
+                                      text: AppLocale.privacyPolicy.getString(
+                                        context,
+                                      ),
                                       style: TextStyle(
                                         color: primaryColor,
                                         fontWeight: FontWeight.bold,
@@ -202,7 +210,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                                 password.isEmpty) {
                               showMessage(
                                 context,
-                                'All fields are required',
+                                AppLocale.allFieldsRequired.getString(context),
                                 isError: true,
                               );
                               return;
@@ -211,7 +219,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                             if (!FlutterUtilities().isEmailValid(email)) {
                               showMessage(
                                 context,
-                                'Invalid email address',
+                                AppLocale.invalidEmail.getString(context),
                                 isError: true,
                               );
                               return;
@@ -220,7 +228,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                             if (password.length < 6) {
                               showMessage(
                                 context,
-                                'Password must be at least 6 characters',
+                                AppLocale.passwordTooShort.getString(context),
                                 isError: true,
                               );
                               return;
@@ -229,7 +237,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                             if (!auth.isTermsAccepted) {
                               showMessage(
                                 context,
-                                'Please accept terms and privacy policy',
+                                AppLocale.acceptTerms.getString(context),
                                 isError: true,
                               );
                               return;
@@ -247,7 +255,9 @@ class _RegisterScreenState extends State<RegisterScreen>
                                 context.mounted) {
                               showMessage(
                                 context,
-                                'Account created successfully!',
+                                AppLocale.accountCreatedSuccess.getString(
+                                  context,
+                                ),
                               );
 
                               Navigator.pushAndRemoveUntil(
@@ -259,7 +269,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                               );
                             }
                           },
-                          text: 'Create Account',
+                          text: AppLocale.createAccount.getString(context),
                         ),
 
                         const SizedBox(height: 20),
@@ -267,11 +277,13 @@ class _RegisterScreenState extends State<RegisterScreen>
                         // Login Link
                         Text.rich(
                           TextSpan(
-                            text: 'Already have an account? ',
+                            text: AppLocale.alreadyHaveAccount.getString(
+                              context,
+                            ),
                             style: const TextStyle(fontSize: 16),
                             children: [
                               TextSpan(
-                                text: 'Log In',
+                                text: AppLocale.logIn.getString(context),
                                 style: TextStyle(
                                   color: primaryColor,
                                   fontWeight: FontWeight.bold,

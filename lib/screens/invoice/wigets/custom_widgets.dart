@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/models/invoice_item_model.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/styles/colors.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:provider/provider.dart';
 
 Widget emptyState(String title, String subtitle) {
@@ -135,7 +137,7 @@ Widget itemCard(
             Expanded(
               child: TextFormField(
                 decoration: InputDecoration(
-                  labelText: 'Item Description',
+                  labelText: AppLocale.itemDescription.getString(context),
                   hintText: 'e.g. Website Design - Phase 1',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -159,7 +161,7 @@ Widget itemCard(
                 spacing: 10,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Qty"),
+                  Text(AppLocale.qty.getString(context)),
                   SizedBox(
                     height: 50,
                     child: Row(
@@ -209,7 +211,7 @@ Widget itemCard(
                 spacing: 10,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Rate"),
+                  Text(AppLocale.rate.getString(context)),
                   SizedBox(
                     height: 50,
                     child: TextFormField(
@@ -239,7 +241,7 @@ Widget itemCard(
                 spacing: 10,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text("Amount"),
+                  Text(AppLocale.amount.getString(context)),
                   Container(
                     height: 50,
                     padding: const EdgeInsets.all(16),

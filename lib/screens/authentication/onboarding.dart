@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:invoice_pay/screens/authentication/login.dart';
 import 'package:invoice_pay/styles/colors.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,25 +17,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<Map<String, dynamic>> _pages = [
+  List<Map<String, dynamic>> _pages(BuildContext context) => [
     {
-      "title": "Send Invoices in Seconds",
-      "description":
-          "Create professional invoices with your logo and branding — no spreadsheets needed.",
+      "title": AppLocale.onboardingTitle1.getString(context),
+      "description": AppLocale.onboardingDesc1.getString(context),
       "icon": Icons.receipt_long,
       "color": Colors.blue,
     },
     {
-      "title": "Get Paid Faster",
-      "description":
-          "Track payments, send smart reminders, and see who owes you at a glance.",
+      "title": AppLocale.onboardingTitle2.getString(context),
+      "description": AppLocale.onboardingDesc2.getString(context),
       "icon": Icons.payment,
       "color": primaryColor,
     },
     {
-      "title": "Work Like a Pro",
-      "description":
-          "Partial payments, late fees, client notes, and beautiful reports — all in one place.",
+      "title": AppLocale.onboardingTitle3.getString(context),
+      "description": AppLocale.onboardingDesc3.getString(context),
       "icon": Icons.trending_up,
       "color": Colors.purple,
     },
@@ -76,7 +75,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
-                  _pages.length,
+                  _pages(context).length,
                   (i) => AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     margin: const EdgeInsets.symmetric(horizontal: 6),
@@ -96,9 +95,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   controller: _pageController,
                   onPageChanged: (value) =>
                       setState(() => _currentPage = value),
-                  itemCount: _pages.length,
+                  itemCount: _pages(context).length,
                   itemBuilder: (context, index) {
-                    return _OnboardingPage(data: _pages[index]);
+                    return _OnboardingPage(data: _pages(context)[index]);
                   },
                 ),
               ),
@@ -113,7 +112,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       width: double.infinity,
                       child: CustomButton(
                         onPressed: () {
-                          if (_currentPage == _pages.length - 1) {
+                          if (_currentPage == _pages(context).length - 1) {
                             _completeOnboarding();
                           } else {
                             _pageController.nextPage(
@@ -122,9 +121,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             );
                           }
                         },
-                        text: _currentPage == _pages.length - 1
-                            ? "Get Started"
-                            : "Next",
+                        text: _currentPage == _pages(context).length - 1
+                            ?  AppLocale.getStarted.getString(context)
+                            :  AppLocale.next.getString(context),
                       ),
                     ),
                   ),
@@ -132,11 +131,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   const SizedBox(height: 10),
 
                   // Skip Button
-                  if (_currentPage < _pages.length - 1)
+                  if (_currentPage < _pages(context).length - 1)
                     TextButton(
                       onPressed: _completeOnboarding,
-                      child: const Text(
-                        "Skip",
+                      child:   Text(
+                         AppLocale.skip.getString(context),
                         style: TextStyle(color: Colors.white70, fontSize: 16),
                       ),
                     ),

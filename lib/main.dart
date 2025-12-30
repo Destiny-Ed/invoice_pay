@@ -1,5 +1,11 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:invoice_pay/firebase_options.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/client_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
@@ -9,16 +15,61 @@ import 'package:invoice_pay/providers/report_provider.dart';
 import 'package:invoice_pay/providers/settings_provider.dart';
 import 'package:invoice_pay/screens/onboarding/splash.dart';
 import 'package:invoice_pay/styles/colors.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/app_version.dart';
 import 'package:provider/provider.dart';
 
-void main() async {
+void main() {
+  runZonedGuarded<Future<void>>(() async {
+    _initApp();
+  }, (error, stack) => FirebaseCrashlytics.instance.recordError(error, stack));
+}
+
+void _initApp() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await FlutterLocalization.instance.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
   await AppVersion.init();
-  runApp(
-    MultiProvider(
+  runApp(MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    localization.init(
+      mapLocales: const [
+        MapLocale('en', AppLocale.EN), // English
+        MapLocale('es', AppLocale.ES), // Spanish
+        MapLocale('pt', AppLocale.PT), // Portuguese
+        MapLocale('hi', AppLocale.HI), // Hindi
+        MapLocale('fr', AppLocale.FR), // French
+        MapLocale('de', AppLocale.DE), // German
+        MapLocale('id', AppLocale.ID), // Indonesian
+      ],
+      initLanguageCode: 'en',
+    );
+    localization.onTranslatedLanguage = _onTranslatedLanguage;
+  }
+
+  // the setState function here is a must to add
+  void _onTranslatedLanguage(Locale? locale) {
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ClientProvider()),
         ChangeNotifierProvider(create: (_) => InvoiceProvider()),
@@ -50,6 +101,8 @@ void main() async {
       child: MaterialApp(
         title: 'Invoice Pay',
         debugShowCheckedModeBanner: false,
+        supportedLocales: localization.supportedLocales,
+        localizationsDelegates: localization.localizationsDelegates,
         theme: ThemeData(
           primarySwatch: Colors.blue,
           scaffoldBackgroundColor: Colors.white,
@@ -76,6 +129,6 @@ void main() async {
           },
         ),
       ),
-    ),
-  );
+    );
+  }
 }

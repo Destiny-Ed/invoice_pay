@@ -1,13 +1,14 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_utilities/flutter_utilities.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/screens/authentication/forgot_password.dart';
 import 'package:invoice_pay/screens/authentication/register.dart';
-import 'package:invoice_pay/screens/dashboard/dashboard.dart';
 import 'package:invoice_pay/screens/main_activity/main_activity.dart';
 import 'package:invoice_pay/styles/colors.dart';
 import 'package:invoice_pay/styles/theme.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
@@ -87,12 +88,12 @@ class _LoginScreenState extends State<LoginScreen>
                         const SizedBox(height: 40),
 
                         Text(
-                          'Welcome Back',
+                         AppLocale.welcomeBack.getString(context).capitalize(),
                           style: AppTheme.headerStyle().copyWith(fontSize: 32),
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Log in to manage your invoices',
+                          AppLocale.logInToManage.getString(context).capitalize(),
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],
@@ -105,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen>
                         CustomTextField(
                           auth.emailController,
                           password: false,
-                          hint: 'Email Address',
+                          hint: AppLocale.emailAddress.getString(context).capitalize(),
                           keyboardType: TextInputType.emailAddress,
                           // prefixIcon: const Icon(Icons.email_outlined),
                           // border: OutlineInputBorder(
@@ -119,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen>
                         // Password Field
                         CustomTextField(
                           auth.passwordController,
-                          hint: 'Password',
+                          hint:AppLocale.password.getString(context).capitalize(),
                           password: true,
                           // prefixIcon: const Icon(Icons.lock_outline),
                           // border: OutlineInputBorder(
@@ -143,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen>
                               );
                             },
                             child: Text(
-                              'Forgot Password?',
+                             AppLocale.forgotPassword.getString(context).capitalize(),
                               style: TextStyle(
                                 color: primaryColor,
                                 fontWeight: FontWeight.w600,
@@ -165,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen>
                             if (email.isEmpty || password.isEmpty) {
                               showMessage(
                                 context,
-                                'Please fill all fields',
+                                AppLocale.pleaseFillAllFields.getString(context).capitalize(),
                                 isError: true,
                               );
                               return;
@@ -174,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen>
                             if (!FlutterUtilities().isEmailValid(email)) {
                               showMessage(
                                 context,
-                                'Please enter a valid email',
+                               AppLocale.pleaseEnterValidEmail.getString(context).capitalize(),
                                 isError: true,
                               );
                               return;
@@ -190,7 +191,10 @@ class _LoginScreenState extends State<LoginScreen>
 
                             if (auth.state == ViewState.Success &&
                                 context.mounted) {
-                              showMessage(context, 'Welcome back!');
+                              showMessage(
+                                context,
+                                AppLocale.welcomeBack.getString(context),
+                              );
                               Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
@@ -200,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen>
                               );
                             }
                           },
-                          text: 'Log In',
+                          text: AppLocale.logIn.getString(context),
                         ),
 
                         const SizedBox(height: 40),
@@ -208,11 +212,13 @@ class _LoginScreenState extends State<LoginScreen>
                         // Sign Up Link
                         Text.rich(
                           TextSpan(
-                            text: "Don't have an account? ",
+                            text: AppLocale.dontHaveAccount.getString(context),
                             style: const TextStyle(fontSize: 16),
                             children: [
                               TextSpan(
-                                text: 'Sign Up',
+                                text: AppLocale.signUp
+                                    .getString(context)
+                                    .capitalize(),
                                 style: TextStyle(
                                   color: primaryColor,
                                   fontWeight: FontWeight.bold,

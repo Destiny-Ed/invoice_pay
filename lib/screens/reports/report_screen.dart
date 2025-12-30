@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
@@ -6,6 +7,7 @@ import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/report_provider.dart';
 import 'package:invoice_pay/screens/reports/widgets/custom_widgets.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -23,8 +25,8 @@ class ReportsScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: Colors.grey[50],
           appBar: AppBar(
-            title: const Text(
-              'Financial Overview',
+            title: Text(
+              AppLocale.financialOverview.getString(context),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             backgroundColor: Colors.white,
@@ -63,9 +65,9 @@ class ReportsScreen extends StatelessWidget {
 📊 InvoicePay Financial Report
 
 📅 Period: $period
-💰 Total Revenue: $currency${NumberFormat('#,##0').format(vm.totalRevenue)}
-⚠️ Outstanding: $currency${NumberFormat('#,##0').format(vm.outstanding)}
-🔴 Overdue: $currency${NumberFormat('#,##0').format(vm.overdue)}
+💰 ${AppLocale.totalRevenue.getString(context)}: $currency${NumberFormat('#,##0').format(vm.totalRevenue)}
+⚠️ ${AppLocale.outstanding.getString(context)}: $currency${NumberFormat('#,##0').format(vm.outstanding)}
+🔴 ${AppLocale.overdue.getString(context)}: $currency${NumberFormat('#,##0').format(vm.overdue)}
 
 Generated with ❤️ by InvoicePay
                   ''';
@@ -102,21 +104,21 @@ Generated with ❤️ by InvoicePay
                     children: [
                       summaryCard(
                         context,
-                        'Total Revenue',
+                        AppLocale.totalRevenue.getString(context),
                         vm.totalRevenue,
                         Icons.trending_up,
                         Colors.green,
                       ),
                       summaryCard(
                         context,
-                        'Outstanding',
+                        AppLocale.outstanding.getString(context),
                         vm.outstanding,
                         Icons.account_balance_wallet,
                         Colors.orange,
                       ),
                       summaryCard(
                         context,
-                        'Overdue',
+                        AppLocale.overdue.getString(context),
                         vm.overdue,
                         Icons.warning_amber,
                         Colors.red,
@@ -154,8 +156,8 @@ Generated with ❤️ by InvoicePay
                   const SizedBox(height: 20),
 
                   // Revenue Trend Chart
-                  const Text(
-                    'Revenue Trend',
+                  Text(
+                    AppLocale.revenueTrend.getString(context),
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
@@ -185,7 +187,7 @@ Generated with ❤️ by InvoicePay
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  'No revenue data',
+                                  AppLocale.noRevenueData.getString(context),
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.grey[600],
@@ -307,8 +309,8 @@ Generated with ❤️ by InvoicePay
                   const SizedBox(height: 20),
 
                   // Top Clients
-                  const Text(
-                    'Top Clients',
+                  Text(
+                    AppLocale.topClients.getString(context),
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
@@ -325,7 +327,7 @@ Generated with ❤️ by InvoicePay
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'No client data yet',
+                              AppLocale.noClientData.getString(context),
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.grey[600],
@@ -395,22 +397,5 @@ Generated with ❤️ by InvoicePay
         );
       },
     );
-  }
-
-  String _statusLabel(InvoiceStatus status) {
-    switch (status) {
-      case InvoiceStatus.paid:
-        return 'Paid';
-      case InvoiceStatus.overdue:
-        return 'Overdue';
-      case InvoiceStatus.partial:
-        return 'Partial';
-      case InvoiceStatus.pending:
-        return 'Pending';
-      case InvoiceStatus.sent:
-        return 'Sent';
-      case InvoiceStatus.draft:
-        return 'Draft';
-    }
   }
 }

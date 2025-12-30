@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/providers/client_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
@@ -8,6 +9,7 @@ import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
 import 'package:invoice_pay/screens/invoice/wigets/custom_widgets.dart';
 import 'package:invoice_pay/screens/settings/settings_screen.dart';
 import 'package:invoice_pay/styles/colors.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/greetings.dart';
 import 'package:invoice_pay/widgets/invoice_card.dart';
 import 'package:invoice_pay/widgets/stats_card.dart';
@@ -34,7 +36,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: Text(AppLocale.dashboard.getString(context)),
         actions: [
           // IconButton(
           //   icon: const Icon(Icons.notifications_outlined),
@@ -78,8 +80,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   getRichGreeting(),
                   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
-                const Text(
-                  'Here\'s your overview',
+                Text(
+                  AppLocale.heresYourOverview.getString(context),
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
 
@@ -111,8 +113,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'Total Revenue',
+                            Text(
+                              AppLocale.totalRevenue.getString(context),
                               style: TextStyle(
                                 color: Colors.white70,
                                 fontSize: 16,
@@ -167,8 +169,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: statCard(context,
-                        title: 'Outstanding',
+                      child: statCard(
+                        context,
+                        title: AppLocale.outstanding.getString(context),
                         amount: outstanding,
                         count: totalInvoices,
                         color: Colors.orange,
@@ -178,7 +181,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Expanded(
                       child: statCard(
                         context,
-                        title: 'Overdue',
+                        title: AppLocale.overdue.getString(context),
                         amount: invoiceProvider.invoices
                             .where((i) => i.isOverdue)
                             .fold(0.0, (sum, i) => sum + i.balanceDue),
@@ -195,8 +198,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Recent Activity',
+                    Text(
+                      AppLocale.recentActivity.getString(context),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -206,7 +209,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       onPressed: () {
                         context.read<MainActivityProvider>().currentIndex = 2;
                       },
-                      child: const Text('See All'),
+                      child: Text(AppLocale.seeAll.getString(context)),
                     ),
                   ],
                 ),
@@ -215,8 +218,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Recent Invoices List
                 if (invoiceProvider.invoices.isEmpty)
                   emptyState(
-                    "No invoices",
-                    'Create your first invoice to get started',
+                    AppLocale.noInvoices.getString(context),
+                    AppLocale.createFirstInvoice.getString(context),
                   )
                 else
                   ...invoiceProvider.invoices

@@ -476,6 +476,8 @@ class InvoiceProvider extends BaseViewModel {
       discountPercent: _draftDiscountPercent,
       receivePayment: _draftReceivePayment,
       paymentMethod: _draftPaymentMethod,
+      currencyCode: _draftCurrencyCode,
+      currencySymbol: _draftCurrencySymbol,
       activities: [],
       paymentDetails: _draftPaymentDetails,
       templateType: _draftTemplate,

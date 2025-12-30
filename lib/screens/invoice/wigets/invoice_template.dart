@@ -1,6 +1,4 @@
-import 'dart:developer';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
@@ -242,7 +240,7 @@ abstract class BasePdfTemplate extends pw.StatelessWidget {
             ),
           ),
           pw.Text(
-            '${isNegative ? '-' : ''}${CompanyProvider().company?.currencySymbol ?? '\$'}${value.abs().toStringAsFixed(2)}',
+            '${isNegative ? '-' : ''}${invoice.currencySymbol ?? CompanyProvider().company?.currencySymbol ?? '\$'}${value.abs().toStringAsFixed(2)}',
             style: pw.TextStyle(
               fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
               fontSize: large ? 20 : 14,
@@ -271,6 +269,7 @@ class MinimalTemplate extends BasePdfTemplate {
 
   @override
   pw.Widget header() {
+    
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -368,6 +367,10 @@ class MinimalTemplate extends BasePdfTemplate {
 
   @override
   pw.Widget itemsTable() {
+    final currency =
+        invoice.currencySymbol ??
+        CompanyProvider().company?.currencySymbol ??
+        '\$';
     return pw.Table(
       border: pw.TableBorder.all(color: PdfColors.grey400),
       children: [
@@ -394,11 +397,11 @@ class MinimalTemplate extends BasePdfTemplate {
                 align: pw.Alignment.centerRight,
               ),
               _tableCell(
-                '${CompanyProvider().company?.currencySymbol ?? '\$'}${item.rate.toStringAsFixed(2)}',
+                '$currency${item.rate.toStringAsFixed(2)}',
                 align: pw.Alignment.centerRight,
               ),
               _tableCell(
-                '${CompanyProvider().company?.currencySymbol ?? '\$'}${item.amount.toStringAsFixed(2)}',
+                '$currency${item.amount.toStringAsFixed(2)}',
                 align: pw.Alignment.centerRight,
               ),
             ],

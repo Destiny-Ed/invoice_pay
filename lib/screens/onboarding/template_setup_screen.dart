@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:invoice_pay/modal/color_picker_modal.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
@@ -9,6 +10,7 @@ import 'package:invoice_pay/screens/main_activity/main_activity.dart';
 import 'package:invoice_pay/screens/onboarding/onboarding_progress.dart';
 import 'package:invoice_pay/styles/colors.dart';
 import 'package:invoice_pay/styles/theme.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
@@ -70,7 +72,7 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
     final color = await showColorPickerModal(
       context: context,
       initialColor: selectedColor,
-      title: 'Choose Primary Color',
+      title:  AppLocale.primaryColor.getString(context),
     );
 
     if (color != null) {
@@ -135,13 +137,13 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
                 const SizedBox(height: 10),
 
                 Text(
-                  'Customize your look',
+                  AppLocale.customizeYourLook.getString(context),
                   style: AppTheme.headerStyle().copyWith(fontSize: 30),
                 ),
                 const SizedBox(height: 10),
 
                 Text(
-                  'Choose a color and font for your invoice templates.',
+                  AppLocale.chooseColorAndFont.getString(context),
                   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                 ),
 
@@ -264,8 +266,8 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
                 const SizedBox(height: 20),
 
                 // Primary Color Section
-                const Text(
-                  'PRIMARY COLOR',
+                  Text(
+                   AppLocale.primaryColor.getString(context).toUpperCase(),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -339,8 +341,8 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
                 const SizedBox(height: 20),
 
                 // Typography Section
-                const Text(
-                  'TYPOGRAPHY',
+                  Text(
+                   AppLocale.typography.getString(context).toUpperCase(),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -435,7 +437,7 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
                             (_) => false,
                           );
                         },
-                        text: "Skip",
+                        text:  AppLocale.skip.getString(context),
                         bgColor: Colors.grey[400]!,
                       ),
                     ),
@@ -459,7 +461,7 @@ class _InvoiceTemplateSetupScreenState extends State<InvoiceTemplateSetupScreen>
                             (_) => false,
                           );
                         },
-                        text: "Finish Setup →",
+                        text:  AppLocale.finishSetup.getString(context),
                         bgColor: selectedColor,
                       ),
                     ),

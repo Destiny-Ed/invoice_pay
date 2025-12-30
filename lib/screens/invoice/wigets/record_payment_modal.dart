@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:invoice_pay/models/invoice_item_model.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
@@ -29,8 +31,8 @@ void showRecordPayment(BuildContext context, InvoiceModel currentInvoice) {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Record Payment',
+              Text(
+              AppLocale.recordPayment.getString(context),
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
@@ -96,7 +98,7 @@ void showRecordPayment(BuildContext context, InvoiceModel currentInvoice) {
                     'Payment of ${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${payment.toStringAsFixed(2)} recorded!',
                   );
                 },
-                text: "Record Payment",
+                text: AppLocale.recordPayment.getString(context),
               ),
             ),
           ],

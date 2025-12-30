@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:invoice_pay/providers/client_provider.dart';
 import 'package:invoice_pay/providers/main_activity_provider.dart';
 import 'package:invoice_pay/screens/clients/client_screen.dart';
@@ -6,6 +7,7 @@ import 'package:invoice_pay/screens/dashboard/dashboard.dart';
 import 'package:invoice_pay/screens/invoice/invoice_screen.dart';
 import 'package:invoice_pay/screens/reports/report_screen.dart';
 import 'package:invoice_pay/styles/colors.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:provider/provider.dart';
 import 'package:upgrader/upgrader.dart';
 
@@ -45,19 +47,19 @@ class _MainActivityState extends State<MainActivity> {
               selectedItemColor: primaryColor,
               unselectedItemColor: Colors.grey,
               currentIndex: model.currentIndex,
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+              items:   [
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: AppLocale.home.getString(context)),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.people),
-                  label: 'Clients',
+                  label: AppLocale.clients.getString(context),
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.receipt_long),
-                  label: 'Invoices',
+                  label: AppLocale.invoices.getString(context),
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.bar_chart),
-                  label: 'Reports',
+                  label: AppLocale.reports.getString(context),
                 ),
               ],
               onTap: (index) {

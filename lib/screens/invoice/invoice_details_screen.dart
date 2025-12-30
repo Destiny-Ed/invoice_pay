@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_utilities/flutter_utilities.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/models/invoice_item_model.dart';
@@ -9,6 +10,7 @@ import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
 import 'package:invoice_pay/screens/invoice/invoice_preview.dart';
 import 'package:invoice_pay/screens/invoice/wigets/custom_widgets.dart';
 import 'package:invoice_pay/screens/invoice/wigets/record_payment_modal.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/utils/resent_invoice.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
@@ -92,7 +94,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context, false),
-                            child: const Text('Cancel'),
+                            child:   Text(AppLocale.cancel.getString(context)),
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(context, true),
@@ -110,7 +112,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           .read<InvoiceProvider>()
                           .deleteInvoice(invoice?.id ?? "");
                       if (success && context.mounted) {
-                        showMessage(context, 'Invoice deleted');
+                        showMessage(context, AppLocale.invoiceDeleted.getString(context));
                         Navigator.pop(context); // Go back to list
                       }
                     }
@@ -167,8 +169,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               color: Colors.red,
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            child: const Text(
-                              'OVERDUE',
+                            child:   Text(
+                              AppLocale.overdue.getString(context).toUpperCase(),
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -185,8 +187,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               color: Colors.green,
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            child: const Text(
-                              'PAID',
+                            child:   Text(
+                              AppLocale.paid.getString(context).toUpperCase(),
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -208,7 +210,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           ),
                         ),
                         Text(
-                          'Due ${DateFormat('MMM dd, yyyy').format(invoice.due)}',
+                          '${AppLocale.due.getString(context)} ${DateFormat('MMM dd, yyyy').format(invoice.due)}',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -225,7 +227,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           children: [
                             _actionChip(
                               icon: Icons.notifications_active,
-                              label: 'Remind',
+                              label: AppLocale.remind.getString(context),
                               onTap: () => resendInvoiceAndMarkSent(
                                 context: context,
                                 client: client,
@@ -235,7 +237,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                             ),
                             _actionChip(
                               icon: Icons.preview,
-                              label: 'Preview',
+                              label: AppLocale.preview.getString(context),
                               onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -249,8 +251,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         const SizedBox(height: 20),
 
                         // Billed To
-                        const Text(
-                          'BILLED TO',
+                          Text(
+                          AppLocale.billedTo.getString(context).toUpperCase(),
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey,
@@ -311,8 +313,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
                         if (invoice.paymentMethod.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          const Text(
-                            'PAYMENT METHOD',
+                             Text(
+                           AppLocale.paymentMethod.getString(context).toUpperCase(),
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey,
@@ -369,11 +371,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             _infoCard(
-                              'Issued',
+                              AppLocale.issued.getString(context),
                               DateFormat('MMM dd, yyyy').format(invoice.issued),
                             ),
                             _infoCard(
-                              'Due',
+                              AppLocale.due.getString(context),
                               DateFormat('MMM dd, yyyy').format(invoice.due),
                               highlight: invoice.isOverdue,
                             ),
@@ -383,8 +385,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         const SizedBox(height: 20),
 
                         // Line Items
-                        const Text(
-                          'Items',
+                          Text(
+                          AppLocale.items.getString(context),
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,

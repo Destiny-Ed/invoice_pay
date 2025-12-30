@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_utilities/flutter_utilities.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/styles/colors.dart';
 import 'package:invoice_pay/styles/theme.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/busy_overlay.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
@@ -44,12 +46,12 @@ class ForgotPasswordScreen extends StatelessWidget {
                   const SizedBox(height: 40),
 
                   Text(
-                    'Reset Password',
+                   AppLocale.resetPassword.getString(context).capitalize(),
                     style: AppTheme.headerStyle().copyWith(fontSize: 32),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Enter your email and we\'ll send you a link to reset your password',
+                   AppLocale.resetDesc.getString(context).capitalize(),
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                   ),
@@ -58,7 +60,7 @@ class ForgotPasswordScreen extends StatelessWidget {
 
                   CustomTextField(
                     auth.emailController,
-                    hint: 'Email Address',
+                    hint:AppLocale.emailAddress.getString(context).capitalize(),
                     keyboardType: TextInputType.emailAddress,
                     // prefixIcon: const Icon(Icons.email_outlined),
                   ),
@@ -73,7 +75,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                       if (email.isEmpty) {
                         showMessage(
                           context,
-                          'Please enter your email',
+                         AppLocale.pleaseFillAllFields.getString(context).capitalize(),
                           isError: true,
                         );
                         return;
@@ -82,7 +84,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                       if (!FlutterUtilities().isEmailValid(email)) {
                         showMessage(
                           context,
-                          'Invalid email address',
+                         AppLocale.invalidEmail.getString(context).capitalize(),
                           isError: true,
                         );
                         return;
@@ -101,7 +103,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                         showMessage(context, auth.message, isError: true);
                       }
                     },
-                    text: 'Send Reset Link',
+                    text: AppLocale.sendResetLink.getString(context).capitalize(),
                   ),
 
                   const SizedBox(height: 40),
