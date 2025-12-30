@@ -9,6 +9,11 @@ mixin AppLocale {
   static const String invoices = 'invoices';
   static const String reports = 'reports';
 
+  static const String settingsTitle = 'settingsTitle';
+  static const String language = 'language';
+  static const String selectLanguage = 'selectLanguage';
+  static const String systemDefault = 'systemDefault';
+
   // Onboarding
   static const String onboardingTitle1 = 'onboardingTitle1';
   static const String onboardingDesc1 = 'onboardingDesc1';
@@ -280,6 +285,11 @@ mixin AppLocale {
     next: "Next",
     skip: "Skip",
 
+    settingsTitle: "Settings",
+    language: "Language",
+    selectLanguage: "Select Language",
+    systemDefault: "System Default",
+
     welcomeBack: "Welcome Back",
     logInToManage: "Log in to manage your invoices",
     emailAddress: "Email Address",
@@ -534,6 +544,11 @@ mixin AppLocale {
     getStarted: "Comenzar",
     next: "Siguiente",
     skip: "Omitir",
+
+    settingsTitle: "Configuración",
+    language: "Idioma",
+    selectLanguage: "Seleccionar Idioma",
+    systemDefault: "Predeterminado del Sistema",
 
     welcomeBack: "Bienvenido de Nuevo",
     logInToManage: "Inicia sesión para gestionar tus facturas",
@@ -1023,6 +1038,11 @@ mixin AppLocale {
     industryHospitality: "Hospitalidade",
     industryOther: "Outro",
     bankHintExample: "Nome da Conta, Número, Banco, IFSC",
+
+    settingsTitle: "Configurações",
+    language: "Idioma",
+    selectLanguage: "Selecionar Idioma",
+    systemDefault: "Padrão do Sistema",
   };
 
   static const Map<String, dynamic> HI = {
@@ -1043,6 +1063,11 @@ mixin AppLocale {
     getStarted: "शुरू करें",
     next: "अगला",
     skip: "स्किप",
+
+    settingsTitle: "सेटिंग्स",
+    language: "भाषा",
+    selectLanguage: "भाषा चुनें",
+    systemDefault: "सिस्टम डिफ़ॉल्ट",
 
     welcomeBack: "वापस स्वागत है",
     logInToManage: "अपने इनवॉइस प्रबंधित करने के लिए लॉग इन करें",
@@ -1286,6 +1311,11 @@ mixin AppLocale {
     clients: "Clients",
     invoices: "Factures",
     reports: "Rapports",
+
+    settingsTitle: "Paramètres",
+    language: "Langue",
+    selectLanguage: "Sélectionner la Langue",
+    systemDefault: "Par Défaut du Système",
 
     onboardingTitle1: "Envoyez des factures en quelques secondes",
     onboardingDesc1:
@@ -1548,6 +1578,11 @@ mixin AppLocale {
     invoices: "Rechnungen",
     reports: "Berichte",
 
+    settingsTitle: "Einstellungen",
+    language: "Sprache",
+    selectLanguage: "Sprache Auswählen",
+    systemDefault: "Systemstandard",
+
     onboardingTitle1: "Rechnungen in Sekunden versenden",
     onboardingDesc1:
         "Erstellen Sie professionelle Rechnungen mit Ihrem Logo und Branding — keine Tabellen nötig.",
@@ -1809,6 +1844,11 @@ mixin AppLocale {
     clients: "Klien",
     invoices: "Faktur",
     reports: "Laporan",
+
+    settingsTitle: "Pengaturan",
+    language: "Bahasa",
+    selectLanguage: "Pilih Bahasa",
+    systemDefault: "Default Sistem",
 
     onboardingTitle1: "Kirim Faktur dalam Hitungan Detik",
     onboardingDesc1:

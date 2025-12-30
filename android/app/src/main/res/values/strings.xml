@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">InvoicePay</string>
+
+    <!-- Add all supported locales -->
+    <string-array name="supported_locales">
+        <item>en</item>
+        <item>es</item>
+        <item>pt</item>
+        <item>hi</item>
+        <item>fr</item>
+        <item>de</item>
+        <item>id</item>
+    </string-array>
+</resources>
