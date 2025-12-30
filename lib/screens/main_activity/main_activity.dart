@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:invoice_pay/providers/client_provider.dart';
+import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/main_activity_provider.dart';
 import 'package:invoice_pay/screens/clients/client_screen.dart';
 import 'package:invoice_pay/screens/dashboard/dashboard.dart';
@@ -33,6 +34,7 @@ class _MainActivityState extends State<MainActivity> {
     // Fetch invoices and clients on screen load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ClientProvider>().loadClients();
+      context.read<CompanyProvider>().loadCompany();
     });
 
     NotificationService().requestionPermission();
