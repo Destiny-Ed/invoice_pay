@@ -14,6 +14,11 @@ mixin AppLocale {
   static const String selectLanguage = 'selectLanguage';
   static const String systemDefault = 'systemDefault';
 
+  static const String goodMorning = 'goodMorning';
+  static const String goodAfternoon = 'goodAfternoon';
+  static const String goodEvening = 'goodEvening';
+  static const String goodNight = 'goodNight';
+
   // Onboarding
   static const String onboardingTitle1 = 'onboardingTitle1';
   static const String onboardingDesc1 = 'onboardingDesc1';
@@ -268,6 +273,10 @@ mixin AppLocale {
   static const String appName = 'appName';
 
   static const Map<String, dynamic> EN = {
+    goodMorning: "Good Morning!",
+    goodAfternoon: "Good Afternoon!",
+    goodEvening: "Good Evening!",
+    goodNight: "Good Night!",
     home: "Home",
     clients: "Clients",
     invoices: "Invoices",
@@ -535,6 +544,11 @@ mixin AppLocale {
     reports: "Informes",
     yourBusiness: "Tu Negocio",
 
+    goodMorning: "¡Buenos días!",
+    goodAfternoon: "¡Buenas tardes!",
+    goodEvening: "¡Buenas tardes!",
+    goodNight: "¡Buenas noches!",
+
     onboardingTitle1: "Envía Facturas en Segundos",
     onboardingDesc1:
         "Crea facturas profesionales con tu logo y marca — sin hojas de cálculo.",
@@ -795,6 +809,11 @@ mixin AppLocale {
     reports: "Relatórios",
     yourBusiness: "Seu Negócio",
 
+    goodMorning: "Bom dia!",
+    goodAfternoon: "Boa tarde!",
+    goodEvening: "Boa tarde!",
+    goodNight: "Boa noite!",
+
     onboardingTitle1: "Envie Faturas em Segundos",
     onboardingDesc1:
         "Crie faturas profissionais com seu logo e marca — sem planilhas necessárias.",
@@ -1054,6 +1073,11 @@ mixin AppLocale {
     clients: "क्लाइंट",
     invoices: "इनवॉइस",
     reports: "रिपोर्ट",
+
+    goodMorning: "सुप्रभात!",
+    goodAfternoon: "नमस्ते!",
+    goodEvening: "शुभ संध्या!",
+    goodNight: "शुभ रात्रि!",
 
     onboardingTitle1: "सेकंड में इनवॉइस भेजें",
     onboardingDesc1:
@@ -1316,6 +1340,11 @@ mixin AppLocale {
     clients: "Clients",
     invoices: "Factures",
     reports: "Rapports",
+
+    goodMorning: "Bonjour !",
+    goodAfternoon: "Bon après-midi !",
+    goodEvening: "Bonsoir !",
+    goodNight: "Bonne nuit !",
 
     settingsTitle: "Paramètres",
     language: "Langue",
@@ -1585,6 +1614,11 @@ mixin AppLocale {
     reports: "Berichte",
     yourBusiness: "Ihr Unternehmen",
 
+    goodMorning: "Guten Morgen!",
+    goodAfternoon: "Guten Tag!",
+    goodEvening: "Guten Abend!",
+    goodNight: "Gute Nacht!",
+
     settingsTitle: "Einstellungen",
     language: "Sprache",
     selectLanguage: "Sprache Auswählen",
@@ -1851,6 +1885,11 @@ mixin AppLocale {
     clients: "Klien",
     invoices: "Faktur",
     reports: "Laporan",
+
+    goodMorning: "Selamat Pagi!",
+    goodAfternoon: "Selamat Siang!",
+    goodEvening: "Selamat Sore!",
+    goodNight: "Selamat Malam!",
 
     settingsTitle: "Pengaturan",
     language: "Bahasa",

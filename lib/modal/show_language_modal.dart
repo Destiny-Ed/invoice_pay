@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:invoice_pay/styles/colors.dart';
 import 'package:invoice_pay/utils/app_locales.dart';
+
+final Locale deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
 
 void showLanguageModal(BuildContext context) {
   final localization = FlutterLocalization.instance;
@@ -62,7 +66,10 @@ void showLanguageModal(BuildContext context) {
                       ? Icon(Icons.check, color: primaryColor)
                       : null,
                   onTap: () {
-                    localization.translate(code); // '' = system default
+                    log("device locale ${deviceLocale.languageCode}");
+                    localization.translate(
+                      code.isEmpty ? deviceLocale.languageCode : code,
+                    ); // '' = system default
                     Navigator.pop(context);
                   },
                 );

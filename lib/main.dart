@@ -47,6 +47,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
     localization.init(
       mapLocales: const [
         MapLocale('en', AppLocale.EN), // English

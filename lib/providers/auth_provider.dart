@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:invoice_pay/services/notification_service.dart';
 
 enum ViewState { Idle, Busy, Success, Error }
 
@@ -192,6 +193,7 @@ class AuthenticationProviderImpl extends ChangeNotifier
     bool isDeleteUser = false,
   }) async {
     if (!isDeleteUser) {
+      final token = await NotificationService().getToken();
       return await FirebaseFirestore.instance
           .collection('users')
           .doc(firebaseUser?.uid)
@@ -202,6 +204,7 @@ class AuthenticationProviderImpl extends ChangeNotifier
             "date_created": DateTime.now().toIso8601String(),
             "date_deleted": null,
             "is_deleted": false,
+            "fcm_token": token,
           });
     } else {
       return await FirebaseFirestore.instance
