@@ -25,7 +25,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         return windows;
       case TargetPlatform.linux:
@@ -52,7 +55,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCYCWxF3AU5F_E2kSs0aSWHg96Hzg-k48k',
-    appId: '1:733179330588:android:de9a092433bcf529a5dfd9',
+    appId: '1:733179330588:android:d4d4c0a7e9ca157ba5dfd9',
     messagingSenderId: '733179330588',
     projectId: 'invoice-pay-ef942',
     storageBucket: 'invoice-pay-ef942.firebasestorage.app',
@@ -60,22 +63,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyA4IO5wEs1Sace0IUk_lf1W_9H7yinSU3g',
-    appId: '1:733179330588:ios:b3711ddb5f2db8cba5dfd9',
+    appId: '1:733179330588:ios:682bb895c8e88e79a5dfd9',
     messagingSenderId: '733179330588',
     projectId: 'invoice-pay-ef942',
     storageBucket: 'invoice-pay-ef942.firebasestorage.app',
-    iosClientId: '733179330588-jv2rgng60u824b1tumsmep5gs404nr15.apps.googleusercontent.com',
-    iosBundleId: 'com.example.invoicePay',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyA4IO5wEs1Sace0IUk_lf1W_9H7yinSU3g',
-    appId: '1:733179330588:ios:b3711ddb5f2db8cba5dfd9',
-    messagingSenderId: '733179330588',
-    projectId: 'invoice-pay-ef942',
-    storageBucket: 'invoice-pay-ef942.firebasestorage.app',
-    iosClientId: '733179330588-jv2rgng60u824b1tumsmep5gs404nr15.apps.googleusercontent.com',
-    iosBundleId: 'com.example.invoicePay',
+    iosClientId: '733179330588-hrs1r1sp5scehifgosbnjosfaal295lj.apps.googleusercontent.com',
+    iosBundleId: 'app.invoicepay.com',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
@@ -87,5 +80,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'invoice-pay-ef942.firebasestorage.app',
     measurementId: 'G-5NT2TFBEWP',
   );
-
 }

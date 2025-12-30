@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>733179330588-jv2rgng60u824b1tumsmep5gs404nr15.apps.googleusercontent.com</string>
+	<string>733179330588-hrs1r1sp5scehifgosbnjosfaal295lj.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.733179330588-jv2rgng60u824b1tumsmep5gs404nr15</string>
+	<string>com.googleusercontent.apps.733179330588-hrs1r1sp5scehifgosbnjosfaal295lj</string>
 	<key>API_KEY</key>
 	<string>AIzaSyA4IO5wEs1Sace0IUk_lf1W_9H7yinSU3g</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.invoicePay</string>
+	<string>app.invoicepay.com</string>
 	<key>PROJECT_ID</key>
 	<string>invoice-pay-ef942</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:733179330588:ios:b3711ddb5f2db8cba5dfd9</string>
+	<string>1:733179330588:ios:682bb895c8e88e79a5dfd9</string>
 </dict>
 </plist>

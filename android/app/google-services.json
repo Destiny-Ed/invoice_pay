@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:733179330588:android:de9a092433bcf529a5dfd9",
+        "mobilesdk_app_id": "1:733179330588:android:d4d4c0a7e9ca157ba5dfd9",
         "android_client_info": {
-          "package_name": "com.example.invoice_pay"
+          "package_name": "app.invoicepay.com"
         }
       },
       "oauth_client": [
@@ -31,10 +31,10 @@
               "client_type": 3
             },
             {
-              "client_id": "733179330588-jv2rgng60u824b1tumsmep5gs404nr15.apps.googleusercontent.com",
+              "client_id": "733179330588-hrs1r1sp5scehifgosbnjosfaal295lj.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.invoicePay"
+                "bundle_id": "app.invoicepay.com"
               }
             }
           ]

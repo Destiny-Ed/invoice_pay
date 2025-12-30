@@ -256,7 +256,7 @@ class AuthenticationProviderImpl extends ChangeNotifier
       _updateState();
     } on FirebaseAuthException catch (e) {
       state = ViewState.Error;
-      message = e.code;
+      message = e.message ?? e.code;
       _updateState();
     } catch (e) {
       state = ViewState.Error;

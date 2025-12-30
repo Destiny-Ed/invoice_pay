@@ -504,7 +504,12 @@ class InvoiceProvider extends BaseViewModel {
 
     final dir = await getTemporaryDirectory();
     final file = File('${dir.path}/invoice_${invoice.number}.pdf');
-    await file.writeAsBytes(await pdf.save());
+    // ADD THIS LINE TO FIX THE ISSUE
+    if (await file.exists()) {
+      await file.delete();
+    }
+
+    await file.writeAsBytes(await pdf.save(), mode: FileMode.write);
     return file;
   }
 
