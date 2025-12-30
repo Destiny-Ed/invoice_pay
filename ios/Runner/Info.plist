@@ -14,6 +14,16 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>es</string>
+		<string>pt</string>
+		<string>hi</string>
+		<string>fr</string>
+		<string>de</string>
+		<string>id</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>invoice_pay</string>
 	<key>CFBundlePackageType</key>
@@ -44,17 +54,6 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-
-	<key>CFBundleLocalizations</key>
-	<array>
-    	<string>en</string>
-    	<string>es</string>
-    	<string>pt</string>
-    	<string>hi</string>
-    	<string>fr</string>
-    	<string>de</string>
-    	<string>id</string>
 	</array>
 </dict>
 </plist>

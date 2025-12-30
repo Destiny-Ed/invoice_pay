@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/modal/auth_modal.dart';
+import 'package:invoice_pay/modal/show_language_modal.dart';
 import 'package:invoice_pay/screens/onboarding/company_setup.dart';
 import 'package:invoice_pay/screens/settings/support_screen.dart';
 import 'package:invoice_pay/screens/settings/widgets/custom_widgets.dart';
@@ -121,6 +122,13 @@ class SettingsScreen extends StatelessWidget {
                     },
                   );
                 },
+              ),
+
+              _SettingsTile(
+                icon: Icons.language,
+                title: AppLocale.language.getString(context),
+                subtitle: getCurrentLanguageName(context),
+                onTap: () => showLanguageModal(context),
               ),
 
               // _SwitchTile(
