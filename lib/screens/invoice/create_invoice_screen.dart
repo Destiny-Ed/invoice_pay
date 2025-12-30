@@ -88,7 +88,7 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Create Invoice'),
+          title:   Text(AppLocale.createInvoice.getString(context)),
           actions: [
             TextButton(
               onPressed: () {
@@ -538,22 +538,22 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
                         runSpacing: 12,
                         children: [
                           _paymentMethodChip(
-                            AppLocale.bankAccountDetails.getString(context),
+                            AppLocale.bankTransfer.getString(context),
                             'bank_transfer',
                             invoiceProvider,
                           ),
                           _paymentMethodChip(
-                            AppLocale.paypalEmail.getString(context),
+                            AppLocale.payPal.getString(context),
                             'paypal',
                             invoiceProvider,
                           ),
                           _paymentMethodChip(
-                            AppLocale.stripeLink.getString(context),
+                            AppLocale.stripe.getString(context),
                             'stripe',
                             invoiceProvider,
                           ),
                           _paymentMethodChip(
-                            AppLocale.upiId.getString(context),
+                            AppLocale.upi.getString(context),
                             'upi',
                             invoiceProvider,
                           ),
@@ -737,14 +737,14 @@ class _NewInvoiceScreenState extends State<NewInvoiceScreen> {
       case 'upi':
         return AppLocale.upiId.getString(context);
       default:
-        return 'Payment Details';
+        return AppLocale.paymentDetails.getString(context);
     }
   }
 
   String _getPaymentHint(String method) {
     switch (method) {
       case 'bank_transfer':
-        return 'Account Name, Number, Bank, IFSC';
+        return AppLocale.bankHintExample.getString(context);
       case 'paypal':
         return 'yourname@paypal.com';
       case 'stripe':

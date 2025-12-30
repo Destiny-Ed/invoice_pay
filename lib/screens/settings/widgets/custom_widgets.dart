@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
@@ -26,13 +28,13 @@ void showGoalModal(BuildContext context) {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Set Monthly Goal',
+            Text(
+              AppLocale.setMonthlyGoal.getString(context),
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Text(
-              'Motivate yourself with a clear target',
+              AppLocale.motivateYourself.getString(context),
               style: TextStyle(color: Colors.grey[600]),
             ),
             const SizedBox(height: 22),
@@ -64,10 +66,10 @@ void showGoalModal(BuildContext context) {
                   Navigator.pop(context);
                   showMessage(
                     context,
-                    'Goal updated to ${companyProvider.company?.currencySymbol ?? '\$'}${NumberFormat('#,##0').format(goal)}',
+                    '${AppLocale.goalUpdatedTo.getString(context)} ${companyProvider.company?.currencySymbol ?? '\$'}${NumberFormat('#,##0').format(goal)}',
                   );
                 },
-                text: "Save Goal",
+                text: AppLocale.saveGoal.getString(context),
               ),
             ),
           ],

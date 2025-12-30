@@ -5,8 +5,7 @@ import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
 import 'package:invoice_pay/screens/invoice/wigets/custom_widgets.dart';
 import 'package:invoice_pay/utils/app_locales.dart';
-import 'package:invoice_pay/widgets/busy_overlay.dart';
-import 'package:provider/provider.dart';
+ import 'package:provider/provider.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/widgets/invoice_card.dart';
@@ -70,7 +69,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                       // Search
                       TextField(
                         decoration: InputDecoration(
-                          hintText: 'Search invoices...',
+                          hintText: AppLocale.searchInvoices.getString(context),
                           prefixIcon: const Icon(Icons.search),
                           filled: true,
                           fillColor: Colors.grey[50],
@@ -90,7 +89,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                         runSpacing: 12,
                         children: [
                           filterChip(
-                            'All',
+                            AppLocale.all.getString(context),
                             invoiceProvider.listSelectedStatus == null,
                             () => invoiceProvider.setListStatusFilter(null),
                           ),
@@ -111,7 +110,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                         children: [
                           Expanded(
                             child: dateButton(
-                              'From',
+                              AppLocale.from.getString(context),
                               invoiceProvider.listStartDate,
                               () async {
                                 final picked = await showDatePicker(
@@ -129,7 +128,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                           const SizedBox(width: 16),
                           Expanded(
                             child: dateButton(
-                              'To',
+                              AppLocale.to.getString(context),
                               invoiceProvider.listEndDate,
                               () async {
                                 final picked = await showDatePicker(

@@ -1,7 +1,9 @@
-
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/contants.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -12,6 +14,7 @@ import 'package:printing/printing.dart';
 
 class PdfInvoiceTemplate {
   static Future<pw.Document> generate({
+    required BuildContext ctx,
     required InvoiceModel invoice,
     required CompanyModel company,
     required ClientModel client,
@@ -43,6 +46,7 @@ class PdfInvoiceTemplate {
         ),
         build: (context) => [
           _buildTemplate(
+            ctx: ctx,
             template: template,
             invoice: invoice,
             company: company,
@@ -59,6 +63,7 @@ class PdfInvoiceTemplate {
   }
 
   static pw.Widget _buildTemplate({
+    required BuildContext ctx,
     required TemplateType template,
     required InvoiceModel invoice,
     required CompanyModel company,
@@ -82,6 +87,7 @@ class PdfInvoiceTemplate {
     switch (template) {
       case TemplateType.minimal:
         return MinimalTemplate(
+          ctx: ctx,
           invoice: invoice,
           company: company,
           client: client,
@@ -93,6 +99,8 @@ class PdfInvoiceTemplate {
         );
       case TemplateType.bold:
         return BoldTemplate(
+          ctx: ctx,
+
           invoice: invoice,
           company: company,
           client: client,
@@ -104,6 +112,8 @@ class PdfInvoiceTemplate {
         );
       case TemplateType.classic:
         return ClassicTemplate(
+          ctx: ctx,
+
           invoice: invoice,
           company: company,
           client: client,
@@ -115,6 +125,8 @@ class PdfInvoiceTemplate {
         );
       case TemplateType.modern:
         return ModernTemplate(
+          ctx: ctx,
+
           invoice: invoice,
           company: company,
           client: client,
@@ -126,6 +138,8 @@ class PdfInvoiceTemplate {
         );
       case TemplateType.creative:
         return CreativeTemplate(
+          ctx: ctx,
+
           invoice: invoice,
           company: company,
           client: client,
@@ -142,6 +156,7 @@ class PdfInvoiceTemplate {
 // ================= Base Template =================
 
 abstract class BasePdfTemplate extends pw.StatelessWidget {
+  final BuildContext ctx;
   final InvoiceModel invoice;
   final CompanyModel company;
   final ClientModel client;
@@ -152,6 +167,7 @@ abstract class BasePdfTemplate extends pw.StatelessWidget {
   final pw.ImageProvider logo;
 
   BasePdfTemplate({
+    required this.ctx,
     required this.invoice,
     required this.company,
     required this.client,
@@ -257,6 +273,7 @@ abstract class BasePdfTemplate extends pw.StatelessWidget {
 
 class MinimalTemplate extends BasePdfTemplate {
   MinimalTemplate({
+    required super.ctx,
     required super.invoice,
     required super.company,
     required super.client,
@@ -269,7 +286,6 @@ class MinimalTemplate extends BasePdfTemplate {
 
   @override
   pw.Widget header() {
-    
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -302,14 +318,17 @@ class MinimalTemplate extends BasePdfTemplate {
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.end,
           children: [
-            pw.Text('INVOICE', style: boldStyle.copyWith(fontSize: 28)),
+            pw.Text(
+              AppLocale.invoices.getString(ctx).replaceAll("s", ""),
+              style: boldStyle.copyWith(fontSize: 28),
+            ),
             pw.SizedBox(height: 4),
             pw.Text(
               '#${invoice.number}',
               style: baseStyle.copyWith(fontSize: 16),
             ),
             pw.Text(
-              'Date: ${DateFormat('MMM dd, yyyy').format(invoice.issued)}',
+              '${AppLocale.dates.getString(ctx).replaceAll("s", "")}: ${DateFormat('MMM dd, yyyy').format(invoice.issued)}',
               style: baseStyle.copyWith(fontSize: 12),
             ),
           ],
@@ -328,7 +347,10 @@ class MinimalTemplate extends BasePdfTemplate {
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text('Bill To:', style: boldStyle.copyWith(fontSize: 14)),
+              pw.Text(
+                '${AppLocale.billTo.getString(ctx)}:',
+                style: boldStyle.copyWith(fontSize: 14),
+              ),
               pw.SizedBox(height: 4),
               pw.Text(
                 client.companyName,
@@ -345,11 +367,11 @@ class MinimalTemplate extends BasePdfTemplate {
           crossAxisAlignment: pw.CrossAxisAlignment.end,
           children: [
             pw.Text(
-              'Due: ${DateFormat('MMM dd, yyyy').format(invoice.due)}',
+              '${AppLocale.due.getString(ctx)}: ${DateFormat('MMM dd, yyyy').format(invoice.due)}',
               style: baseStyle,
             ),
             pw.Text(
-              'Status: ${invoice.status.name.toUpperCase()}',
+              '${AppLocale.status.getString(ctx)}: ${invoice.status.name.toUpperCase()}',
               style: boldStyle.copyWith(
                 fontSize: 12,
                 color: invoice.status == InvoiceStatus.paid
@@ -377,10 +399,19 @@ class MinimalTemplate extends BasePdfTemplate {
         pw.TableRow(
           decoration: pw.BoxDecoration(color: accentColor.shade(0.2)),
           children: [
-            _tableHeader('Description'),
-            _tableHeader('Qty', align: pw.Alignment.centerRight),
-            _tableHeader('Rate', align: pw.Alignment.centerRight),
-            _tableHeader('Amount', align: pw.Alignment.centerRight),
+            _tableHeader(AppLocale.description.getString(ctx)),
+            _tableHeader(
+              AppLocale.qty.getString(ctx),
+              align: pw.Alignment.centerRight,
+            ),
+            _tableHeader(
+              AppLocale.rate.getString(ctx),
+              align: pw.Alignment.centerRight,
+            ),
+            _tableHeader(
+              AppLocale.amount.getString(ctx),
+              align: pw.Alignment.centerRight,
+            ),
           ],
         ),
         ...invoice.items.asMap().entries.map((entry) {
@@ -425,18 +456,18 @@ class MinimalTemplate extends BasePdfTemplate {
         ),
         child: pw.Column(
           children: [
-            _totalRow('Subtotal', invoice.subtotal),
+            _totalRow(AppLocale.subtotal.getString(ctx), invoice.subtotal),
             _totalRow(
-              'Tax (${invoice.taxPercent.toStringAsFixed(0)}%)',
+              '${AppLocale.taxPercent.getString(ctx).replaceAll("%", "")} (${invoice.taxPercent.toStringAsFixed(0)}%)',
               invoice.taxAmount,
             ),
             _totalRow(
-              'Discount (${invoice.discountPercent.toStringAsFixed(0)}%)',
+              '${AppLocale.discountPercent.getString(ctx).replaceAll("%", "")} (${invoice.discountPercent.toStringAsFixed(0)}%)',
               -invoice.discountAmount,
             ),
             pw.Divider(thickness: 1.5, color: accentColor),
             _totalRow(
-              'Total Due',
+              AppLocale.totalDue.getString(ctx),
               invoice.total,
               bold: true,
               large: true,
@@ -455,10 +486,10 @@ class MinimalTemplate extends BasePdfTemplate {
     }
     String methodLabel =
         {
-          'bank_transfer': 'Bank Transfer',
-          'paypal': 'PayPal',
-          'stripe': 'Stripe',
-          'upi': 'UPI',
+          'bank_transfer': AppLocale.bankTransfer.getString(ctx),
+          'paypal': AppLocale.payPal.getString(ctx),
+          'stripe': AppLocale.stripe.getString(ctx),
+          'upi': AppLocale.upi.getString(ctx),
         }[invoice.paymentMethod] ??
         invoice.paymentMethod;
     return pw.Container(
@@ -473,12 +504,18 @@ class MinimalTemplate extends BasePdfTemplate {
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text('Payment Method', style: boldStyle.copyWith(fontSize: 14)),
+          pw.Text(
+            AppLocale.paymentMethod.getString(ctx),
+            style: boldStyle.copyWith(fontSize: 14),
+          ),
           pw.SizedBox(height: 4),
           pw.Text(methodLabel, style: accentStyle),
           if (invoice.paymentDetails.isNotEmpty) ...[
             pw.SizedBox(height: 8),
-            pw.Text('Payment Details', style: boldStyle.copyWith(fontSize: 14)),
+            pw.Text(
+              AppLocale.paymentDetails.getString(ctx),
+              style: boldStyle.copyWith(fontSize: 14),
+            ),
             pw.SizedBox(height: 4),
             pw.Text(invoice.paymentDetails, style: baseStyle),
           ],
@@ -493,7 +530,7 @@ class MinimalTemplate extends BasePdfTemplate {
       child: pw.Column(
         children: [
           pw.Text(
-            'Thank you for your business!',
+            AppLocale.thankYouFooter.getString(ctx),
             style: baseStyle.copyWith(
               fontStyle: pw.FontStyle.italic,
               color: PdfColors.grey700,
@@ -502,7 +539,7 @@ class MinimalTemplate extends BasePdfTemplate {
           pw.SizedBox(height: 20),
           pw.UrlLink(
             child: pw.Text(
-              'Proudly Powered by InvoicePay',
+              AppLocale.proudlyPoweredBy.getString(ctx),
               style: baseStyle.copyWith(
                 fontStyle: pw.FontStyle.italic,
                 color: PdfColors.grey700,
@@ -520,6 +557,7 @@ class MinimalTemplate extends BasePdfTemplate {
 
 class BoldTemplate extends MinimalTemplate {
   BoldTemplate({
+    required super.ctx,
     required super.invoice,
     required super.company,
     required super.client,
@@ -544,6 +582,7 @@ class BoldTemplate extends MinimalTemplate {
 
 class ClassicTemplate extends MinimalTemplate {
   ClassicTemplate({
+    required super.ctx,
     required super.invoice,
     required super.company,
     required super.client,
@@ -572,6 +611,7 @@ class ClassicTemplate extends MinimalTemplate {
 
 class ModernTemplate extends MinimalTemplate {
   ModernTemplate({
+    required super.ctx,
     required super.invoice,
     required super.company,
     required super.client,
@@ -597,7 +637,10 @@ class ModernTemplate extends MinimalTemplate {
               ),
               color: accentColor,
               child: pw.Text(
-                'INVOICE',
+                AppLocale.invoices
+                    .getString(ctx)
+                    .replaceAll("s", "")
+                    .toUpperCase(),
                 style: pw.TextStyle(
                   color: PdfColors.white,
                   fontSize: 18,
@@ -616,6 +659,7 @@ class ModernTemplate extends MinimalTemplate {
 
 class CreativeTemplate extends MinimalTemplate {
   CreativeTemplate({
+    required super.ctx,
     required super.invoice,
     required super.company,
     required super.client,
@@ -650,7 +694,7 @@ class CreativeTemplate extends MinimalTemplate {
 
         // Invoice number
         pw.Text(
-          'INVOICE #${invoice.number}',
+          '${AppLocale.invoices.getString(ctx).replaceAll("s", "").toUpperCase()} #${invoice.number}',
           style: boldStyle.copyWith(fontSize: 22),
         ),
         pw.SizedBox(height: 20),

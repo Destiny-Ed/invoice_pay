@@ -37,7 +37,7 @@ void showRecordPayment(BuildContext context, InvoiceModel currentInvoice) {
             ),
             const SizedBox(height: 10),
             Text(
-              'Invoice #${currentInvoice.number}',
+              '${AppLocale.invoices.getString(context).replaceAll("s", "")} #${currentInvoice.number}',
               style: TextStyle(color: Colors.grey[600]),
             ),
             const SizedBox(height: 20),
@@ -45,7 +45,7 @@ void showRecordPayment(BuildContext context, InvoiceModel currentInvoice) {
               controller: controller,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelText: 'Payment Amount',
+                labelText: AppLocale.paymentAmount.getString(context),
                 prefixText:
                     '${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'} ',
                 border: OutlineInputBorder(
@@ -56,10 +56,10 @@ void showRecordPayment(BuildContext context, InvoiceModel currentInvoice) {
               ),
               validator: (v) {
                 final amount = double.tryParse(v ?? '');
-                if (amount == null || amount <= 0) return 'Enter valid amount';
+                if (amount == null || amount <= 0) return AppLocale.enterValidAmount.getString(context);
 
                 if (amount > currentInvoice.balanceDue.ceil()) {
-                  return 'Cannot exceed balance';
+                  return AppLocale.cannotExceedBalance.getString(context);
                 }
                 return null;
               },
@@ -95,7 +95,7 @@ void showRecordPayment(BuildContext context, InvoiceModel currentInvoice) {
                   Navigator.pop(context);
                   showMessage(
                     context,
-                    'Payment of ${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${payment.toStringAsFixed(2)} recorded!',
+                    '${AppLocale.paymentOf.getString(context)} ${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${payment.toStringAsFixed(2)} ${AppLocale.recorded.getString(context)}',
                   );
                 },
                 text: AppLocale.recordPayment.getString(context),

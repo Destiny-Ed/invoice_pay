@@ -87,19 +87,19 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                     final confirm = await showDialog<bool>(
                       context: context,
                       builder: (_) => AlertDialog(
-                        title: const Text('Delete Invoice?'),
+                        title: Text(AppLocale.deleteInvoice.getString(context)),
                         content: Text(
-                          'Are you sure you want to delete invoice #${invoice?.number ?? ""}? This cannot be undone.',
+                          '${AppLocale.deleteInvoiceQuestion.getString(context)} #${invoice?.number ?? ""}? ${AppLocale.thisCannotBeUndone.getString(context)}',
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context, false),
-                            child:   Text(AppLocale.cancel.getString(context)),
+                            child: Text(AppLocale.cancel.getString(context)),
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(context, true),
-                            child: const Text(
-                              'Delete',
+                            child: Text(
+                              AppLocale.delete.getString(context),
                               style: TextStyle(color: Colors.red),
                             ),
                           ),
@@ -112,31 +112,34 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           .read<InvoiceProvider>()
                           .deleteInvoice(invoice?.id ?? "");
                       if (success && context.mounted) {
-                        showMessage(context, AppLocale.invoiceDeleted.getString(context));
+                        showMessage(
+                          context,
+                          AppLocale.invoiceDeleted.getString(context),
+                        );
                         Navigator.pop(context); // Go back to list
                       }
                     }
                   }
                 },
                 itemBuilder: (_) => [
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'edit',
                     child: Row(
                       children: [
                         Icon(Icons.edit),
                         SizedBox(width: 12),
-                        Text('Edit Invoice'),
+                        Text(AppLocale.editInvoice.getString(context)),
                       ],
                     ),
                   ),
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'delete',
                     child: Row(
                       children: [
                         Icon(Icons.delete, color: Colors.red),
                         SizedBox(width: 12),
                         Text(
-                          'Delete Invoice',
+                          AppLocale.deleteInvoice.getString(context),
                           style: TextStyle(color: Colors.red),
                         ),
                       ],
@@ -150,8 +153,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             show: invoiceProvider.viewState == ViewState.Busy,
             child: invoice == null
                 ? emptyState(
-                    "Oh, we apologize",
-                    "Failed to fetch invoice details at the time. please try again",
+                    AppLocale.failedToFetchInvoice
+                        .getString(context)
+                        .split("\n")
+                        .first,
+                    AppLocale.failedToFetchInvoice
+                        .getString(context)
+                        .split("\n")
+                        .last,
                   )
                 : SingleChildScrollView(
                     padding: const EdgeInsets.all(20),
@@ -169,8 +178,10 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               color: Colors.red,
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            child:   Text(
-                              AppLocale.overdue.getString(context).toUpperCase(),
+                            child: Text(
+                              AppLocale.overdue
+                                  .getString(context)
+                                  .toUpperCase(),
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -187,7 +198,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               color: Colors.green,
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            child:   Text(
+                            child: Text(
                               AppLocale.paid.getString(context).toUpperCase(),
                               style: TextStyle(
                                 color: Colors.white,
@@ -251,7 +262,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         const SizedBox(height: 20),
 
                         // Billed To
-                          Text(
+                        Text(
                           AppLocale.billedTo.getString(context).toUpperCase(),
                           style: TextStyle(
                             fontSize: 14,
@@ -313,8 +324,10 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
                         if (invoice.paymentMethod.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                             Text(
-                           AppLocale.paymentMethod.getString(context).toUpperCase(),
+                          Text(
+                            AppLocale.paymentMethod
+                                .getString(context)
+                                .toUpperCase(),
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey,
@@ -385,7 +398,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         const SizedBox(height: 20),
 
                         // Line Items
-                          Text(
+                        Text(
                           AppLocale.items.getString(context),
                           style: TextStyle(
                             fontSize: 20,
@@ -413,36 +426,36 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                             children: [
                               _summaryRow(
                                 currency,
-                                'Subtotal',
+                                AppLocale.subtotal.getString(context),
                                 invoice.subtotal,
                               ),
                               _summaryRow(
                                 currency,
-                                'Tax (${invoice.taxPercent.toStringAsFixed(0)}%)',
+                                '${AppLocale.taxPercent.getString(context).replaceAll("%", "")} (${invoice.taxPercent.toStringAsFixed(0)}%)',
                                 invoice.taxAmount,
                               ),
                               _summaryRow(
                                 currency,
-                                'Discount (${invoice.discountPercent.toStringAsFixed(0)}%)',
+                                '${AppLocale.discountPercent.getString(context).replaceAll("%", "")} (${invoice.discountPercent.toStringAsFixed(0)}%)',
                                 -invoice.discountAmount,
                               ),
                               const Divider(),
                               _summaryRow(
                                 currency,
-                                'Total Due',
+                                AppLocale.totalDue.getString(context),
                                 invoice.total,
                                 isLarge: true,
                               ),
                               if (invoice.paidAmount > 0)
                                 _summaryRow(
                                   currency,
-                                  'Amount Paid',
+                                  AppLocale.amountPaid.getString(context),
                                   invoice.paidAmount,
                                   color: Colors.green,
                                 ),
                               _summaryRow(
                                 currency,
-                                'Balance Due',
+                                AppLocale.balanceDue.getString(context),
                                 invoice.balanceDue,
                                 isLarge: true,
                                 color: invoice.balanceDue > 0
@@ -466,7 +479,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                   onPressed: () {
                                     showRecordPayment(context, invoice);
                                   },
-                                  text: "Record Payment",
+                                  text: AppLocale.recordPayment.getString(
+                                    context,
+                                  ),
                                 ),
                               ),
 
@@ -481,7 +496,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                     company: companyProvider.company!,
                                   );
                                 },
-                                text: "Resend Invoice",
+                                text: AppLocale.resendInvoice.getString(
+                                  context,
+                                ),
                               ),
                             ),
                           ],
@@ -490,8 +507,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         const SizedBox(height: 20),
 
                         // Activity Timeline
-                        const Text(
-                          'Activity',
+                        Text(
+                          AppLocale.activity.getString(context),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

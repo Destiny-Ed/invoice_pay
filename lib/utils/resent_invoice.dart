@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:intl/intl.dart';
 import 'package:invoice_pay/models/company_model.dart';
 import 'package:invoice_pay/models/client_model.dart';
@@ -10,6 +11,7 @@ import 'package:invoice_pay/models/invoice_item_model.dart';
 import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/screens/invoice/wigets/invoice_template.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
@@ -20,12 +22,14 @@ import 'package:url_launcher/url_launcher.dart';
 
 /// Generate PDF bytes for a given invoice
 Future<Uint8List> generateInvoicePdf({
+  required BuildContext context,
   required InvoiceModel invoice,
   required CompanyModel company,
   required ClientModel client,
   TemplateType template = TemplateType.minimal,
 }) async {
   final pdf = await PdfInvoiceTemplate.generate(
+    ctx: context,
     invoice: invoice,
     company: company,
     client: client,
@@ -44,6 +48,7 @@ Future<void> downloadInvoicePdf({
 }) async {
   try {
     final pdfBytes = await generateInvoicePdf(
+      context: context,
       invoice: invoice,
       company: company,
       client: client,
@@ -56,9 +61,11 @@ Future<void> downloadInvoicePdf({
     );
   } catch (e) {
     if (context.mounted) {
-      ScaffoldMessenger.of(
+      showMessage(
         context,
-      ).showSnackBar(SnackBar(content: Text('Failed to download PDF: $e')));
+        '${AppLocale.failedToDownloadPdf.getString(context)}: $e',
+        isError: true,
+      );
     }
   }
 }
@@ -73,6 +80,7 @@ Future<void> shareInvoicePdf({
 }) async {
   try {
     final pdfBytes = await generateInvoicePdf(
+      context: context,
       invoice: invoice,
       company: company,
       client: client,
@@ -84,17 +92,23 @@ Future<void> shareInvoicePdf({
     final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     await SharePlus.instance.share(
       ShareParams(
-        title: 'Invoice #${invoice.number}',
+        title:
+            '${AppLocale.invoices.getString(context).replaceAll("s", "")} #${invoice.number}',
         files: [
           XFile.fromData(pdfBytes, name: fileName, mimeType: 'application/pdf'),
         ],
-        text: 'Invoice #${invoice.number} from ${company.name}',
+        text:
+            '${AppLocale.invoices.getString(context).replaceAll("s", "")} #${invoice.number} ${AppLocale.from.getString(context)} ${company.name}',
         sharePositionOrigin: Offset.zero & overlay.size,
       ),
     );
   } catch (e) {
     if (context.mounted) {
-      showMessage(context, 'Failed to share PDF: $e', isError: true);
+      showMessage(
+        context,
+        '${AppLocale.failedToSharePdf.getString(context)}: $e',
+        isError: true,
+      );
     }
   }
 }
@@ -113,18 +127,18 @@ Future<void> resendInvoiceAndMarkSent({
   // Professional & clean message body
   final messageBody =
       '''
-Hi ${client.contactName.isNotEmpty ? client.contactName : client.companyName},
+${AppLocale.hiGreeting.getString(context)} ${client.contactName.isNotEmpty ? client.contactName : client.companyName},
 
-Please find your invoice attached for your review.
+${AppLocale.pleaseFindInvoiceAttached.getString(context)}
 
-Invoice Details:
-• Invoice: ${invoice.number}
-• Amount Due: ${company.currencySymbol}$formattedTotal
-• Due Date: $formattedDue
+${AppLocale.invoiceDetailsLabel.getString(context)}:
+• ${AppLocale.invoices.getString(context).replaceAll("s", "")}: ${invoice.number}
+• ${AppLocale.amountDueLabel.getString(context)}: ${company.currencySymbol}$formattedTotal
+• ${AppLocale.dueDateLabel.getString(context)}: $formattedDue
 
-Thank you for your business! We appreciate your prompt payment.
+${AppLocale.thankYouBusiness.getString(context)}
 
-Best regards,
+${AppLocale.bestRegards.getString(context)},
 ${company.name}
 ${company.email}
 ${company.phone}
@@ -134,6 +148,7 @@ ${company.phone}
   Uint8List pdfBytes;
   try {
     final pdfDoc = await PdfInvoiceTemplate.generate(
+      ctx: context,
       invoice: invoice,
       company: company,
       client: client,
@@ -142,7 +157,11 @@ ${company.phone}
     pdfBytes = await pdfDoc.save();
   } catch (e) {
     if (context.mounted) {
-      showMessage(context, 'Failed to generate PDF', isError: true);
+      showMessage(
+        context,
+        AppLocale.failedToGeneratePdf.getString(context),
+        isError: true,
+      );
     }
     return;
   }
@@ -165,29 +184,29 @@ ${company.phone}
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
             child: Text(
-              'Send Invoice',
+              AppLocale.sendInvoice.getString(context),
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.email_outlined, color: Colors.red),
-            title: const Text('Email'),
+            title: Text(AppLocale.email.getString(context)),
             subtitle: Text(client.email),
             onTap: () => Navigator.pop(context, 'email'),
           ),
           ListTile(
             leading: const Icon(Icons.chat_bubble_outline, color: Colors.green),
-            title: const Text('WhatsApp'),
+            title: Text(AppLocale.whatsapp.getString(context)),
             subtitle: Text(client.phone),
             onTap: () => Navigator.pop(context, 'whatsapp'),
           ),
           ListTile(
             leading: const Icon(Icons.share_outlined),
-            title: const Text('Other Apps'),
+            title: Text(AppLocale.otherApps.getString(context)),
             onTap: () => Navigator.pop(context, 'share'),
           ),
           const SizedBox(height: 10),
@@ -207,7 +226,8 @@ ${company.phone}
         scheme: 'mailto',
         path: client.email,
         queryParameters: {
-          'subject': 'Invoice #${invoice.number} - ${company.name}',
+          'subject':
+              '${AppLocale.invoices.getString(context).replaceAll("s", "")} #${invoice.number} - ${company.name}',
           'body': messageBody,
           'attachment': [xFile.path],
         },
@@ -222,7 +242,8 @@ ${company.phone}
       if (!sent) {
         await SharePlus.instance.share(
           ShareParams(
-            subject: 'Invoice #${invoice.number}',
+            subject:
+                '${AppLocale.invoiceSent.getString(context)} #${invoice.number}',
             files: [xFile],
             text: messageBody,
             sharePositionOrigin: Offset.zero & overlay.size,
@@ -259,7 +280,8 @@ ${company.phone}
     case 'share':
       await SharePlus.instance.share(
         ShareParams(
-          subject: 'Invoice #${invoice.number}',
+          subject:
+              '${AppLocale.invoices.getString(context).replaceAll("s", "")} #${invoice.number}',
           files: [xFile],
           text: messageBody,
           sharePositionOrigin: Offset.zero & overlay.size,
@@ -282,7 +304,7 @@ ${company.phone}
     );
 
     if (context.mounted) {
-      showMessage(context, 'Invoice sent successfully!');
+      showMessage(context, AppLocale.invoiceSent.getString(context));
     }
   }
 }

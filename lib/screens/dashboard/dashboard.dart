@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:intl/intl.dart';
-import 'package:invoice_pay/providers/client_provider.dart';
-import 'package:invoice_pay/providers/company_provider.dart';
+ import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/invoice_provider.dart';
 import 'package:invoice_pay/providers/main_activity_provider.dart';
 import 'package:invoice_pay/screens/invoice/create_invoice_screen.dart';
@@ -155,7 +154,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         const SizedBox(height: 8),
 
                         Text(
-                          'Target: ${companyProvider.company?.currencySymbol ?? '\$'}${NumberFormat('#,##0').format(goal)} / month • ${(progress * 100).toStringAsFixed(0)}% achieved',
+                          '${AppLocale.target.getString(context)}: ${companyProvider.company?.currencySymbol ?? '\$'}${NumberFormat('#,##0').format(goal)} / ${AppLocale.month.getString(context)} • ${(progress * 100).toStringAsFixed(0)}% ${AppLocale.achieved.getString(context)}',
                           style: TextStyle(color: Colors.white70),
                         ),
                       ],

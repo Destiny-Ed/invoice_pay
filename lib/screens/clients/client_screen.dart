@@ -77,21 +77,23 @@ class ClientsScreen extends StatelessWidget {
     final TextEditingController emailCtrl = TextEditingController();
     final TextEditingController phoneCtrl = TextEditingController();
     final TextEditingController websiteCtrl = TextEditingController();
-    String selectedIndustry = 'Technology'; // Default
+    String selectedIndustry = AppLocale.industryTechnology.getString(
+      context,
+    ); // Default
 
     final List<String> industries = [
-      'Technology',
-      'Healthcare',
-      'Finance',
-      'Education',
-      'Retail',
-      'Real Estate',
-      'Marketing',
-      'Design',
-      'Consulting',
-      'Manufacturing',
-      'Hospitality',
-      'Other',
+      AppLocale.industryTechnology.getString(context),
+      AppLocale.industryHealthcare.getString(context),
+      AppLocale.industryFinance.getString(context),
+      AppLocale.industryEducation.getString(context),
+      AppLocale.industryRetail.getString(context),
+      AppLocale.industryRealEstate.getString(context),
+      AppLocale.industryMarketing.getString(context),
+      AppLocale.industryDesign.getString(context),
+      AppLocale.industryConsulting.getString(context),
+      AppLocale.industryManufacturing.getString(context),
+      AppLocale.industryHospitality.getString(context),
+      AppLocale.industryOther.getString(context),
     ];
 
     final provider = context.read<ClientProvider>();
@@ -133,7 +135,7 @@ class ClientsScreen extends StatelessWidget {
                           controller: controller,
                           padding: const EdgeInsets.all(14),
                           children: [
-                              Text(
+                            Text(
                               AppLocale.newClient.getString(context),
                               style: TextStyle(
                                 fontSize: 28,
@@ -142,7 +144,7 @@ class ClientsScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                             AppLocale.addClientDetails.getString(context),
+                              AppLocale.addClientDetails.getString(context),
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey[600],
@@ -155,7 +157,9 @@ class ClientsScreen extends StatelessWidget {
                             TextField(
                               controller: nameCtrl,
                               decoration: InputDecoration(
-                                labelText: AppLocale.contactName.getString(context),
+                                labelText: AppLocale.contactName.getString(
+                                  context,
+                                ),
                                 prefixIcon: const Icon(Icons.person_outline),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -171,7 +175,9 @@ class ClientsScreen extends StatelessWidget {
                             TextField(
                               controller: companyCtrl,
                               decoration: InputDecoration(
-                                labelText: AppLocale.companyName.getString(context),
+                                labelText: AppLocale.companyName.getString(
+                                  context,
+                                ),
                                 prefixIcon: const Icon(Icons.business),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -185,7 +191,9 @@ class ClientsScreen extends StatelessWidget {
                             TextField(
                               controller: websiteCtrl,
                               decoration: InputDecoration(
-                                labelText: AppLocale.companyWebsite.getString(context),
+                                labelText: AppLocale.companyWebsite.getString(
+                                  context,
+                                ),
                                 prefixIcon: const Icon(Icons.web),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -219,7 +227,9 @@ class ClientsScreen extends StatelessWidget {
                               controller: phoneCtrl,
                               keyboardType: TextInputType.phone,
                               decoration: InputDecoration(
-                                labelText: AppLocale.phoneNumber.getString(context),
+                                labelText: AppLocale.phoneNumber.getString(
+                                  context,
+                                ),
                                 prefixIcon: const Icon(Icons.phone_outlined),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -236,7 +246,9 @@ class ClientsScreen extends StatelessWidget {
                               onTap: () async {
                                 final selected = await showSingleSelectModal(
                                   context: context,
-                                  title: AppLocale.selectIndustry.getString(context),
+                                  title: AppLocale.selectIndustry.getString(
+                                    context,
+                                  ),
                                   items: industries,
                                   selectedItem: selectedIndustry,
                                 );
@@ -298,7 +310,9 @@ class ClientsScreen extends StatelessWidget {
                                       emailCtrl.text.isEmpty) {
                                     showMessage(
                                       context,
-                                     AppLocale.allFieldsRequired.getString(context),
+                                      AppLocale.allFieldsRequired.getString(
+                                        context,
+                                      ),
                                     );
                                     return;
                                   }

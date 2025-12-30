@@ -489,11 +489,13 @@ class InvoiceProvider extends BaseViewModel {
   // ==========================================================
 
   Future<File> generatePdf({
+    required BuildContext ctx,
     required InvoiceModel invoice,
     required CompanyModel company,
     required ClientModel client,
   }) async {
     final pdf = await PdfInvoiceTemplate.generate(
+      ctx: ctx,
       invoice: invoice,
       company: company,
       client: client,

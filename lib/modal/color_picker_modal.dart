@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_utilities/flutter_utilities.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/widgets/custom_button.dart';
 
 Future<Color?> showColorPickerModal({
@@ -56,7 +58,7 @@ Future<Color?> showColorPickerModal({
                         TextButton(
                           onPressed: () => Navigator.pop(ctx),
                           child: Text(
-                            'Cancel',
+                            AppLocale.cancel.getString(context),
                             style: TextStyle(color: Colors.grey[600]),
                           ),
                         ),

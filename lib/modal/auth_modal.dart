@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
- import 'package:invoice_pay/providers/auth_provider.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/screens/onboarding/splash.dart';
+import 'package:invoice_pay/utils/app_locales.dart';
 import 'package:invoice_pay/utils/message.dart';
 import 'package:invoice_pay/widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
@@ -37,8 +39,8 @@ void showLogoutDialog(BuildContext context) {
             const SizedBox(height: 24),
 
             // Title
-            const Text(
-              'Log Out?',
+            Text(
+              AppLocale.logOutQuestion.getString(context),
               style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
@@ -49,7 +51,7 @@ void showLogoutDialog(BuildContext context) {
 
             // Message
             Text(
-              'You will be signed out of your account.\nAll your loans are safely saved.',
+              AppLocale.logOutMessage.getString(context),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
             ),
@@ -68,8 +70,8 @@ void showLogoutDialog(BuildContext context) {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: const Text(
-                      'Stay Logged In',
+                    child: Text(
+                      AppLocale.stayLoggedIn.getString(context),
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -97,8 +99,8 @@ void showLogoutDialog(BuildContext context) {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: const Text(
-                      'Log Out',
+                    child: Text(
+                      AppLocale.logOut.getString(context),
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
@@ -155,8 +157,8 @@ void showDeleteAccountDialog(BuildContext context) {
                 const SizedBox(height: 24),
 
                 // Title
-                const Text(
-                  'Delete Account Permanently?',
+                Text(
+                  AppLocale.deleteAccountPermanently.getString(context),
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
@@ -168,8 +170,7 @@ void showDeleteAccountDialog(BuildContext context) {
 
                 // Message
                 Text(
-                  'This action is irreversible. All your data will be permanently deleted.\n\n'
-                  'Please enter your password to confirm.',
+                  AppLocale.deleteAccountMessage.getString(context),
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                 ),
@@ -192,8 +193,8 @@ void showDeleteAccountDialog(BuildContext context) {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        child: const Text(
-                          "Cancel",
+                        child: Text(
+                          AppLocale.cancel.getString(context),
                           style: TextStyle(fontSize: 16),
                         ),
                       ),
@@ -230,7 +231,7 @@ void showDeleteAccountDialog(BuildContext context) {
                                     }
                                     showMessage(
                                       context,
-                                      "Account deleted successfully",
+                                     AppLocale.accountDeletedSuccess.getString(context),
                                       isError: true,
                                     );
                                   }
@@ -267,8 +268,8 @@ void showDeleteAccountDialog(BuildContext context) {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text(
-                                'Delete Forever',
+                            :   Text(
+                                AppLocale.deleteForever.getString(context),
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.white,

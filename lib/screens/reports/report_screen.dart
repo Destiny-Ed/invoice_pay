@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:invoice_pay/models/invoice_model.dart';
 import 'package:invoice_pay/providers/auth_provider.dart';
 import 'package:invoice_pay/providers/company_provider.dart';
 import 'package:invoice_pay/providers/report_provider.dart';
@@ -55,23 +54,34 @@ class ReportsScreen extends StatelessWidget {
               ),
               IconButton(
                 icon: const Icon(Icons.share_outlined),
-                onPressed: () {
+                onPressed: () async {
+                  final overlay =
+                      Overlay.of(context).context.findRenderObject()
+                          as RenderBox;
+
                   final period = vm.dateRange != null
                       ? '${DateFormat('MMM dd').format(vm.dateRange!.start)} - ${DateFormat('MMM dd, yyyy').format(vm.dateRange!.end)}'
-                      : 'All Time';
+                      : AppLocale.allTime.getString(context);
 
                   final text =
                       '''
-📊 InvoicePay Financial Report
+📊 ${AppLocale.invoicePayFinancialReport.getString(context)}
 
-📅 Period: $period
+📅 ${AppLocale.periodLabel.getString(context)}: $period
 💰 ${AppLocale.totalRevenue.getString(context)}: $currency${NumberFormat('#,##0').format(vm.totalRevenue)}
 ⚠️ ${AppLocale.outstanding.getString(context)}: $currency${NumberFormat('#,##0').format(vm.outstanding)}
 🔴 ${AppLocale.overdue.getString(context)}: $currency${NumberFormat('#,##0').format(vm.overdue)}
 
-Generated with ❤️ by InvoicePay
+${AppLocale.generatedByInvoicePay.getString(context)}
                   ''';
-                  Share.share(text, subject: 'InvoicePay Report - $period');
+                  await SharePlus.instance.share(
+                    ShareParams(
+                      subject:
+                          '${AppLocale.invoicePayReportSubject.getString(context)} - $period',
+                      text: text,
+                      sharePositionOrigin: Offset.zero & overlay.size,
+                    ),
+                  );
                 },
               ),
             ],
@@ -87,7 +97,7 @@ Generated with ❤️ by InvoicePay
                   Text(
                     vm.dateRange != null
                         ? '${DateFormat('MMMM dd').format(vm.dateRange!.start)} – ${DateFormat('MMMM dd, yyyy').format(vm.dateRange!.end)}'
-                        : 'All Time',
+                        : AppLocale.allTime.getString(context),
                     style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                   ),
 
@@ -194,7 +204,8 @@ Generated with ❤️ by InvoicePay
                                   ),
                                 ),
                                 Text(
-                                  'Complete some invoices to see trends',
+                                  AppLocale.completeInvoicesToSeeTrends
+                                      .getString(context),
                                   style: TextStyle(color: Colors.grey[500]),
                                 ),
                               ],

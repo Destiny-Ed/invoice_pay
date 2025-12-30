@@ -153,7 +153,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                                 child: Text(
                                   outstanding > 0
                                       ? '${AppLocale.outstanding.getString(context)}: ${context.read<CompanyProvider>().company?.currencySymbol ?? '\$'}${outstanding.toStringAsFixed(2)}'
-                                      : AppLocale.allCaughtUp.getString(context),
+                                      : AppLocale.allCaughtUp.getString(
+                                          context,
+                                        ),
                                   style: TextStyle(
                                     color: outstanding > 0
                                         ? Colors.red
@@ -226,7 +228,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                       labelColor: primaryColor,
                       unselectedLabelColor: Colors.grey[600],
                       indicatorColor: primaryColor,
-                      tabs:   [
+                      tabs: [
                         Tab(text: AppLocale.open.getString(context)),
                         Tab(text: AppLocale.paid.getString(context)),
                         Tab(text: AppLocale.projects.getString(context)),
@@ -274,8 +276,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                             spacing: 10,
                             children: [
                               const Icon(Icons.note, color: primaryColor),
-                                Text(
-                               AppLocale.clientNotes.getString(context).toUpperCase(),
+                              Text(
+                                AppLocale.clientNotes
+                                    .getString(context)
+                                    .toUpperCase(),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
@@ -318,8 +322,11 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
 
   Widget _buildInvoiceList(List<InvoiceModel> invoices) {
     if (invoices.isEmpty) {
-      return   Center(
-        child: Text(AppLocale.noInvoices.getString(context), style: TextStyle(color: Colors.grey)),
+      return Center(
+        child: Text(
+          AppLocale.noInvoices.getString(context),
+          style: TextStyle(color: Colors.grey),
+        ),
       );
     }
 
@@ -337,17 +344,20 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   }
 
   Widget _buildProjectsTab() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.folder_open, size: 80, color: Colors.grey),
           SizedBox(height: 16),
           Text(
-            'No projects yet',
+            AppLocale.noProjectsYet.getString(context),
             style: TextStyle(fontSize: 18, color: Colors.grey),
           ),
-          Text('Projects coming soon', style: TextStyle(color: Colors.grey)),
+          Text(
+            AppLocale.projectsComingSoon.getString(context),
+            style: TextStyle(color: Colors.grey),
+          ),
         ],
       ),
     );
@@ -421,7 +431,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                         padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
                         child: Row(
                           children: [
-                              Text(
+                            Text(
                               AppLocale.clientNotes.getString(context),
                               style: TextStyle(
                                 fontSize: 24,
@@ -431,7 +441,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                             const Spacer(),
                             TextButton(
                               onPressed: () => Navigator.pop(context),
-                              child:   Text(
+                              child: Text(
                                 AppLocale.cancel.getString(context),
                                 style: TextStyle(color: Colors.grey),
                               ),
@@ -449,8 +459,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                             controller: notesCtrl,
                             maxLines: null,
                             decoration: InputDecoration(
-                              hintText:
-                                  'Add notes about this client...\ne.g. Payment terms, preferences, contact person, etc.',
+                              hintText: AppLocale.addNotesHint.getString(
+                                context,
+                              ),
                               hintStyle: TextStyle(
                                 color: Colors.grey[500],
                                 fontStyle: FontStyle.italic,
@@ -478,7 +489,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                               if (context.mounted) Navigator.pop(context);
                             },
 
-                            text: isSaving ? AppLocale.pleaseWait.getString(context) : AppLocale.saveNotes.getString(context),
+                            text: isSaving
+                                ? AppLocale.pleaseWait.getString(context)
+                                : AppLocale.saveNotes.getString(context),
                           ),
                         ),
                       ),

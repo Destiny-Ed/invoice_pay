@@ -36,6 +36,7 @@ class _InvoicePreviewScreenState extends State<InvoicePreviewScreen> {
     if (client == null) return;
 
     final file = await invoiceProvider.generatePdf(
+      ctx: context,
       invoice: widget.fromAdd
           ? invoiceProvider.previewInvoice(context)
           : invoiceProvider.singleInvoice ??
@@ -62,7 +63,7 @@ class _InvoicePreviewScreenState extends State<InvoicePreviewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title:   Text(AppLocale.invoicePreview.getString(context)),
+        title: Text(AppLocale.invoicePreview.getString(context)),
         actions: [
           IconButton(
             icon: const Icon(Icons.picture_as_pdf_outlined),
